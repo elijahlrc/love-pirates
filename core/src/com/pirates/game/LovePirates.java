@@ -14,6 +14,9 @@ public class LovePirates extends ApplicationAdapter {
 	public void create () {
 		batch = new SpriteBatch();
 		img = new Texture("badlogic.jpg");
+		PerlinNoiseGen noiseGen =  PerlinNoiseGen.init();
+		double[][] map = noiseGen.getFullPerlinArray(11);
+		MyUtils.visuliseArray(map);
 	}
 
 	@Override
