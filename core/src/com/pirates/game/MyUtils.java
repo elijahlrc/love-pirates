@@ -15,13 +15,14 @@ public class MyUtils {
 				if (r<.75) {
 					r = 0;
 				}
-				c.set((float) r, (float) a[i][j]/2, (float) a[i][j]/4,1f);
+				c.set((float) r, (float) a[i][j]/2, (float) a[i][j]/3,1f);
 				toSave.drawPixel(i,j,Color.rgba8888(c));
 			}
 		}
 		String filename = "heightmap"+imageCount+".png";
-		FileHandle handle = Gdx.files.external(filename);
+		FileHandle handle = Gdx.files.local(filename);
 		imageCount++;
 		PixmapIO.writePNG(handle,toSave);
+		toSave.dispose();
 	}
 }

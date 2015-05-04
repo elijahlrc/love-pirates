@@ -9,14 +9,25 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 public class LovePirates extends ApplicationAdapter {
 	SpriteBatch batch;
 	Texture img;
-	
+	double[][] map;
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
 		img = new Texture("badlogic.jpg");
 		PerlinNoiseGen noiseGen =  PerlinNoiseGen.init();
-		double[][] map = noiseGen.getFullPerlinArray(11);
-		MyUtils.visuliseArray(map);
+		map = noiseGen.getFullPerlinArray(11);
+		for (int i = 0; i<20; i++) {
+			map = noiseGen.getFullPerlinArray(10);
+			MyUtils.visuliseArray(map);
+		}
+		for (int i = 0; i<10; i++) {
+			map = noiseGen.getFullPerlinArray(11);
+			MyUtils.visuliseArray(map);
+		}
+		for (int i = 0; i<3; i++) {
+			map = noiseGen.getFullPerlinArray(13);
+			MyUtils.visuliseArray(map);
+		}
 	}
 
 	@Override

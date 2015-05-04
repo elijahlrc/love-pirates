@@ -12,7 +12,14 @@ public class PerlinNoiseGen {
 	private int powerSize; //in the form of a power of 2, i.e. 2 means a 4x4 grid, 8 means a 256x256 grid
 	private int realSize;
 	private Random rand;
+	/*Persistence, rate of change, and octave weight affect the weight of each octave
+	 * center weighting is the power by which the expression
+	 * y(y_range-y) and x(x_range-x) are raised to.
+	 */
 	private final double PERSISTANCE = .6;
+	private final double RATEOFCHANGE = .8;
+	private final double OCTAVEWEIGHTCONSTANT = 3;//if the distribution is good but the magnitude is off, change this one
+	private final double CENTERWEIGHTING = .5;
 	private PerlinNoiseGen() {
 		rand = new Random();
 	}
@@ -87,24 +94,29 @@ public class PerlinNoiseGen {
 				returnArray[i][j] = linInterpolate(v11,v21,v12,v22,xRatio,yRatio);
 			}
 		}
-		MyUtils.visuliseArray(quantisedNoise);
-		MyUtils.visuliseArray(returnArray);
 		return returnArray;
 	}
 	/** generates a full array by calling genOctave for each octave*/
 	double[][] getFullPerlinArray(int powSize) {
 		powerSize = powSize;
 		realSize = (int) Math.pow(2,powerSize);
+		double modifiedOctiveWeightConstant = OCTAVEWEIGHTCONSTANT/(Math.pow(2,powerSize));
 		double octavePower;
+		double centerWeighting;
 		double[][] fullArray = new double [realSize][realSize];
-		for (int o = 1; o<powerSize; o++) {
+		for (int o = 2; o<powerSize-1; o++) {
 			double[][] newOctave = genOctave(o);
-			octavePower = Math.pow(PERSISTANCE, o);
+			octavePower = modifiedOctiveWeightConstant*Math.pow(PERSISTANCE, RATEOFCHANGE*o);
 			for (int i=0; i<realSize;i++) {
 				for (int j=0; j<realSize;j++) {
-					fullArray[i][j] += newOctave[i][j]*octavePower;
+					centerWeighting = (Math.pow(i*(realSize-i),CENTERWEIGHTING)*
+									   Math.pow(j*(realSize-j),CENTERWEIGHTING))/
+									   Math.pow(realSize/2,2*CENTERWEIGHTING);
+					fullArray[i][j] += newOctave[i][j]*octavePower*centerWeighting;
 				}
 			}
+			//Following line is used to save debug renders of the map at each octave
+			//MyUtils.visuliseArray(fullArray);
 		}
 		return fullArray;
 	}
