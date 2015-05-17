@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.PixmapIO;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-public class MyUtils {
+class MyUtils {
 	static int imageCount = 0;
 	static void visuliseArray(double[][] a) {
 		Pixmap toSave = new Pixmap(a.length, a.length, Pixmap.Format.RGB565);

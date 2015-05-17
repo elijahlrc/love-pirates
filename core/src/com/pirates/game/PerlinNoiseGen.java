@@ -7,7 +7,7 @@ import java.util.Random;
  * @author Elijah
  *
  */
-public class PerlinNoiseGen {
+class PerlinNoiseGen {
 	private static PerlinNoiseGen instatiated = null;
 	private int powerSize; //in the form of a power of 2, i.e. 2 means a 4x4 grid, 8 means a 256x256 grid
 	private int realSize;
@@ -18,7 +18,7 @@ public class PerlinNoiseGen {
 	 */
 	private final double PERSISTANCE = .6;
 	private final double RATEOFCHANGE = .8;
-	private final double OCTAVEWEIGHTCONSTANT = 3;//if the distribution is good but the magnitude is off, change this one
+	private final double OCTAVEWEIGHTCONSTANT = 4.0;//if the distribution is good but the magnitude is off, change this one
 	private final double CENTERWEIGHTING = .5;
 	private PerlinNoiseGen() {
 		rand = new Random();
@@ -36,11 +36,10 @@ public class PerlinNoiseGen {
 	/** interpolate between 4 squares given the x and y ratios of the location to there centers
 	 * 	called by genOctave to get values for each point*/
 	private double linInterpolate(double v11, double v21, double v12, double v22,  double xRatio, double yRatio) {
-		double val = (v11*(1-xRatio)*(1-yRatio) + 
-					  v21*(xRatio)*(1-yRatio) + 
-					  v12*(1-xRatio)*(yRatio) + 
-					  v22*(xRatio)*(yRatio));//fix me!!
-		return val;
+		return (v11*(1-xRatio)*(1-yRatio) + 
+				v21*(xRatio)*(1-yRatio) + 
+				v12*(1-xRatio)*(yRatio) + 
+				v22*(xRatio)*(yRatio));
 	}
 	/**make a empty array of size powerOfTwo*/
 	double[][] genEmptyArray(int pSize) {
@@ -66,8 +65,8 @@ public class PerlinNoiseGen {
 				quantisedNoise[i][j] = rand.nextDouble();
 			}
 		}
-		for (int i=0; i<realSize; i++) {
-			for (int j=0; j<realSize; j++) {
+		for (int i=0; i<realSize; i++) {//sorry this is ugly, its just to check that we are not trying to get a pixel thats out of the array
+			for (int j=0; j<realSize; j++) {// there is probably a better way to do it, but its not important.
 				if ((int) (i/squareSize + 1) < quantisedSize && (int) (j/squareSize + 1) < quantisedSize ) {
 					v22 = quantisedNoise[(int) (i/squareSize + 1)][(int) (j/squareSize + 1)];
 					v21 = quantisedNoise[(int) (i/squareSize + 1)][(int) ( j/squareSize)];
@@ -96,7 +95,14 @@ public class PerlinNoiseGen {
 		}
 		return returnArray;
 	}
-	/** generates a full array by calling genOctave for each octave*/
+	/** generates a full array by calling genOctave for each octave
+	 * for more focus on large or small scale structures one could
+	 * change the calculation of modifiedOctiveWeightConstant
+	 * even specifying it manually once map size is known.
+	 * This would allow for much more precise map generation.
+	 * Additionally, some octaves could be provided by the programmer
+	 * in order to create maps with some predefined non-procedural structure.
+	 * */
 	double[][] getFullPerlinArray(int powSize) {
 		powerSize = powSize;
 		realSize = (int) Math.pow(2,powerSize);
@@ -104,7 +110,7 @@ public class PerlinNoiseGen {
 		double octavePower;
 		double centerWeighting;
 		double[][] fullArray = new double [realSize][realSize];
-		for (int o = 2; o<powerSize-1; o++) {
+		for (int o = 3; o<powerSize; o++) {
 			double[][] newOctave = genOctave(o);
 			octavePower = modifiedOctiveWeightConstant*Math.pow(PERSISTANCE, RATEOFCHANGE*o);
 			for (int i=0; i<realSize;i++) {
@@ -115,7 +121,7 @@ public class PerlinNoiseGen {
 					fullArray[i][j] += newOctave[i][j]*octavePower*centerWeighting;
 				}
 			}
-			//Following line is used to save debug renders of the map at each octave
+			//Following line was used to save debug renders of the map at each octave
 			//MyUtils.visuliseArray(fullArray);
 		}
 		return fullArray;
