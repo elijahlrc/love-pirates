@@ -46,8 +46,9 @@ public class Ship implements DrawableObj{
 		}
 	}
 	
+	private Vector2 vel = new Vector2(0,1);
 	private Vector2 loc;
-	private Vector2 vel;
+	private float dir = 0f;
 	private Controller controller;
 	private float maxPower;
 	private float turnRate;
@@ -63,13 +64,10 @@ public class Ship implements DrawableObj{
 	 * 
 	*/
 	Ship(int x, int y, float turnrate, float dragcoef, float maxpower) {
-		loc = new Vector2();
-		vel = new Vector2();
 		turnRate = turnrate;
 		dragCoef = dragcoef;
 		maxPower = maxpower;
-		loc.set(x,y);
-		vel.set(0,1);
+		loc = new Vector2(x,y);
 	}
 	/** 
 	 * just calls all the moves, firing, etc that each ship does each frame, maybe should take in a dt.
@@ -87,18 +85,24 @@ public class Ship implements DrawableObj{
 	 * includes turning and changes to velocity
 	 */
 	void move() {
+		
 		Direction turnDir = controller.getTurn();
 		float power = controller.getPower();
-		float newSpeed = (vel.len()+power*maxPower);//for some reason vector2's use floats.
-		newSpeed -= newSpeed*dragCoef;
-		vel.setLength(newSpeed);
+		Vector2 thrustVec = new Vector2(0f,1f);
+		thrustVec.setAngle(dir);
 		if (turnDir == Direction.LEFT) {
-			vel.setAngle((vel.angle()+turnRate));//left turn is positive direction
+			dir += turnRate;
 		} else if (turnDir == Direction.RIGHT) {
-			vel.setAngle((vel.angle()-turnRate));
+			dir -= turnRate;
 		}
-		System.out.println(vel);
+		if (power < 0) {
+			thrustVec.setAngle(dir+180);
+		}
+		thrustVec.setLength(power*maxPower);
+		vel.add(thrustVec);
+		vel.setLength(vel.len()*(1-dragCoef));
 		loc.add(vel);
+		
 	}
 	/**
 	 * Fire method iterates through slots and fires them with the appropriate side;
@@ -113,6 +117,9 @@ public class Ship implements DrawableObj{
 	}
 	public Vector2 getVel() {
 		return vel;
+	}
+	public float getDir() {
+		return dir;
 	}
 	@Override
 	public int getSpriteIndex() {
