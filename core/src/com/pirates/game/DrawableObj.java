@@ -12,4 +12,6 @@ import com.badlogic.gdx.math.Vector2;
 public interface DrawableObj {
 	Vector2 getPos();
 	int getSpriteIndex();
+	public float[] getSize();
+
 }

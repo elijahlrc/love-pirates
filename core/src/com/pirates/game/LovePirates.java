@@ -25,7 +25,8 @@ public class LovePirates extends ApplicationAdapter {
 	static Ship playerShip;
 	static int width;
 	static int height;
-	static int tileSize = 32;
+	static int TILESIZE = 32;
+	static float SEALEVEL = .73f;
 	static TextureRegion land;
 	static TextureRegion sea;
 	static TextureRegion grass;
@@ -34,9 +35,14 @@ public class LovePirates extends ApplicationAdapter {
 	static TextureRegion sand;
 	static TextureRegion dsea;
 	static TextureRegion lsea ;
-	static int mapSize = 11;
+	static int MAPSIZE = 10;
 	static float dt;
 	static World world;
+	static Body[][] bodyWorld = new Body[(int) Math.pow(2, MAPSIZE)][(int) Math.pow(2, MAPSIZE)];
+
+	static Box2DDebugRenderer debugRenderer;
+	//static BodyDef bodyDef = new BodyDef();
+	//static FixtureDef fixtureDef = new FixtureDef();
 	public LovePirates(int w, int h){
 		super();
 		width = w;
@@ -44,19 +50,22 @@ public class LovePirates extends ApplicationAdapter {
 	}
 	@Override
 	public void create() {
-		camera = new OrthographicCamera(width*1.5f,height*1.5f);
+		camera = new OrthographicCamera(60f,33.75f);
 		inputProcessor = HandleUserInput.init();
 		Gdx.input.setInputProcessor(inputProcessor);
 		//box2d
 		Box2D.init();
-		world = new World(new Vector2(0, 0f), true);
-		//debug renderer for physics rendering
-		Box2DDebugRenderer debugRenderer = new Box2DDebugRenderer();
 		
-		//gamestate stuff
+		world = new World(new Vector2(0, 0), true);
+		//debug renderer for physics rendering
+		debugRenderer = new Box2DDebugRenderer();
+		
+		
+		
+		//game state stuff
 		ships = new HashSet<Ship>();
 		projectiles = new HashSet<Projectile>();
-		//sprite batch for efficent bliting
+		//sprite batch for efficient bliting
 		batch = new SpriteBatch();
 		
 		//map gen init
@@ -79,15 +88,19 @@ public class LovePirates extends ApplicationAdapter {
 		dsea =  new TextureRegion(tiles,32,64,32,32);
 		lsea =  new TextureRegion(tiles,64,64,32,32);
 		sand =  new TextureRegion(tiles,0,32,32,32);
-		map = noiseGen.getFullPerlinArray(mapSize);
+		
+		map = noiseGen.getFullPerlinArray(MAPSIZE);
 		
 		//save map
 		MyUtils.visuliseArray(map,false);
 		
-
 		
-		//					  x,y,turnrate,dragcoef,maxpower
-		playerShip = new Ship((int) Math.pow(2, mapSize-1),2000,3f,.05f,1f);
+		
+		//					  x,y,turnrate,dragcoef,maxpower, width, length
+		playerShip = new Ship((int) Math.pow(2, MAPSIZE-1),500,2f,.9f,15f,1,3);
+		while (map[(int) playerShip.getPos().x][(int) playerShip.getPos().y]>SEALEVEL) {
+			playerShip.setPos((int) playerShip.getPos().x+10, (int) playerShip.getPos().y);
+		}
 		playerShip.setControler(new PlayerController());
 		ships.add(playerShip);
 		/*
@@ -114,43 +127,49 @@ public class LovePirates extends ApplicationAdapter {
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
 		int index;
-		int x;
-		int y;
+		float x;
+		float y;
 		Vector2 playerPos = playerShip.getPos();
-		System.out.println(playerPos);
-		for (int i = (((int) playerPos.x)-width)/tileSize; i< ((int) (playerPos.x) +width)/tileSize; i++){
-			for (int j = (((int)(playerPos.y)-height)/tileSize); j<((int) (playerPos.y)+height)/tileSize; j++){
+		for (int i = (((int) playerPos.x)-(width/10)); i< ((int) (playerPos.x) +(width/10)); i++){
+			for (int j = (((int)(playerPos.y)-height/10)); j<((int) (playerPos.y)+height/10); j++){
 				if (i<0 || i>=map.length || j<0 || j>=map[0].length){
-					batch.draw(dsea,i*tileSize,j*tileSize);
-				} else if (map[i][j] > .77) {
-					batch.draw(land,i*tileSize,j*tileSize);
-				} else if (map[i][j] > .76){
-					batch.draw(bgrass, i*tileSize, j*tileSize);
-				} else if (map[i][j] > .755){
-					batch.draw(ygrass, i*tileSize, j*tileSize);
-				} else if (map[i][j] > .75){
-					batch.draw(grass, i*tileSize, j*tileSize);
-				} else if (map[i][j] > .745){
-					batch.draw(sand, i*tileSize, j*tileSize);
-				} else if (map[i][j] > .74){
-					batch.draw(lsea, i*tileSize, j*tileSize);
+					batch.draw(dsea,i,j, 1f, 1f);
+				} else if (map[i][j] > SEALEVEL+.04) {
+					batch.draw(land,i,j, 1f, 1f);
+				} else if (map[i][j] > SEALEVEL+.025){
+					batch.draw(bgrass, i, j, 1f, 1f);
+				} else if (map[i][j] > SEALEVEL+.015){
+					batch.draw(ygrass, i, j, 1f, 1f);
+				} else if (map[i][j] > SEALEVEL+.01){
+					batch.draw(grass, i, j, 1f, 1f);
+				} else if (map[i][j] > SEALEVEL){
+					batch.draw(sand, i, j, 1f, 1f);
+				} else if (map[i][j] > SEALEVEL-.01){
+					batch.draw(lsea, i, j, 1f, 1f);
 				} else if (map[i][j] > .0){
-					batch.draw(dsea, i*tileSize, j*tileSize);
+					batch.draw(sea, i, j, 1f, 1f);
 				}
 
 			}
 		}
 		TextureRegion t;
+		//delete terrain physics in this loop
+		for (Ship ship : ships){
+			ship.clearTerrain();
+		}
+		//add terrain physics obj in this loop
 		for (Ship ship : ships){
 			ship.tick();
-			x = (int) ship.getPos().x;
-			y = (int) ship.getPos().y;
+			x = ship.getPos().x;
+			y = ship.getPos().y;
 			index = ship.getSpriteIndex();
+			float[] size = ship.getSize();
 			t = textureRegions[index];
-			float shipRotation = ship.getDir();
+			float shipRotation = (float) (ship.getDir()*360/(2*Math.PI));
+			
 			batch.draw(t,x,y,
-					   t.getRegionHeight()/2,t.getRegionWidth()/2, 
-					   t.getRegionHeight(),t.getRegionWidth(),
+					   0,0,//t.getRegionWidth()/2, 
+					   size[0],size[1],
 					   1f,1f,shipRotation,true);
 		}
 		for (Projectile proj : projectiles){
@@ -163,6 +182,8 @@ public class LovePirates extends ApplicationAdapter {
 		
 		
 		batch.end();
-		world.step(1/300f, 6, 2);
+		world.step(1/60f, 6, 2);
+		debugRenderer.render(world, camera.combined);
+
 	}
 }

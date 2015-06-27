@@ -13,6 +13,7 @@ public class Cannonball extends Projectile {
 	Vector2 pos;
 	Vector2 vel;
 	double lifetime;
+	float[] size = {.3f, .3f};
 	/**
 	 * @param pos
 	 */
@@ -54,6 +55,11 @@ public class Cannonball extends Projectile {
 	public int getSpriteIndex() {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+
+	@Override
+	public float[] getSize() {
+		return size;
 	}
 
 }
