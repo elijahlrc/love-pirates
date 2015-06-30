@@ -39,7 +39,7 @@ public class LovePirates extends ApplicationAdapter {
 	static float dt;
 	static World world;
 	static Body[][] bodyWorld = new Body[(int) Math.pow(2, MAPSIZE)][(int) Math.pow(2, MAPSIZE)];
-
+	
 	static Box2DDebugRenderer debugRenderer;
 	//static BodyDef bodyDef = new BodyDef();
 	//static FixtureDef fixtureDef = new FixtureDef();
@@ -97,12 +97,16 @@ public class LovePirates extends ApplicationAdapter {
 		
 		
 		//					  x,y,turnrate,dragcoef,maxpower, width, length
-		playerShip = new Ship((int) Math.pow(2, MAPSIZE-1),500,2f,.9f,15f,1,3);
+		playerShip = new Ship((int) Math.pow(2, MAPSIZE-1),500,2f,0f,15f,1,3);
 		while (map[(int) playerShip.getPos().x][(int) playerShip.getPos().y]>SEALEVEL) {
 			playerShip.setPos((int) playerShip.getPos().x+10, (int) playerShip.getPos().y);
 		}
 		playerShip.setControler(new PlayerController());
 		ships.add(playerShip);
+		
+		
+		Ship aiShip = new Ship((int) Math.pow(2, MAPSIZE-1),500,2f,.7f,15f,1,3);
+		aiShip.setControler(new AiController(aiShip));
 		/*
 		  for (int i = 0; i<20; i++) {
 			map = noiseGen.getFullPerlinArray(10);
@@ -133,21 +137,21 @@ public class LovePirates extends ApplicationAdapter {
 		for (int i = (((int) playerPos.x)-(width/10)); i< ((int) (playerPos.x) +(width/10)); i++){
 			for (int j = (((int)(playerPos.y)-height/10)); j<((int) (playerPos.y)+height/10); j++){
 				if (i<0 || i>=map.length || j<0 || j>=map[0].length){
-					batch.draw(dsea,i,j, 1f, 1f);
-				} else if (map[i][j] > SEALEVEL+.04) {
-					batch.draw(land,i,j, 1f, 1f);
-				} else if (map[i][j] > SEALEVEL+.025){
-					batch.draw(bgrass, i, j, 1f, 1f);
-				} else if (map[i][j] > SEALEVEL+.015){
-					batch.draw(ygrass, i, j, 1f, 1f);
-				} else if (map[i][j] > SEALEVEL+.01){
-					batch.draw(grass, i, j, 1f, 1f);
+					batch.draw(dsea,i,j, 1, 1);
+				} else if (map[i][j] > SEALEVEL+.1) {
+					batch.draw(land,i,j, 1, 1);
+				} else if (map[i][j] > SEALEVEL+.05){
+					batch.draw(bgrass, i, j, 1, 1);
+				} else if (map[i][j] > SEALEVEL+.03){
+					batch.draw(ygrass, i, j, 1, 1);
+				} else if (map[i][j] > SEALEVEL+.02){
+					batch.draw(grass, i, j, 1, 1);
 				} else if (map[i][j] > SEALEVEL){
-					batch.draw(sand, i, j, 1f, 1f);
-				} else if (map[i][j] > SEALEVEL-.01){
-					batch.draw(lsea, i, j, 1f, 1f);
+					batch.draw(sand, i, j, 1, 1);
+				} else if (map[i][j] > SEALEVEL-.04){
+					batch.draw(lsea, i, j, 1, 1);
 				} else if (map[i][j] > .0){
-					batch.draw(sea, i, j, 1f, 1f);
+					batch.draw(sea, i, j, 1, 1);
 				}
 
 			}

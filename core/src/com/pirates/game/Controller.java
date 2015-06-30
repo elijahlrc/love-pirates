@@ -12,4 +12,5 @@ interface Controller {
 	float getPower();
 	/** get the directions a ship is firing at any given time*/
 	ArrayList<FireingDirection> getFireDir();//returns a firing direction for the ship to fire
+	void tick();
 }

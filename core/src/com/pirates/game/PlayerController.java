@@ -23,7 +23,7 @@ class PlayerController implements Controller {
 			return 1.0f;
 		} else if ( (inputProcessor.keysDown.contains(Input.Keys.A) || inputProcessor.keysDown.contains(Input.Keys.D)) && 
 					inputProcessor.keysDown.contains(Input.Keys.S)) {
-			return .25f;//if player attempts to turn while pressing backwards, turn at 1/4 throttle.
+			return -.1f;//if player attempts to turn while pressing backwards, turn at 1/4 throttle.
 		} else if (inputProcessor.keysDown.contains(Input.Keys.A) || inputProcessor.keysDown.contains(Input.Keys.D)) {
 			return .75f;
 		} else if (inputProcessor.keysDown.contains(Input.Keys.S)) {
@@ -45,6 +45,11 @@ class PlayerController implements Controller {
 			dirs.add(FireingDirection.FORWARD);
 		}
 		return dirs;
+	}
+	@Override
+	public void tick() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

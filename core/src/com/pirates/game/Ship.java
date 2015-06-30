@@ -104,6 +104,7 @@ public class Ship implements DrawableObj{
 	}
 	void tick(){
 		updateColidors();
+		controller.tick();
 		move();
 		fire();
 	}
@@ -125,10 +126,10 @@ public class Ship implements DrawableObj{
 			for (int j= -PHYSICSBUFFER; j<PHYSICSBUFFER; j++){
 				if (LovePirates.map[x+i][y+j] > LovePirates.SEALEVEL) {
 					if (LovePirates.bodyWorld[x+i][y+j] == null){
+						// we need to use a pool of physics objects
 						bodyDef.position.set(x+i,y+j);
 						LovePirates.bodyWorld[x+i][y+j] = LovePirates.world.createBody(bodyDef);
 						LovePirates.bodyWorld[x+i][y+j].createFixture(fixtureDef);
-						LovePirates.bodyWorld[x+i][y+j].setAwake(false);
 					}
 				}
 			}
@@ -144,6 +145,7 @@ public class Ship implements DrawableObj{
 	void move() {
 		float drag;
 		float currentDir = body.getAngle();
+		
 		Direction turnDir = controller.getTurn();
 		float power = controller.getPower();
 		
@@ -163,15 +165,24 @@ public class Ship implements DrawableObj{
 		} else if (turnDir == Direction.RIGHT) {
 			body.applyTorque(-turnRate, true);
 		}
-		//float deltaAngle = (float) ((body.getAngle()-body.getLinearVelocity().angleRad())%(Math.PI*2));
-		//body.getLinearVelocity();
+		
+		float deltaAngle = (float) ((body.getAngle()-body.getLinearVelocity().angleRad())%(Math.PI*2));
+		
+		drag = (float) Math.abs(Math.sin(deltaAngle));
+		
+		Vector2 forceD = new Vector2(1,1);
+		Vector2 dir = body.getLinearVelocity();
+		forceD.setAngleRad((float) (dir.angleRad()+Math.PI));
+		forceD.setLength((float) (drag*Math.pow(getVel().len(),1.5)));
+		
+		body.applyForceToCenter(forceD, true);
+		
 	}
 	/**
 	 * Fire method iterates through slots and fires them with the appropriate side;
 	 */
 	void fire() {
 		ArrayList<FireingDirection> fireDirs = controller.getFireDir();
-		/*TODO*/
 	}
 	public void setPos(int x,int y){
 		body.setTransform(x, y, getDir());

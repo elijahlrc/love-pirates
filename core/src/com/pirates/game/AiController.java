@@ -5,6 +5,8 @@ package com.pirates.game;
 
 import java.util.ArrayList;
 
+import com.badlogic.gdx.math.Vector2;
+
 /**
  * @author Elijah
  *
@@ -14,8 +16,19 @@ public class AiController implements Controller {
 	/**
 	 * 
 	 */
-	public AiController() {
-		// TODO Auto-generated constructor stub
+	Vector2 target;
+	Ship owner;
+	@Override
+	public void tick() {
+		if (target == null){
+			findTarget();
+		}
+	}
+	private Vector2 findTarget(){
+		return LovePirates.playerShip.getPos();
+	}
+	public AiController(Ship owner) {
+		this.owner = owner;
 	}
 
 	/* (non-Javadoc)
@@ -44,5 +57,6 @@ public class AiController implements Controller {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 
 }
