@@ -113,28 +113,18 @@ public class Ship implements DrawableObj{
 		
 	}
 	private void updateColidors() {
-		//creating map coliders
-		bodyDef.type = BodyDef.BodyType.StaticBody;
-		PolygonShape boxShape = new PolygonShape();
-		float[] verts = {0,0,0,1,1,1,1,0};
-		boxShape.set(verts);
-		fixtureDef.shape = boxShape;
-		fixtureDef.filter.groupIndex = -2;
 		int x = (int) getPos().x;
 		int y = (int) getPos().y;
 		for (int i = -PHYSICSBUFFER; i<PHYSICSBUFFER; i++){
 			for (int j= -PHYSICSBUFFER; j<PHYSICSBUFFER; j++){
 				if (LovePirates.map[x+i][y+j] > LovePirates.SEALEVEL) {
-					if (LovePirates.bodyWorld[x+i][y+j] == null){
-						// we need to use a pool of physics objects
-						bodyDef.position.set(x+i,y+j);
-						LovePirates.bodyWorld[x+i][y+j] = LovePirates.world.createBody(bodyDef);
-						LovePirates.bodyWorld[x+i][y+j].createFixture(fixtureDef);
-					}
+					//if a terrain collider is already at the point specified
+					//colliderPool should handle this
+					//and ignore this command.
+					LovePirates.colliderPool.createTerainCollider(x+i,y+j);
 				}
 			}
 		}
-		boxShape.dispose();
 	}
 	/** move method
 	 * gets move from controller

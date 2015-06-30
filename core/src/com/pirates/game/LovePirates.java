@@ -36,10 +36,10 @@ public class LovePirates extends ApplicationAdapter {
 	static TextureRegion dsea;
 	static TextureRegion lsea ;
 	static int MAPSIZE = 10;
+	static int COLLIDERPOOLSIZE = 10000;
 	static float dt;
 	static World world;
-	static Body[][] bodyWorld = new Body[(int) Math.pow(2, MAPSIZE)][(int) Math.pow(2, MAPSIZE)];
-	
+	static ColliderPool colliderPool;
 	static Box2DDebugRenderer debugRenderer;
 	//static BodyDef bodyDef = new BodyDef();
 	//static FixtureDef fixtureDef = new FixtureDef();
@@ -57,6 +57,12 @@ public class LovePirates extends ApplicationAdapter {
 		Box2D.init();
 		
 		world = new World(new Vector2(0, 0), true);
+		
+		//this number is performance sensitive and can create subtle collision bugs, beware
+		//large number == fewer bugs but worse performance
+		colliderPool = new ColliderPool(COLLIDERPOOLSIZE);
+		
+		
 		//debug renderer for physics rendering
 		debugRenderer = new Box2DDebugRenderer();
 		
