@@ -4,40 +4,24 @@
 package com.pirates.game;
 
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.*;
-
 
 /**
  * @author Elijah
- *NEEDS FULL REWRITE FOR BOX2D
- *TODO
+ *
  */
 public class Cannonball extends Projectile {
-	Body body;
+	Vector2 pos;
+	Vector2 vel;
 	double lifetime;
-	float size = .3f;
-	private BodyDef bodyDef;
-	private FixtureDef fixtureDef;
+	float[] size = {.3f, .3f};
 	/**
 	 * @param pos
 	 */
 	public Cannonball(Vector2 position, Vector2 velocity, Ship owner) {
-		bodyDef = new BodyDef();
-		fixtureDef = new FixtureDef();
-		
-		bodyDef.type = BodyDef.BodyType.DynamicBody;
-		CircleShape boxShape = new CircleShape();
-		fixtureDef.shape = boxShape;
-		fixtureDef.filter.groupIndex = -2;
-		
-		bodyDef.position.set(position);
-		
-		body = LovePirates.world.createBody(bodyDef);
-		body.createFixture(fixtureDef);
-		
-		
+		pos = position;
+		vel = velocity;
 		lifetime = 100;
-		boxShape.dispose(); 
+		// TODO Auto-generated constructor stub
 	}
 
 	/* (non-Javadoc)
@@ -45,6 +29,7 @@ public class Cannonball extends Projectile {
 	 */
 	@Override
 	protected void move() {
+		pos.add(vel);
 	}
 
 	/* (non-Javadoc)
@@ -60,7 +45,7 @@ public class Cannonball extends Projectile {
 	 */
 	@Override
 	public Vector2 getPos() {
-		return body.getPosition();
+		return pos;
 	}
 
 	/* (non-Javadoc)
@@ -68,13 +53,13 @@ public class Cannonball extends Projectile {
 	 */
 	@Override
 	public int getSpriteIndex() {
-		//TODO no sprite exists yet :-(
+		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	@Override
 	public float[] getSize() {
-		return new float[] {size, size};
+		return size;
 	}
 
 }

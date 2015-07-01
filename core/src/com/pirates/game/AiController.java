@@ -16,15 +16,13 @@ public class AiController implements Controller {
 	/**
 	 * 
 	 */
-	private Vector2 target;
-	private Ship owner;
-	private Vector2 vecToTarget;
+	Vector2 target;
+	Ship owner;
 	@Override
 	public void tick() {
 		if (target == null){
-			target = findTarget();
+			findTarget();
 		}
-		
 	}
 	private Vector2 findTarget(){
 		return LovePirates.playerShip.getPos();
@@ -39,14 +37,7 @@ public class AiController implements Controller {
 	@Override
 	public Direction getTurn() {
 		// TODO Auto-generated method stub
-		vecToTarget = owner.getPos().sub(target);
-		float deltaAngle = (float) (vecToTarget.angleRad()-(owner.getDir())%(2*Math.PI));
-		System.out.println(deltaAngle);
-		if (deltaAngle<Math.PI) {
-			return Direction.RIGHT;
-		} else {
-			return Direction.LEFT;
-		}
+		return null;
 	}
 
 	/* (non-Javadoc)
@@ -55,7 +46,7 @@ public class AiController implements Controller {
 	@Override
 	public float getPower() {
 		// TODO Auto-generated method stub
-		return 1;
+		return 0;
 	}
 
 	/* (non-Javadoc)
