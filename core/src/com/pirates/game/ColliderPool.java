@@ -12,7 +12,10 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 /**
  * @author Elijah
- *
+ *This class provides a method, createTerainCollider(int x, int y), for ships to create 
+ *new terrain colliders (in order to stream colliders rather than loading all 2,000,000 of them
+ *It creates a set number of colliders then once that number has been created, it moves an old 
+ *collider when createTerainCollider is called rather than creating another one.
  */
 public class ColliderPool {
 
@@ -21,11 +24,9 @@ public class ColliderPool {
 	 */
 	private ArrayDeque<Body> pool;
 	private int size;
-	private Fixture fixture;
 	private BodyDef bodyDef;
 	private FixtureDef fixtureDef;
 	private Body body;
-	private Body delBody;
 	private HashSet<String> colliderLocations;
 
 	/**
@@ -54,28 +55,35 @@ public class ColliderPool {
 		//boxShape.dispose(); 
 		//MEMORY LEEK??? above.
 	}
-	
+	/**
+	 * helper function to create unique id for each location
+	 */
 	private String pairToString(Integer x, Integer y) {
 		String s = x.toString()+"/"+y.toString();
 		return s;
 	}
-	
+	/**
+	 * main function does the main job of the class
+	 * @param x
+	 * @param y
+	 */
 	void createTerainCollider(int x, int y) {
 		if (colliderLocations.contains(pairToString(x,y)) == false) {
-			System.out.println("creating collider");
 			colliderLocations.add(pairToString(x,y));
-			bodyDef.position.set(x,y);
-			body = LovePirates.world.createBody(bodyDef);
-			body.createFixture(fixtureDef);
 			if (pool.size()<size){
+				bodyDef.position.set(x,y);
+				body = LovePirates.world.createBody(bodyDef);
+				body.createFixture(fixtureDef);
 				pool.addFirst(body);
 			} else {
+				//pool.addFirst(body);
+				body = pool.removeLast();
+				int delX = (int) body.getPosition().x;
+				int delY = (int) body.getPosition().y;
+				body.setTransform(x, y, 0);
 				pool.addFirst(body);
-				delBody = pool.removeLast();
-				int delX = (int) delBody.getPosition().x;
-				int delY = (int) delBody.getPosition().y;
 				colliderLocations.remove(pairToString(delX, delY));
-				LovePirates.world.destroyBody(delBody);
+				//LovePirates.world.destroyBody(delBody);
 				
 			}
 		}

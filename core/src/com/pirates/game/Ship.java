@@ -178,7 +178,6 @@ public class Ship implements DrawableObj{
 		body.setTransform(x, y, getDir());
 	}
 	public Vector2 getPos() {
-		System.out.println(body.getPosition());
 		return body.getPosition();
 	}
 	public Vector2 getVel() {

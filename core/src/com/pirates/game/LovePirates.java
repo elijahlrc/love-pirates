@@ -36,7 +36,7 @@ public class LovePirates extends ApplicationAdapter {
 	static TextureRegion dsea;
 	static TextureRegion lsea ;
 	static int MAPSIZE = 10;
-	static int COLLIDERPOOLSIZE = 10000;
+	static int COLLIDERPOOLSIZE = 100;
 	static float dt;
 	static World world;
 	static ColliderPool colliderPool;
@@ -113,6 +113,10 @@ public class LovePirates extends ApplicationAdapter {
 		
 		Ship aiShip = new Ship((int) Math.pow(2, MAPSIZE-1),500,2f,.7f,15f,1,3);
 		aiShip.setControler(new AiController(aiShip));
+		while (map[(int) aiShip.getPos().x][(int) aiShip.getPos().y]>SEALEVEL) {
+			aiShip.setPos((int) aiShip.getPos().x+10, (int) aiShip.getPos().y);
+		}
+		ships.add(aiShip);
 		/*
 		  for (int i = 0; i<20; i++) {
 			map = noiseGen.getFullPerlinArray(10);
@@ -163,11 +167,10 @@ public class LovePirates extends ApplicationAdapter {
 			}
 		}
 		TextureRegion t;
-		//delete terrain physics in this loop
-		for (Ship ship : ships){
-			ship.clearTerrain();
-		}
-		//add terrain physics obj in this loop
+
+		//add terrain physics obj in this ship.tick
+		//also do all the important ship things like moving, firing, etc
+		//death not yet implemented.
 		for (Ship ship : ships){
 			ship.tick();
 			x = ship.getPos().x;
