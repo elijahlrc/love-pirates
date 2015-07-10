@@ -9,42 +9,48 @@ import com.badlogic.gdx.physics.box2d.*;
 
 /**
  * @author Elijah
- *NEEDS FULL REWRITE FOR BOX2D
- *TODO
  */
-public class Cannonball extends Projectile {
-	Body body;
-	double lifetime;
-	float size = .3f;
+public class Cannonball extends Projectile implements Collideable  {	
+	int number;
+	private float size;
+	private Body body;
 	private BodyDef bodyDef;
 	private FixtureDef fixtureDef;
+	CircleShape circleShape = new CircleShape();
+	private Fixture fixture;
+	private Ship owner;
+	
 	/**
 	 * @param pos
 	 */
 	public Cannonball(Vector2 position, Vector2 velocity, Ship owner) {
+		dead = false;
+		lifetime = 100;
+		size = .3f;
+		this.owner = owner;
 		bodyDef = new BodyDef();
 		fixtureDef = new FixtureDef();
-		
 		bodyDef.type = BodyDef.BodyType.DynamicBody;
-		CircleShape boxShape = new CircleShape();
-		fixtureDef.shape = boxShape;
-		fixtureDef.filter.groupIndex = -2;
-		
+		circleShape.setRadius(size);
+		fixtureDef.shape = circleShape;
+		fixtureDef.filter.categoryBits = LovePirates.PROJ_MASK;
+		fixtureDef.filter.maskBits = LovePirates.SHIP_MASK;
+
+		//boxShape.dispose(); 
+
 		bodyDef.position.set(position);
-		
 		body = LovePirates.world.createBody(bodyDef);
-		body.createFixture(fixtureDef);
-		
-		
-		lifetime = 100;
-		boxShape.dispose(); 
+		fixture = body.createFixture(fixtureDef);
+		fixture.setUserData(this);
+		body.setLinearVelocity(velocity);
+
 	}
 
 	/* (non-Javadoc)
 	 * @see com.pirates.game.Projectile#move()
 	 */
 	@Override
-	protected void move() {
+	void move() {
 	}
 
 	/* (non-Javadoc)
@@ -52,6 +58,11 @@ public class Cannonball extends Projectile {
 	 */
 	@Override
 	void tick() {
+		//dt?
+		lifetime -= 1;
+		if (lifetime<0) {
+			dead = true;
+		}
 		move();
 	}
 
@@ -67,14 +78,44 @@ public class Cannonball extends Projectile {
 	 * @see com.pirates.game.Projectile#getSpriteIndex()
 	 */
 	@Override
+	
 	public int getSpriteIndex() {
 		//TODO no sprite exists yet :-(
-		return 0;
+		return 1;
 	}
+	
 
 	@Override
 	public float[] getSize() {
+		//return new float[2];
 		return new float[] {size, size};
+	}
+	public Ship getOwner() {
+		return owner;
+	}
+
+	@Override
+	void delete() {
+		LovePirates.world.destroyBody(body);
+		
+	}
+
+	@Override
+	public boolean handlePreCollide(Contact contact) {
+		return true;
+	}
+
+	@Override
+	public void handleBeginContact(Contact contact) {
+		// TODO Auto-generated method stub
+		
+		
+	}
+
+	@Override
+	public void handlePostCollide(Contact contact, ContactImpulse impulse) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

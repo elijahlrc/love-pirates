@@ -36,11 +36,18 @@ public class LovePirates extends ApplicationAdapter {
 	static TextureRegion dsea;
 	static TextureRegion lsea ;
 	static int MAPSIZE = 10;
-	static int COLLIDERPOOLSIZE = 100;
+	static int COLLIDERPOOLSIZE = 10000;
 	static float dt;
 	static World world;
 	static ColliderPool colliderPool;
 	static Box2DDebugRenderer debugRenderer;
+	//some collision filters:
+	final static short LAND_MASK = 0x0001; 
+	final static short SHIP_MASK = 0x0002;
+	final static short PROJ_MASK = 0x0004;
+	
+	
+	HashSet<Projectile> projRemovalSet;
 	//static BodyDef bodyDef = new BodyDef();
 	//static FixtureDef fixtureDef = new FixtureDef();
 	public LovePirates(int w, int h){
@@ -50,18 +57,18 @@ public class LovePirates extends ApplicationAdapter {
 	}
 	@Override
 	public void create() {
-		camera = new OrthographicCamera(60f,33.75f);
+		camera = new OrthographicCamera(width/32f,height/32f);
 		inputProcessor = HandleUserInput.init();
 		Gdx.input.setInputProcessor(inputProcessor);
 		//box2d
 		Box2D.init();
 		
 		world = new World(new Vector2(0, 0), true);
-		
+		world.setContactListener(new MyContactListener());
 		//this number is performance sensitive and can create subtle collision bugs, beware
 		//large number == fewer bugs but worse performance
 		colliderPool = new ColliderPool(COLLIDERPOOLSIZE);
-		
+		projRemovalSet = new HashSet<Projectile>();
 		
 		//debug renderer for physics rendering
 		debugRenderer = new Box2DDebugRenderer();
@@ -81,7 +88,9 @@ public class LovePirates extends ApplicationAdapter {
 		textureRegions = new TextureRegion[99];
 		//this next line is bad, should be part of the spritesheet and a texture region
 		Texture shiptex = new Texture("ship.bmp");
-		textureRegions[0] = new TextureRegion(shiptex, shiptex.getWidth(), shiptex.getHeight()); //this is wrong
+		Texture cannoballtext = new Texture("cannonball.png");
+		textureRegions[1] = new TextureRegion(cannoballtext, cannoballtext.getWidth(), cannoballtext.getHeight());
+		textureRegions[0] = new TextureRegion(cannoballtext, cannoballtext.getWidth(), cannoballtext.getHeight()); //this is wrong
 
 		
 		
@@ -103,7 +112,7 @@ public class LovePirates extends ApplicationAdapter {
 		
 		
 		//					  x,y,turnrate,dragcoef,maxpower, width, length
-		playerShip = new Ship((int) Math.pow(2, MAPSIZE-1),500,2f,0f,15f,1,3);
+		playerShip = new PlayerShip((int) Math.pow(2, MAPSIZE-1),500,4f,0f,15f,1,3);
 		while (map[(int) playerShip.getPos().x][(int) playerShip.getPos().y]>SEALEVEL) {
 			playerShip.setPos((int) playerShip.getPos().x+10, (int) playerShip.getPos().y);
 		}
@@ -112,7 +121,7 @@ public class LovePirates extends ApplicationAdapter {
 		
 		
 		Ship aiShip = new Ship((int) Math.pow(2, MAPSIZE-1),500,2f,.7f,15f,1,3);
-		aiShip.setControler(new AiController(aiShip));
+		aiShip.setControler(new AiController(aiShip, 10));
 		while (map[(int) aiShip.getPos().x][(int) aiShip.getPos().y]>SEALEVEL) {
 			aiShip.setPos((int) aiShip.getPos().x+10, (int) aiShip.getPos().y);
 		}
@@ -187,11 +196,25 @@ public class LovePirates extends ApplicationAdapter {
 		}
 		for (Projectile proj : projectiles){
 			proj.tick();
-			x = (int) proj.getPos().x;
-			y = (int) proj.getPos().y;
-			index = proj.getSpriteIndex();
-			batch.draw(textureRegions[index],x,y);
+			x = proj.getPos().x;
+			y = proj.getPos().y;
+			t = textureRegions[proj.getSpriteIndex()];
+			float[] size = proj.getSize();
+			batch.draw(t,x,y,
+					   t.getRegionWidth()/2, t.getRegionHeight()/2, 
+					   size[0],size[1],
+					   1f,1f,0,true);
+			
 		}
+		
+		for (Projectile proj : projectiles){
+			if (proj.dead == true) {
+				projRemovalSet.add(proj);
+				proj.delete();
+			}
+		}
+		projectiles.removeAll(projRemovalSet);
+		projRemovalSet.clear();
 		
 		
 		batch.end();

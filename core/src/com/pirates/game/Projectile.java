@@ -19,10 +19,11 @@ public abstract class Projectile implements DrawableObj{
 	 * 
 	 */
 	int sprite;
-	Vector2 pos;
-	double lifetime;
-	protected abstract void move();
+	boolean dead;
+	protected double lifetime;
+	abstract void move();
 	abstract void tick();
-	abstract public Vector2 getPos();
-	abstract public int getSpriteIndex();
+	public abstract Vector2 getPos();
+	public abstract int getSpriteIndex();
+	abstract void delete();
 }

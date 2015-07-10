@@ -10,7 +10,7 @@ import com.badlogic.gdx.physics.box2d.*;
  * @author Elijah
  *
  */
-public class Ship implements DrawableObj{
+public class Ship implements DrawableObj, Collideable{
 	/**
 	 * @author Elijah
 	 *
@@ -18,7 +18,7 @@ public class Ship implements DrawableObj{
 	public class Slot {
 		Vector2 offset;
 		int size;
-		int dir;//in degrees, ranging from 0 to 360
+		float dir;//in rad, ranging from 0 to 2pi
 		FireingDirection side;
 		Equipment inslot;
 		Ship owner;
@@ -30,14 +30,19 @@ public class Ship implements DrawableObj{
 		 * @param slotDir angle slot fires, in degrees
 		 * @param fireSlot the key which fires this slot
 		 */
-		Slot(int xOffset, int yOffset, int sizeOfSlot,int slotDir, FireingDirection fireSlot,Ship ownedBy) {
+		Slot(int xOffset, int yOffset, int sizeOfSlot,float slotDir, FireingDirection fireSlot,Ship ownedBy) {
 			offset = new Vector2(xOffset,yOffset);
 			size = sizeOfSlot;
 			dir = slotDir;
 			owner = ownedBy;
+			side = fireSlot;
 		}
-		void fire(FireingDirection dirToFire) {
-			if (dirToFire == side) {
+		void setContents(Equipment e) {
+			inslot = e;
+		}
+		void fire(ArrayList<FireingDirection> dirToFire) {
+			inslot.tick();
+			if (dirToFire.contains(side)) {
 				if (inslot.iswepon()) {
 					inslot.fire(dir, offset, owner);//how to handle this nicely?
 				}
@@ -47,6 +52,8 @@ public class Ship implements DrawableObj{
 			inslot = e;
 		}
 	}
+	
+	static final int NUM_SLOTS = 0;
 	
 	private float dir = 0f;
 	private Controller controller;
@@ -60,7 +67,8 @@ public class Ship implements DrawableObj{
 	private float width;
 	private float length;
 	private Body body;
-	private int PHYSICSBUFFER = 5;
+	protected Slot[] slots;
+	private int PHYSICSBUFFER = 15;
 	/**This class is the super for all ships
 	 * All ships have position vector "loc", velocity vector "vel", drag coefficient "dragcoef", and a "maxpower"
 	 * Perhaps the following things should be in some kind of ship data structure/class, 
@@ -71,11 +79,13 @@ public class Ship implements DrawableObj{
 	 * 
 	*/
 	Ship(int x, int y, float turnrate, float dragcoef, float maxpower,float len, float wid) {
+		
 		turnRate = turnrate;
 		dragCoef = dragcoef;
 		maxPower = maxpower;
 		width = wid;
 		length = len;
+		slots = new Slot[NUM_SLOTS];
 		bodyDef.position.set(x,y);
 		bodyDef.type = BodyDef.BodyType.DynamicBody;
 		bodyDef.active = true;
@@ -91,8 +101,10 @@ public class Ship implements DrawableObj{
 		fixtureDef.density = 1f;
 		fixtureDef.friction = .9f;
 		fixtureDef.restitution = .2f;
+		fixtureDef.filter.categoryBits = LovePirates.SHIP_MASK;
+		fixtureDef.filter.maskBits = LovePirates.LAND_MASK | LovePirates.SHIP_MASK | LovePirates.PROJ_MASK;
 		fixture = body.createFixture(fixtureDef);
-		
+		fixture.setUserData(this);
 		//shapes must be disposed otherwise memory leak.
 		shipshape.dispose();
 	}
@@ -173,11 +185,15 @@ public class Ship implements DrawableObj{
 	 */
 	void fire() {
 		ArrayList<FireingDirection> fireDirs = controller.getFireDir();
+		for (Slot s : slots) {
+			s.fire(fireDirs);
+		}
 	}
 	public void setPos(int x,int y){
 		body.setTransform(x, y, getDir());
 	}
 	public Vector2 getPos() {
+		//should be center of mass
 		return body.getPosition();
 	}
 	public Vector2 getVel() {
@@ -193,6 +209,27 @@ public class Ship implements DrawableObj{
 	@Override
 	public int getSpriteIndex() {
 		return spriteIndex;
+	}
+	@Override
+	public boolean handlePreCollide(Contact contact) {
+		Object b = contact.getFixtureB().getUserData();
+		if (b instanceof Cannonball){
+			Ship owner = ((Cannonball) b).getOwner();
+			if (owner == this) {
+				return false;
+			}
+		}
+		return true;
+	}
+	@Override
+	public void handleBeginContact(Contact contact) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void handlePostCollide(Contact contact, ContactImpulse impulse) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 	

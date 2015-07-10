@@ -1,6 +1,7 @@
 package com.pirates.game;
 
 import com.badlogic.gdx.Input;
+
 import java.util.ArrayList;
 class PlayerController implements Controller {
 	HandleUserInput inputProcessor;

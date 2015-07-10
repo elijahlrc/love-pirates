@@ -8,8 +8,8 @@ public class DesktopLauncher {
 	static int width;
 	static int height;
 	public static void main (String[] arg) {
-		width = 1800;
-		height = 1000;
+		width = 900;
+		height = 900;
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		new LwjglApplication(new LovePirates(width, height), config);
 		config.width = width;

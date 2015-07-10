@@ -16,9 +16,17 @@ public class AiController implements Controller {
 	/**
 	 * 
 	 */
-	private Vector2 target;
+	private Object target;
 	private Ship owner;
 	private Vector2 vecToTarget;
+	private float projectileSpeed;
+
+	AiController(Ship owner, float projectileSpeed) {
+		this.owner = owner;
+		this.projectileSpeed = projectileSpeed;
+
+	}
+	
 	@Override
 	public void tick() {
 		if (target == null){
@@ -26,12 +34,13 @@ public class AiController implements Controller {
 		}
 		
 	}
-	private Vector2 findTarget(){
+	private Object findTarget() {
+		return LovePirates.playerShip;
+	}
+	private Vector2 dirToTarget(){
 		return LovePirates.playerShip.getPos();
 	}
-	public AiController(Ship owner) {
-		this.owner = owner;
-	}
+
 
 	/* (non-Javadoc)
 	 * @see com.pirates.game.Controller#getTurn()
@@ -39,9 +48,8 @@ public class AiController implements Controller {
 	@Override
 	public Direction getTurn() {
 		// TODO Auto-generated method stub
-		vecToTarget = owner.getPos().sub(target);
+		vecToTarget = owner.getPos().sub(dirToTarget());
 		float deltaAngle = (float) (vecToTarget.angleRad()-(owner.getDir())%(2*Math.PI));
-		System.out.println(deltaAngle);
 		if (deltaAngle<Math.PI) {
 			return Direction.RIGHT;
 		} else {
@@ -63,7 +71,12 @@ public class AiController implements Controller {
 	 */
 	@Override
 	public ArrayList<FireingDirection> getFireDir() {
-		// TODO Auto-generated method stub
+		Ship pShip = (Ship) target;
+		vecToTarget = owner.getPos().sub(pShip.getPos());
+		float deltaAngle = (float) (vecToTarget.angleRad()-(owner.getDir())%(2*Math.PI));
+		if (deltaAngle<Math.PI) {
+		} else {
+		}
 		return null;
 	}
 

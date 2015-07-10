@@ -51,7 +51,8 @@ public class ColliderPool {
 		float[] verts = {0,0,0,1,1,1,1,0};
 		boxShape.set(verts);
 		fixtureDef.shape = boxShape;
-		fixtureDef.filter.groupIndex = -2;
+		fixtureDef.filter.categoryBits = LovePirates.LAND_MASK;
+		fixtureDef.filter.maskBits = -1;
 		//boxShape.dispose(); 
 		//MEMORY LEEK??? above.
 	}

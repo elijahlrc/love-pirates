@@ -17,5 +17,6 @@ public abstract class Equipment {
 	/**
 	 * this method basically just constructs particles with the appropriate params.
 	 */
-	abstract void fire(int dir, Vector2 offset, Ship owner);
+	abstract void fire(float dir, Vector2 offset, Ship owner);
+	abstract void tick();
 }
