@@ -3,7 +3,7 @@
  */
 package com.pirates.game;
 import com.badlogic.gdx.math.Vector2;
-
+import java.util.Random;
 /**
  * @author Elijah
  *
@@ -13,39 +13,50 @@ public class Cannon extends Equipment {
 	/**
 	 * 
 	 */
-	private Ship owner;
-	private int countdown;
+	private static Random rand = new Random();
+	private float countdown;
+	private float fireSpeed;
 	public Cannon() {
 		countdown = 0;
+		fireSpeed = 30f;
 	}
 
 	@Override
 	boolean iswepon() {
 		return true;
 	}
-	void setOwner(Ship owner){
-		this.owner = owner;
-	}
-
 	@Override
 	void fire(float dir, Vector2 offset, Ship owner) {
 		if (countdown < 0) {
-			Vector2 ownerpos = owner.getPos();
+			Vector2 offsetVec = offset.cpy().rotateRad(owner.getDir());
+			Vector2 firepos = owner.getPos().add(offsetVec);
 			Vector2 vel = new Vector2(1,1);
-			vel.setLength(30f);
-			vel.setAngleRad((float) dir+owner.getDir());
-			LovePirates.projectiles.add(new Cannonball(ownerpos,vel,owner));
-			countdown += 10;
+			vel.setLength(fireSpeed);
+			vel.setAngleRad((float) dir + owner.getDir());
+			vel.add(owner.getVel());
+			LovePirates.projectiles.add(new Cannonball(firepos,vel,owner));
+			countdown += 60;
 		}
 	}
 
 	@Override
 	void tick() {
 		if (countdown >= 0) {
-			countdown -= 1;
+			countdown -= .5 + rand.nextFloat();
 		}
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	float getProjSpeed() {
+		return fireSpeed;
+	}
+
+	@Override
+	float getProjLifetime() {
+		
+		return Cannonball.LIFETIME;
 	}
 	
 

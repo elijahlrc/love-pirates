@@ -15,51 +15,13 @@ public class Ship implements DrawableObj, Collideable{
 	 * @author Elijah
 	 *
 	 */
-	public class Slot {
-		Vector2 offset;
-		int size;
-		float dir;//in rad, ranging from 0 to 2pi
-		FireingDirection side;
-		Equipment inslot;
-		Ship owner;
-		/**
-		 * 
-		 * @param xOffset
-		 * @param yOffset
-		 * @param sizeOfSlot not yet implemented
-		 * @param slotDir angle slot fires, in degrees
-		 * @param fireSlot the key which fires this slot
-		 */
-		Slot(int xOffset, int yOffset, int sizeOfSlot,float slotDir, FireingDirection fireSlot,Ship ownedBy) {
-			offset = new Vector2(xOffset,yOffset);
-			size = sizeOfSlot;
-			dir = slotDir;
-			owner = ownedBy;
-			side = fireSlot;
-		}
-		void setContents(Equipment e) {
-			inslot = e;
-		}
-		void fire(ArrayList<FireingDirection> dirToFire) {
-			inslot.tick();
-			if (dirToFire.contains(side)) {
-				if (inslot.iswepon()) {
-					inslot.fire(dir, offset, owner);//how to handle this nicely?
-				}
-			}
-		}
-		void setEquip(Equipment e) {
-			inslot = e;
-		}
-	}
+	
 	
 	static final int NUM_SLOTS = 0;
 	
-	private float dir = 0f;
-	private Controller controller;
+	Controller controller;
 	private float maxPower;
 	private float turnRate;
-	private float dragCoef;
 	private int spriteIndex;
 	private static BodyDef bodyDef = new BodyDef();
 	private static FixtureDef fixtureDef = new FixtureDef();
@@ -69,6 +31,7 @@ public class Ship implements DrawableObj, Collideable{
 	private Body body;
 	protected Slot[] slots;
 	private int PHYSICSBUFFER = 15;
+	private Vector2 offset;
 	/**This class is the super for all ships
 	 * All ships have position vector "loc", velocity vector "vel", drag coefficient "dragcoef", and a "maxpower"
 	 * Perhaps the following things should be in some kind of ship data structure/class, 
@@ -81,7 +44,6 @@ public class Ship implements DrawableObj, Collideable{
 	Ship(int x, int y, float turnrate, float dragcoef, float maxpower,float len, float wid) {
 		
 		turnRate = turnrate;
-		dragCoef = dragcoef;
 		maxPower = maxpower;
 		width = wid;
 		length = len;
@@ -94,7 +56,8 @@ public class Ship implements DrawableObj, Collideable{
 		body = LovePirates.world.createBody(bodyDef);
 		body.setAwake(true);
 		PolygonShape shipshape = new PolygonShape();
-		float[] verts = {width/2,length,width, length/2, width/2, 0f, 0f, length/2};
+		offset = new Vector2(-width/2, -length/2);
+		float[] verts = {0,width/2,length/2, 0, 0, -width/2, -length/2, 0};
 		shipshape.set(verts);
 		
 		fixtureDef.shape = shipshape;
@@ -192,18 +155,23 @@ public class Ship implements DrawableObj, Collideable{
 	public void setPos(int x,int y){
 		body.setTransform(x, y, getDir());
 	}
+				
 	public Vector2 getPos() {
 		//should be center of mass
-		return body.getPosition();
+		return body.getPosition().cpy();
+	}
+	public Vector2 getDrawPos() {
+		
+		return body.getPosition().add(offset);
 	}
 	public Vector2 getVel() {
-		return body.getLinearVelocity();
+		return body.getLinearVelocity().cpy();
 	}
 	public float getDir() {
 		return body.getAngle();
 	}
 	public float[] getSize() {
-		float[] size =  {width, length};
+		float[] size =  {length, width};
 		return size;
 	}
 	@Override
@@ -229,7 +197,36 @@ public class Ship implements DrawableObj, Collideable{
 	@Override
 	public void handlePostCollide(Contact contact, ContactImpulse impulse) {
 		// TODO Auto-generated method stub
+		//damage?
 		
+	}
+	public float getCannonSpeed() {
+		float speedTotal = 0;
+		int weaponCount = 0;
+		for (Slot slot : slots) {
+			if (slot.getProjSpeed()>=0) {
+				weaponCount += 1;
+				speedTotal += slot.getProjSpeed();
+			}
+		}
+		if (weaponCount == 0) {
+			return 0;
+		}
+		return speedTotal/weaponCount;
+	}
+	public float getCannonballLifetime() {
+		float lifetimeTotal = 0;
+		int weaponCount = 0;
+		for (Slot slot : slots) {
+			if (slot.getProjLifetime()>=0) {
+				weaponCount += 1;
+				lifetimeTotal += slot.getProjLifetime();
+			}
+		}
+		if (weaponCount == 0) {
+			return 0;
+		}
+		return lifetimeTotal/weaponCount;
 	}
 	
 	

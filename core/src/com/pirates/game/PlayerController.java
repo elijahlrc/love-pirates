@@ -52,5 +52,15 @@ class PlayerController implements Controller {
 		// TODO Auto-generated method stub
 		
 	}
+	@Override
+	public void setProjectileSpeed(float projectileSpeed) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public float getProjectileSpeed() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 
 }

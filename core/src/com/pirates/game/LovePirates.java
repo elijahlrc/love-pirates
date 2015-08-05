@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 
 public class LovePirates extends ApplicationAdapter {
@@ -34,7 +35,9 @@ public class LovePirates extends ApplicationAdapter {
 	static TextureRegion bgrass;
 	static TextureRegion sand;
 	static TextureRegion dsea;
-	static TextureRegion lsea ;
+	static TextureRegion lsea;
+	static Texture debug;
+	static HashSet<Vector2> debugObjects;
 	static int MAPSIZE = 10;
 	static int COLLIDERPOOLSIZE = 10000;
 	static float dt;
@@ -57,7 +60,10 @@ public class LovePirates extends ApplicationAdapter {
 	}
 	@Override
 	public void create() {
-		camera = new OrthographicCamera(width/32f,height/32f);
+		debugObjects = new HashSet<Vector2>();
+		ShapeRenderer debugShapeRenderer = new ShapeRenderer();
+		
+		camera = new OrthographicCamera(width/16f,height/16f);
 		inputProcessor = HandleUserInput.init();
 		Gdx.input.setInputProcessor(inputProcessor);
 		//box2d
@@ -89,9 +95,9 @@ public class LovePirates extends ApplicationAdapter {
 		//this next line is bad, should be part of the spritesheet and a texture region
 		Texture shiptex = new Texture("ship.bmp");
 		Texture cannoballtext = new Texture("cannonball.png");
+		debug = new Texture("debug.bmp");
 		textureRegions[1] = new TextureRegion(cannoballtext, cannoballtext.getWidth(), cannoballtext.getHeight());
-		textureRegions[0] = new TextureRegion(cannoballtext, cannoballtext.getWidth(), cannoballtext.getHeight()); //this is wrong
-
+		textureRegions[0] = new TextureRegion(shiptex, shiptex.getWidth(), shiptex.getHeight()); //this is wrong
 		
 		
 		tiles = new Texture("tiles.png");
@@ -109,23 +115,28 @@ public class LovePirates extends ApplicationAdapter {
 		//save map
 		MyUtils.visuliseArray(map,false);
 		
-		
-		
-		//					  x,y,turnrate,dragcoef,maxpower, width, length
-		playerShip = new PlayerShip((int) Math.pow(2, MAPSIZE-1),500,4f,0f,15f,1,3);
+		ShipGenerator shipGen = new ShipGenerator();
+		//					  x,y,turnrate,dragcoef,maxpower, length, width, cannons
+		playerShip = ShipGenerator.genShip((int) Math.pow(2, MAPSIZE-1),100,1f,1f,4f,5,1.5f,20);
 		while (map[(int) playerShip.getPos().x][(int) playerShip.getPos().y]>SEALEVEL) {
 			playerShip.setPos((int) playerShip.getPos().x+10, (int) playerShip.getPos().y);
 		}
 		playerShip.setControler(new PlayerController());
 		ships.add(playerShip);
 		
-		
-		Ship aiShip = new Ship((int) Math.pow(2, MAPSIZE-1),500,2f,.7f,15f,1,3);
-		aiShip.setControler(new AiController(aiShip, 10));
+		Ship aiShip = ShipGenerator.genShip((int) Math.pow(2, MAPSIZE-1),100,1f,2f,4f,3,1f,3);
+		aiShip.setControler(new AiController(aiShip));
 		while (map[(int) aiShip.getPos().x][(int) aiShip.getPos().y]>SEALEVEL) {
 			aiShip.setPos((int) aiShip.getPos().x+10, (int) aiShip.getPos().y);
 		}
+		Ship aiShip2 = ShipGenerator.genShip((int) Math.pow(2, MAPSIZE-1)-10,110,1f,1f,4f,3f,1f,3);
+		aiShip2.setControler(new AiController(aiShip2));
+		while (map[(int) aiShip2.getPos().x][(int) aiShip2.getPos().y]>SEALEVEL) {
+			aiShip2.setPos((int) aiShip2.getPos().x+10, (int) aiShip2.getPos().y);
+		}
+		ships.add(aiShip2);
 		ships.add(aiShip);
+		
 		/*
 		  for (int i = 0; i<20; i++) {
 			map = noiseGen.getFullPerlinArray(10);
@@ -182,18 +193,27 @@ public class LovePirates extends ApplicationAdapter {
 		//death not yet implemented.
 		for (Ship ship : ships){
 			ship.tick();
-			x = ship.getPos().x;
-			y = ship.getPos().y;
+			x = ship.getDrawPos().x;
+			y = ship.getDrawPos().y;
 			index = ship.getSpriteIndex();
 			float[] size = ship.getSize();
 			t = textureRegions[index];
 			float shipRotation = (float) (ship.getDir()*360/(2*Math.PI));
-			
-			batch.draw(t,x,y,
-					   0,0,//t.getRegionWidth()/2, 
+			System.out.println(size[0]);
+			System.out.println(size[1]);
+			//wtf are these fudge factors
+			//whyyyyyyy
+			batch.draw(t,x-(size[0]/3),y+size[1],
+					   size[0]/2,size[1]/2,
 					   size[0],size[1],
 					   1f,1f,shipRotation,true);
 		}
+
+		for (Vector2 debugLoc : debugObjects) {
+			batch.draw(debug,debugLoc.x, debugLoc.y,.2f,.2f);
+		}
+		
+		debugObjects.clear();
 		for (Projectile proj : projectiles){
 			proj.tick();
 			x = proj.getPos().x;

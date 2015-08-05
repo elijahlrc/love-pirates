@@ -19,4 +19,6 @@ public abstract class Equipment {
 	 */
 	abstract void fire(float dir, Vector2 offset, Ship owner);
 	abstract void tick();
+	abstract float getProjSpeed();
+	abstract float getProjLifetime();
 }
