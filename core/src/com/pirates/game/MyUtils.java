@@ -7,7 +7,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 class MyUtils {
-	private static ShapeRenderer debugRenderer = new ShapeRenderer();
 	static int imageCount = 0;
 	static void visuliseArray(double[][] a, boolean b) {
 		Pixmap toSave = new Pixmap(a.length, a.length, Pixmap.Format.RGB565);
@@ -39,14 +38,15 @@ class MyUtils {
 		PixmapIO.writePNG(handle,toSave);
 		toSave.dispose();
 	}
+	//seems to break rendering when you call this. Nothing but land renders.
 	public static void DrawDebugLine(Vector2 start,
 			Vector2 end) {
 	    Gdx.gl.glLineWidth(1);
-	    debugRenderer.setProjectionMatrix(LovePirates.camera.combined);
-	    debugRenderer.begin(ShapeRenderer.ShapeType.Line);
-	    debugRenderer.setColor(Color.WHITE);
-	    debugRenderer.line(start, end);
-	    debugRenderer.end();
+	    LovePirates.debugShapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+	    LovePirates.debugShapeRenderer.setProjectionMatrix(LovePirates.camera.combined);
+	    LovePirates.debugShapeRenderer.setColor(Color.WHITE);
+	    LovePirates.debugShapeRenderer.line(start, end);
+	    LovePirates.debugShapeRenderer.end();
 	    Gdx.gl.glLineWidth(1);
 	}
 }

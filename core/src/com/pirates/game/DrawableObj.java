@@ -9,9 +9,9 @@ import com.badlogic.gdx.math.Vector2;
  * @author Elijah
  *
  */
-interface DrawableObj {
-	Vector2 getPos();
-	int getSpriteIndex();
-	float[] getSize();
+abstract class DrawableObj {
+	abstract Vector2 getPos();
+	abstract int getSpriteIndex();
+	abstract float[] getSize();
 
 }

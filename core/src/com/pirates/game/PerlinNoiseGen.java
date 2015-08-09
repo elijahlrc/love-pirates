@@ -16,9 +16,9 @@ class PerlinNoiseGen {
 	 * center weighting is the power by which the expression
 	 * y(y_range-y) and x(x_range-x) are raised to.
 	 */
-	private final double PERSISTANCE = .6;
-	private final double RATEOFCHANGE = .8;
-	private final double OCTAVEWEIGHTCONSTANT = 4.0;//if the distribution is good but the magnitude is off, change this one
+	private final double PERSISTANCE = .53;
+	private final double RATEOFCHANGE = .95;
+	private final double OCTAVEWEIGHTCONSTANT = 10;//if the distribution is good but the magnitude is off, change this one
 	private final double CENTERWEIGHTING = .5;
 	private PerlinNoiseGen() {
 		rand = new Random();

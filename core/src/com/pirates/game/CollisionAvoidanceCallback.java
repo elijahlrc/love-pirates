@@ -20,8 +20,9 @@ public class CollisionAvoidanceCallback implements RayCastCallback {
 	Fixture f;
 	float frac;
 	Filter filter;
-	public CollisionAvoidanceCallback() {
-		// TODO Auto-generated constructor stub
+	AiController c;
+	public CollisionAvoidanceCallback(AiController controller) {
+		this.c = controller;
 	}
 
 	/* (non-Javadoc)
@@ -40,8 +41,9 @@ public class CollisionAvoidanceCallback implements RayCastCallback {
 	public float reportRayFixture(Fixture fixture, Vector2 point,
 			Vector2 normal, float fraction) {
 		filter = fixture.getFilterData();
-		if (filter.categoryBits == LovePirates.LAND_MASK) {
-			return fraction;
+		if ((filter.categoryBits == LovePirates.LAND_MASK) || (filter.categoryBits == LovePirates.SHIP_MASK)){
+			c.rayCastCatcher(point);
+			return 1;
 		}
 		return -1;
 	}

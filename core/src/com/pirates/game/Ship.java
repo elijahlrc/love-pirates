@@ -10,7 +10,7 @@ import com.badlogic.gdx.physics.box2d.*;
  * @author Elijah
  *
  */
-public class Ship implements DrawableObj, Collideable{
+public class Ship extends DrawableObj implements Collideable{
 	/**
 	 * @author Elijah
 	 *
@@ -30,8 +30,9 @@ public class Ship implements DrawableObj, Collideable{
 	private float length;
 	private Body body;
 	protected Slot[] slots;
-	private int PHYSICSBUFFER = 15;
-	private Vector2 offset;
+	private int PHYSICSBUFFER = 25;
+	private float hp;
+	boolean alive;
 	/**This class is the super for all ships
 	 * All ships have position vector "loc", velocity vector "vel", drag coefficient "dragcoef", and a "maxpower"
 	 * Perhaps the following things should be in some kind of ship data structure/class, 
@@ -39,10 +40,12 @@ public class Ship implements DrawableObj, Collideable{
 	 * private float maxPower;
 	 * private float turnRate;
 	 * private float dragCoef;
+	 * @param hp 
 	 * 
 	*/
-	Ship(int x, int y, float turnrate, float dragcoef, float maxpower,float len, float wid) {
-		
+	Ship(int x, int y, float turnrate, float dragcoef, float maxpower,float len, float wid, float hp) {
+		this.hp = hp;
+		alive = true;
 		turnRate = turnrate;
 		maxPower = maxpower;
 		width = wid;
@@ -56,7 +59,6 @@ public class Ship implements DrawableObj, Collideable{
 		body = LovePirates.world.createBody(bodyDef);
 		body.setAwake(true);
 		PolygonShape shipshape = new PolygonShape();
-		offset = new Vector2(-width/2, -length/2);
 		float[] verts = {0,width/2,length/2, 0, 0, -width/2, -length/2, 0};
 		shipshape.set(verts);
 		
@@ -82,6 +84,9 @@ public class Ship implements DrawableObj, Collideable{
 		controller.tick();
 		move();
 		fire();
+		if (hp<0) {
+			alive = false;
+		}
 	}
 	void clearTerrain() {
 		
@@ -92,11 +97,13 @@ public class Ship implements DrawableObj, Collideable{
 		int y = (int) getPos().y;
 		for (int i = -PHYSICSBUFFER; i<PHYSICSBUFFER; i++){
 			for (int j= -PHYSICSBUFFER; j<PHYSICSBUFFER; j++){
-				if (LovePirates.map[x+i][y+j] > LovePirates.SEALEVEL) {
-					//if a terrain collider is already at the point specified
-					//colliderPool should handle this
-					//and ignore this command.
-					LovePirates.colliderPool.createTerainCollider(x+i,y+j);
+				if ((x+i < LovePirates.map.length)&&(x+i >= 0)&&(y+j < LovePirates.map.length)&&( y+j >= 0)){
+					if (LovePirates.map[x+i][y+j] > LovePirates.SEALEVEL) {
+						//if a terrain collider is already at the point specified
+						//colliderPool should handle this
+						//and ignore this command.
+						LovePirates.colliderPool.createTerainCollider(x+i,y+j);
+					}
 				}
 			}
 		}
@@ -157,12 +164,7 @@ public class Ship implements DrawableObj, Collideable{
 	}
 				
 	public Vector2 getPos() {
-		//should be center of mass
 		return body.getPosition().cpy();
-	}
-	public Vector2 getDrawPos() {
-		
-		return body.getPosition().add(offset);
 	}
 	public Vector2 getVel() {
 		return body.getLinearVelocity().cpy();
@@ -196,8 +198,14 @@ public class Ship implements DrawableObj, Collideable{
 	}
 	@Override
 	public void handlePostCollide(Contact contact, ContactImpulse impulse) {
-		// TODO Auto-generated method stub
-		//damage?
+		Object b = contact.getFixtureB().getUserData();
+		if (b instanceof Cannonball){
+			Ship owner = ((Cannonball) b).getOwner();
+			if (owner != this) {
+				System.out.println("HP is"+hp);
+				hp-=impulse.getNormalImpulses()[0];
+			}
+		}
 		
 	}
 	public float getCannonSpeed() {
@@ -227,6 +235,10 @@ public class Ship implements DrawableObj, Collideable{
 			return 0;
 		}
 		return lifetimeTotal/weaponCount;
+	}
+	public void delete() {
+		LovePirates.world.destroyBody(body);
+		
 	}
 	
 	

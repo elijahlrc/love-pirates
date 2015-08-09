@@ -20,11 +20,11 @@ public class Cannonball extends Projectile implements Collideable  {
 	CircleShape circleShape = new CircleShape();
 	private Fixture fixture;
 	private Ship owner;
-	
+	private float realVel;
 	/**
-	 * @param pos
+	 * 
 	 */
-	public Cannonball(Vector2 position, Vector2 velocity, Ship owner) {
+	Cannonball(Vector2 position, Vector2 velocity, Ship owner) {
 		dead = false;
 		lifetime = LIFETIME;
 		size = .3f;
@@ -50,6 +50,7 @@ public class Cannonball extends Projectile implements Collideable  {
 		Vector2 realVel = velocity.cpy();
 		realVel.setLength(actualspeed);
 		realVel.setAngleRad(actualang);
+		body.setLinearDamping(.9f);
 		body.setLinearVelocity(realVel);
 
 	}
@@ -68,6 +69,7 @@ public class Cannonball extends Projectile implements Collideable  {
 	void tick() {
 		//dt?
 		lifetime -= 1;
+
 		if (lifetime<0) {
 			dead = true;
 		}
@@ -87,7 +89,7 @@ public class Cannonball extends Projectile implements Collideable  {
 	 */
 	@Override
 	
-	public int getSpriteIndex() {
+	int getSpriteIndex() {
 		//TODO no sprite exists yet :-(
 		return 1;
 	}

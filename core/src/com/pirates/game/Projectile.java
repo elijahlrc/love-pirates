@@ -13,7 +13,7 @@ import com.badlogic.gdx.math.Vector2;
  * ship wakes
  * etc
  */
-public abstract class Projectile implements DrawableObj{
+public abstract class Projectile extends DrawableObj{
 
 	/**
 	 * 
@@ -23,7 +23,7 @@ public abstract class Projectile implements DrawableObj{
 	protected double lifetime;
 	abstract void move();
 	abstract void tick();
-	public abstract Vector2 getPos();
-	public abstract int getSpriteIndex();
+	abstract Vector2 getPos();
+	abstract int getSpriteIndex();
 	abstract void delete();
 }

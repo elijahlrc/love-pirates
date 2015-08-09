@@ -18,7 +18,7 @@ public class Cannon extends Equipment {
 	private float fireSpeed;
 	public Cannon() {
 		countdown = 0;
-		fireSpeed = 30f;
+		fireSpeed = 45f;
 	}
 
 	@Override

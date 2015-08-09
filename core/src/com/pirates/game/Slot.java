@@ -31,7 +31,7 @@ public class Slot {
 	}
 	void fire(ArrayList<FireingDirection> dirToFire) {
 		inslot.tick();
-		if (dirToFire.contains(side)) {
+		if ((dirToFire != null)&&(dirToFire.contains(side))) {
 			if (inslot.iswepon()) {
 				inslot.fire(dir, offset, owner);//how to handle this nicely?
 			}
