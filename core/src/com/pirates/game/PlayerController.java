@@ -62,5 +62,8 @@ class PlayerController implements Controller {
 		// TODO Auto-generated method stub
 		return 0;
 	}
+	public boolean getActive() {
+		return true;
+	}
 
 }

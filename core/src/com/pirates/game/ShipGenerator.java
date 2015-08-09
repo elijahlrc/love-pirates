@@ -7,10 +7,11 @@ public class ShipGenerator {
 	}
 	//later add type of cannon two the genship function
 	static Ship genShip(int x, int y, float turnRate, float drag, float power,  float length, float width, int cannons, float hp) {
-		float massfactor = length*width;
+		float massFactor = length*width;
+		float turnMassFactor = (float) Math.pow(massFactor, 1.25);
 		float offset = -length/2f;
 		float spacing = length/(float)cannons;
-		Ship returnShip = new Ship(x,y,turnRate*massfactor,drag,power*massfactor,length,width,hp);
+		Ship returnShip = new Ship(x,y,turnRate*turnMassFactor,drag,power*massFactor,length,width,hp);
 		Slot[] slots = new Slot[2*cannons];
 		
 		for (int i=0; i<cannons; i++) {

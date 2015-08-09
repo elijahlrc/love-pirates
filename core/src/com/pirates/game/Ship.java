@@ -93,16 +93,18 @@ public class Ship extends DrawableObj implements Collideable{
 		
 	}
 	private void updateColidors() {
-		int x = (int) getPos().x;
-		int y = (int) getPos().y;
-		for (int i = -PHYSICSBUFFER; i<PHYSICSBUFFER; i++){
-			for (int j= -PHYSICSBUFFER; j<PHYSICSBUFFER; j++){
-				if ((x+i < LovePirates.map.length)&&(x+i >= 0)&&(y+j < LovePirates.map.length)&&( y+j >= 0)){
-					if (LovePirates.map[x+i][y+j] > LovePirates.SEALEVEL) {
-						//if a terrain collider is already at the point specified
-						//colliderPool should handle this
-						//and ignore this command.
-						LovePirates.colliderPool.createTerainCollider(x+i,y+j);
+		if (controller.getActive()) {
+			int x = (int) getPos().x;
+			int y = (int) getPos().y;
+			for (int i = -PHYSICSBUFFER; i<PHYSICSBUFFER; i++){
+				for (int j= -PHYSICSBUFFER; j<PHYSICSBUFFER; j++){
+					if ((x+i < LovePirates.map.length)&&(x+i >= 0)&&(y+j < LovePirates.map.length)&&( y+j >= 0)){
+						if (LovePirates.map[x+i][y+j] > LovePirates.SEALEVEL) {
+							//if a terrain collider is already at the point specified
+							//colliderPool should handle this
+							//and ignore this command.
+							LovePirates.colliderPool.createTerainCollider(x+i,y+j);
+						}
 					}
 				}
 			}
@@ -239,6 +241,9 @@ public class Ship extends DrawableObj implements Collideable{
 	public void delete() {
 		LovePirates.world.destroyBody(body);
 		
+	}
+	public float getHp() {
+		return hp;
 	}
 	
 	

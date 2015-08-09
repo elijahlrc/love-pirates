@@ -11,10 +11,13 @@ public class DesktopLauncher {
 		width = 1920;
 		height = 1080;
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
+		config.fullscreen = true;
+		config.vSyncEnabled = true;
 		new LwjglApplication(new LovePirates(width, height), config);
 		config.width = width;
 		config.height = height;
 		config.foregroundFPS = 60;
+
 		//config.fullscreen = true;
 	}
 }

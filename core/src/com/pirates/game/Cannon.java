@@ -35,7 +35,7 @@ public class Cannon extends Equipment {
 			vel.setAngleRad((float) dir + owner.getDir());
 			vel.add(owner.getVel());
 			LovePirates.projectiles.add(new Cannonball(firepos,vel,owner));
-			countdown += 60;
+			countdown += 120;
 		}
 	}
 

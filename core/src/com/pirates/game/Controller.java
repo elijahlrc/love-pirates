@@ -18,4 +18,5 @@ interface Controller {
 	void tick();
 	void setProjectileSpeed(float projectileSpeed);
 	float getProjectileSpeed();
+	boolean getActive();
 }

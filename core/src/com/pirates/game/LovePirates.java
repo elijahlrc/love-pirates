@@ -2,12 +2,15 @@ package com.pirates.game;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 
 import java.util.HashSet;
+import java.util.Random;
 
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Texture.TextureFilter;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -27,7 +30,7 @@ public class LovePirates extends ApplicationAdapter {
 	static int height;
 	static int TILESIZE = 32;
 	static float SEALEVEL = .73f;
-	static boolean DEBUGPRINTOUT = false;
+	static boolean DEBUGPRINTOUT = true;
 	static TextureRegion land;
 	static TextureRegion sea;
 	static TextureRegion grass;
@@ -44,7 +47,7 @@ public class LovePirates extends ApplicationAdapter {
 	static World world;
 	static ColliderPool colliderPool;
 	static Box2DDebugRenderer debugRenderer;
-	
+	static Random rand;
 	//these are used to keep track of preformance.
 	static PerformanceCounter totalPrefCount;
 	static PerformanceCounter renderPrefCount;
@@ -55,7 +58,7 @@ public class LovePirates extends ApplicationAdapter {
 	final static short SHIP_MASK = 0x0002;
 	final static short PROJ_MASK = 0x0004;
 	static ShapeRenderer debugShapeRenderer;
-	
+	static BitmapFont font;
 	HashSet<Projectile> projRemovalSet;
 	HashSet<Ship> shipRemovalSet;
 	//static BodyDef bodyDef = new BodyDef();
@@ -67,6 +70,12 @@ public class LovePirates extends ApplicationAdapter {
 	}
 	@Override
 	public void create() {
+		Gdx.graphics.setDisplayMode(Gdx.graphics.getDesktopDisplayMode().width, Gdx.graphics.getDesktopDisplayMode().height, true);
+
+		font = new BitmapFont();
+		font.setScale(1/16f);
+		font.setUseIntegerPositions(false);
+		rand = new Random();
 		shipPrefCount = new PerformanceCounter("ship");
 		renderPrefCount = new PerformanceCounter("render");
 		physicsPrefCount = new PerformanceCounter("physics");
@@ -74,7 +83,7 @@ public class LovePirates extends ApplicationAdapter {
 		debugObjects = new HashSet<Vector2>();
 		debugShapeRenderer = new ShapeRenderer();
 		
-		camera = new OrthographicCamera(width/16,height/16);
+		camera = new OrthographicCamera(width/32,height/32);
 		inputProcessor = HandleUserInput.init();
 		Gdx.input.setInputProcessor(inputProcessor);
 		//box2d
@@ -112,6 +121,7 @@ public class LovePirates extends ApplicationAdapter {
 		
 		
 		tiles = new Texture("tiles.png");
+		tiles.setFilter(TextureFilter.Nearest,TextureFilter.Nearest);
 		land =  new TextureRegion(tiles,0,0,32,32);
 		sea =  new TextureRegion(tiles,32,32,32,32);
 		grass =  new TextureRegion(tiles,32,0,32,32);
@@ -127,7 +137,7 @@ public class LovePirates extends ApplicationAdapter {
 		MyUtils.visuliseArray(map,false);
 		
 		//					  x,y,turnrate,dragcoef,maxpower, length, width, cannons,hp
-		playerShip = ShipGenerator.genShip((int) Math.pow(2, MAPSIZE-1),100,2f,1f,16f,5,1.5f,20,100);
+		playerShip = ShipGenerator.genShip((int) Math.pow(2, MAPSIZE-1),100,1f,1f,4f,3,1f,20,100);
 		while (map[(int) playerShip.getPos().x][(int) playerShip.getPos().y]>SEALEVEL) {
 			playerShip.setPos((int) playerShip.getPos().x+10, (int) playerShip.getPos().y);
 		}
@@ -176,8 +186,8 @@ public class LovePirates extends ApplicationAdapter {
 		/*seems that the preformance issues are from the following block of code :-(
 		 * where the land is rendered
 		 */
-		for (int i = (((int) playerPos.x)-(width/20)); i< ((int) (playerPos.x) +(width/20)); i++){
-			for (int j = (((int)(playerPos.y)-height/20)); j<((int) (playerPos.y)+height/20); j++){
+		for (int i 		= (int)((playerPos.x)-(width/20)); 	   	i < ((int) (playerPos.x) + (width/20)); i++){
+			for (int j 	= (int)((playerPos.y)-(height/20)); 	j < ((int) (playerPos.y) + (height/20)); j++){
 				if (i<0 || i>=map.length || j<0 || j>=map[0].length){
 					batch.draw(dsea,i,j, 1, 1);
 				} else if (map[i][j] > SEALEVEL+.15) {
@@ -206,25 +216,34 @@ public class LovePirates extends ApplicationAdapter {
 		//also do all the important ship things like moving, firing, etc
 		//death not yet implemented.
 		
-		while (ships.size()<50) {
+		while (ships.size()<100) {
 			int mapSize = (int) Math.pow(2, MAPSIZE);
-			
-			Ship aiShip = ShipGenerator.genShip((int) (Math.random()*mapSize),(int) (Math.random()*mapSize),1f,1f,8f,3f,1f,3,25);
+			float turnRate = (float) Math.abs(rand.nextGaussian()+1);
+			float length = (float) Math.abs(rand.nextGaussian()+1)+.5f;
+			float width = length*(rand.nextFloat()/4+.25f);
+			float drag = (float) Math.abs(rand.nextGaussian()/4+1);
+			float power = (float) Math.abs(rand.nextGaussian()*2+6);
+			int cannons = (int) Math.abs(rand.nextGaussian()*4)+1;
+			float hp = (float) Math.abs(rand.nextGaussian()*20+10);
+			//					 									 x,y,turnrate,dragcoef,maxpower, length, width, cannons,hp
+			Ship aiShip = ShipGenerator.genShip((int) (Math.random()*mapSize),(int) (Math.random()*mapSize),turnRate,drag,power,length,width,cannons,hp);
 			aiShip.setControler(new AiController(aiShip));
 			while (map[(int) aiShip.getPos().x][(int) aiShip.getPos().y]>SEALEVEL) {
 				aiShip.setPos((int) (Math.random()*mapSize),((int) Math.random()*mapSize));
 			}
 			ships.add(aiShip);
 		}
+		
 		for (Ship ship : ships){
 			ship.tick();
-			System.out.println(ship.getPos());
 			x = ship.getPos().x;
 			y = ship.getPos().y;
 			index = ship.getSpriteIndex();
 			float[] size = ship.getSize();
 			t = textureRegions[index];
 			float shipRotation = (float) (ship.getDir()*360/(2*Math.PI));
+			font.draw(batch, ((Float) ship.getHp()).toString(), ship.getPos().x, ship.getPos().y+3,0,3);
+
 			batch.draw(t,x-size[0]/2,y-size[1]/2,
 					   size[0]/2,size[1]/2,
 					   size[0],size[1],
@@ -238,7 +257,6 @@ public class LovePirates extends ApplicationAdapter {
 			}
 		}
 		ships.removeAll(shipRemovalSet);
-		
 		for (Vector2 debugLoc : debugObjects) {
 			batch.draw(debug,debugLoc.x, debugLoc.y,.2f,.2f);
 		}
@@ -255,7 +273,7 @@ public class LovePirates extends ApplicationAdapter {
 					   1f,1f,0,true);
 			
 		}
-		
+		batch.end();
 		for (Projectile proj : projectiles){
 			if (proj.dead == true) {
 				projRemovalSet.add(proj);
@@ -265,7 +283,7 @@ public class LovePirates extends ApplicationAdapter {
 		
 		projectiles.removeAll(projRemovalSet);
 		projRemovalSet.clear();
-		batch.end();
+		
 		shipPrefCount.stop();
 		
 		physicsPrefCount.start();
@@ -276,8 +294,8 @@ public class LovePirates extends ApplicationAdapter {
 		
 		//this debug renderer seems to be very heavy
 		//debugRenderer.render(world, camera.combined);
-		
 		totalPrefCount.stop();
+		MyUtils.renderLines();
 		if (DEBUGPRINTOUT) {
 			if (shipPrefCount.load.latest > .05) {
 				System.out.println(shipPrefCount);

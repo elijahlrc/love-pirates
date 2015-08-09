@@ -25,14 +25,14 @@ public class AiController implements Controller {
 	private float targetDeltaAngle;
 	private Vector2 rayCastHitLoc;
 	private Vector2 reverse;
-	private boolean active;
 	private CollisionAvoidanceCallback raycastCallback;
+	private boolean active;
 	AiController(Ship owner) {
 		active = false;
 		this.owner = owner;
 		reverse = new Vector2(999,999);
 		rayCastHitLoc = new Vector2(0,0);
-		projectileSpeed = getCannonProjectileSpeed();
+		projectileSpeed = getCannonProjectileSpeed()*.75f;
 		projectileLifetime = getCannonProjectileLifetime();
 		projectileRange = projectileSpeed*projectileLifetime/60;
 		raycastCallback = new CollisionAvoidanceCallback(this);
@@ -127,15 +127,18 @@ public class AiController implements Controller {
 				forwardRaycastPos.setLength(rayLen);
 				forwardRaycastPos.setAngleRad((float) (owner.getDir()+ang));
 				forwardRaycastPos.add(leftOffset);
-				
-				//MyUtils.DrawDebugLine(forwardRaycastPos, leftOffset);
+				if (LovePirates.DEBUGPRINTOUT){
+					MyUtils.DrawDebugLine(forwardRaycastPos, leftOffset);
+				}
 				LovePirates.world.rayCast(raycastCallback, leftOffset, forwardRaycastPos);
 				rightVec = getCollisionLoc();
 				forwardRaycastPos.setLength(rayLen);
 				forwardRaycastPos.setAngleRad((float) (owner.getDir()-ang));
 				forwardRaycastPos.add(rightOffset);
 				
-				//MyUtils.DrawDebugLine(forwardRaycastPos, rightOffset);	
+				if (LovePirates.DEBUGPRINTOUT){
+					MyUtils.DrawDebugLine(forwardRaycastPos, rightOffset);
+				}
 				LovePirates.world.rayCast(raycastCallback, rightOffset, forwardRaycastPos);
 				leftVec = getCollisionLoc();
 				if (leftVec == null) {
@@ -260,6 +263,13 @@ public class AiController implements Controller {
 
 	public void setProjectileSpeed(float projectileSpeed) {
 		this.projectileSpeed = projectileSpeed;
+	}
+
+
+
+	@Override
+	public boolean getActive() {
+		return active;
 	}
 
 
