@@ -13,10 +13,13 @@ public class DesktopLauncher {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		config.fullscreen = true;
 		config.vSyncEnabled = true;
-		new LwjglApplication(new LovePirates(width, height), config);
 		config.width = width;
 		config.height = height;
 		config.foregroundFPS = 60;
+		config.allowSoftwareMode = true;
+		config.samples = 2;
+		new LwjglApplication(new LovePirates(width, height), config);
+
 
 		//config.fullscreen = true;
 	}

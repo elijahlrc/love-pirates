@@ -24,13 +24,14 @@ public class LovePirates extends ApplicationAdapter {
 	static Texture tiles;
 	static HashSet<Projectile> projectiles;
 	static HashSet<Ship> ships;
+	static HashSet<Debries> debries;
 	static OrthographicCamera camera;
 	static Ship playerShip;
 	static int width;
 	static int height;
 	static int TILESIZE = 32;
 	static float SEALEVEL = .73f;
-	static boolean DEBUGPRINTOUT = true;
+	static boolean DEBUGPRINTOUT = false;
 	static TextureRegion land;
 	static TextureRegion sea;
 	static TextureRegion grass;
@@ -61,6 +62,7 @@ public class LovePirates extends ApplicationAdapter {
 	static BitmapFont font;
 	HashSet<Projectile> projRemovalSet;
 	HashSet<Ship> shipRemovalSet;
+	HashSet<Debries> debriesRemovalSet;
 	//static BodyDef bodyDef = new BodyDef();
 	//static FixtureDef fixtureDef = new FixtureDef();
 	public LovePirates(int w, int h){
@@ -83,7 +85,7 @@ public class LovePirates extends ApplicationAdapter {
 		debugObjects = new HashSet<Vector2>();
 		debugShapeRenderer = new ShapeRenderer();
 		
-		camera = new OrthographicCamera(width/32,height/32);
+		camera = new OrthographicCamera(width/24,height/24);
 		inputProcessor = HandleUserInput.init();
 		Gdx.input.setInputProcessor(inputProcessor);
 		//box2d
@@ -96,6 +98,7 @@ public class LovePirates extends ApplicationAdapter {
 		colliderPool = new ColliderPool(COLLIDERPOOLSIZE);
 		projRemovalSet = new HashSet<Projectile>();
 		shipRemovalSet = new HashSet<Ship>();
+		debriesRemovalSet = new HashSet<Debries>();
 		//debug renderer for physics rendering
 		debugRenderer = new Box2DDebugRenderer();
 		
@@ -104,6 +107,7 @@ public class LovePirates extends ApplicationAdapter {
 		//game state stuff
 		ships = new HashSet<Ship>();
 		projectiles = new HashSet<Projectile>();
+		debries = new HashSet<Debries>();
 		//sprite batch for efficient bliting
 		batch = new SpriteBatch();
 		
@@ -115,13 +119,15 @@ public class LovePirates extends ApplicationAdapter {
 		//this next line is bad, should be part of the spritesheet and a texture region
 		Texture shiptex = new Texture("ship.bmp");
 		Texture cannoballtext = new Texture("cannonball.png");
+		Texture debristext = new Texture("debris.png");
 		debug = new Texture("debug.bmp");
 		textureRegions[1] = new TextureRegion(cannoballtext, cannoballtext.getWidth(), cannoballtext.getHeight());
 		textureRegions[0] = new TextureRegion(shiptex, shiptex.getWidth(), shiptex.getHeight()); //this is wrong
+		textureRegions[3] = new TextureRegion(debristext, debristext.getWidth(), debristext.getHeight());
 		
 		
 		tiles = new Texture("tiles.png");
-		tiles.setFilter(TextureFilter.Nearest,TextureFilter.Nearest);
+		tiles.setFilter(TextureFilter.Linear,TextureFilter.Linear);
 		land =  new TextureRegion(tiles,0,0,32,32);
 		sea =  new TextureRegion(tiles,32,32,32,32);
 		grass =  new TextureRegion(tiles,32,0,32,32);
@@ -212,19 +218,38 @@ public class LovePirates extends ApplicationAdapter {
 		shipPrefCount.start();
 		TextureRegion t;
 		
-		//add terrain physics obj in this ship.tick
-		//also do all the important ship things like moving, firing, etc
-		//death not yet implemented.
+
+		
+		for (Debries debrie : debries){
+			x = debrie.getPos().x;
+			y = debrie.getPos().y;
+			index = debrie.getSpriteIndex();
+			float[] size = debrie.getSize();
+			t = textureRegions[index];
+			float debrieRot = (float) (debrie.getRotation()*360/(2*Math.PI));
+			batch.draw(t,x-size[0]/2,y-size[1]/2,
+					   size[0]/2,size[1]/2,
+					   size[0],size[1],
+					   1f,1f,debrieRot,true);
+		}
+		
+		for (Debries debrie : debries){
+			if (debrie.alive == false) {
+				debriesRemovalSet.add(debrie);
+				debrie.delete();
+			}
+		}
+		debries.removeAll(debriesRemovalSet);
 		
 		while (ships.size()<100) {
 			int mapSize = (int) Math.pow(2, MAPSIZE);
-			float turnRate = (float) Math.abs(rand.nextGaussian()+1);
-			float length = (float) Math.abs(rand.nextGaussian()+1)+.5f;
-			float width = length*(rand.nextFloat()/4+.25f);
+			float turnRate = (float) Math.abs(rand.nextGaussian()+1.5f);
+			float length = (float) Math.abs(rand.nextGaussian()*2)+1f;
+			float width = (length*rand.nextFloat()*.75f)+.25f;
 			float drag = (float) Math.abs(rand.nextGaussian()/4+1);
-			float power = (float) Math.abs(rand.nextGaussian()*2+6);
-			int cannons = (int) Math.abs(rand.nextGaussian()*4)+1;
-			float hp = (float) Math.abs(rand.nextGaussian()*20+10);
+			float power = (float) Math.abs(rand.nextGaussian()*length*2+4);
+			int cannons = (int) Math.abs(rand.nextGaussian()*length*2)+1;
+			float hp = (float) Math.abs((rand.nextGaussian()+1)*width*15+5);
 			//					 									 x,y,turnrate,dragcoef,maxpower, length, width, cannons,hp
 			Ship aiShip = ShipGenerator.genShip((int) (Math.random()*mapSize),(int) (Math.random()*mapSize),turnRate,drag,power,length,width,cannons,hp);
 			aiShip.setControler(new AiController(aiShip));
@@ -257,6 +282,14 @@ public class LovePirates extends ApplicationAdapter {
 			}
 		}
 		ships.removeAll(shipRemovalSet);
+
+		
+		
+		
+
+		
+		
+		
 		for (Vector2 debugLoc : debugObjects) {
 			batch.draw(debug,debugLoc.x, debugLoc.y,.2f,.2f);
 		}
@@ -297,7 +330,7 @@ public class LovePirates extends ApplicationAdapter {
 		totalPrefCount.stop();
 		MyUtils.renderLines();
 		if (DEBUGPRINTOUT) {
-			if (shipPrefCount.load.latest > .05) {
+			if (shipPrefCount.load.latest > .06) {
 				System.out.println(shipPrefCount);
 	
 			}

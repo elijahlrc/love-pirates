@@ -240,6 +240,11 @@ public class Ship extends DrawableObj implements Collideable{
 	}
 	public void delete() {
 		LovePirates.world.destroyBody(body);
+		int debriesAmount = (int) (3*length*width);
+		for (int i = 0 ; i <= debriesAmount; i++) {
+			LovePirates.debries.add(new Debries((float) (body.getPosition().x+(Math.random()*i*.2-.5)),(float) (body.getPosition().y+(Math.random()*i*.2-.5))));
+		}
+		
 		
 	}
 	public float getHp() {

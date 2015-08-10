@@ -32,7 +32,7 @@ public class AiController implements Controller {
 		this.owner = owner;
 		reverse = new Vector2(999,999);
 		rayCastHitLoc = new Vector2(0,0);
-		projectileSpeed = getCannonProjectileSpeed()*.75f;
+		projectileSpeed = getCannonProjectileSpeed()*.65f;
 		projectileLifetime = getCannonProjectileLifetime();
 		projectileRange = projectileSpeed*projectileLifetime/60;
 		raycastCallback = new CollisionAvoidanceCallback(this);
