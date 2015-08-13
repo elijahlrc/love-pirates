@@ -13,12 +13,12 @@ public class Cannon extends Equipment {
 	/**
 	 * 
 	 */
-	private static Random rand = new Random();
 	private float countdown;
 	private float fireSpeed;
+	private static Random rand = new Random();
 	public Cannon() {
 		countdown = 0;
-		fireSpeed = 45f;
+		fireSpeed = 25f;
 	}
 
 	@Override
@@ -31,7 +31,8 @@ public class Cannon extends Equipment {
 			Vector2 offsetVec = offset.cpy().rotateRad(owner.getDir());
 			Vector2 firepos = owner.getPos().add(offsetVec);
 			Vector2 vel = new Vector2(1,1);
-			vel.setLength(fireSpeed);
+			float exitVel = (float) (rand.nextGaussian()*2+fireSpeed);
+			vel.setLength(exitVel);
 			vel.setAngleRad((float) dir + owner.getDir());
 			vel.add(owner.getVel());
 			LovePirates.projectiles.add(new Cannonball(firepos,vel,owner));

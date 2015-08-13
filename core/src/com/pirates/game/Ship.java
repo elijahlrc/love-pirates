@@ -18,7 +18,7 @@ public class Ship extends DrawableObj implements Collideable{
 	
 	
 	static final int NUM_SLOTS = 0;
-	
+	static final float DAMAGEFACTOR = 3;
 	Controller controller;
 	private float maxPower;
 	private float turnRate;
@@ -33,6 +33,8 @@ public class Ship extends DrawableObj implements Collideable{
 	private int PHYSICSBUFFER = 25;
 	private float hp;
 	boolean alive;
+
+	private float repairSupplies;
 	/**This class is the super for all ships
 	 * All ships have position vector "loc", velocity vector "vel", drag coefficient "dragcoef", and a "maxpower"
 	 * Perhaps the following things should be in some kind of ship data structure/class, 
@@ -46,6 +48,7 @@ public class Ship extends DrawableObj implements Collideable{
 	Ship(int x, int y, float turnrate, float dragcoef, float maxpower,float len, float wid, float hp) {
 		this.hp = hp;
 		alive = true;
+		repairSupplies = 5f;
 		turnRate = turnrate;
 		maxPower = maxpower;
 		width = wid;
@@ -64,7 +67,7 @@ public class Ship extends DrawableObj implements Collideable{
 		
 		fixtureDef.shape = shipshape;
 		fixtureDef.density = 1f;
-		fixtureDef.friction = .9f;
+		fixtureDef.friction = .1f;
 		fixtureDef.restitution = .2f;
 		fixtureDef.filter.categoryBits = LovePirates.SHIP_MASK;
 		fixtureDef.filter.maskBits = LovePirates.LAND_MASK | LovePirates.SHIP_MASK | LovePirates.PROJ_MASK;
@@ -84,6 +87,10 @@ public class Ship extends DrawableObj implements Collideable{
 		controller.tick();
 		move();
 		fire();
+		if (repairSupplies > 0){
+			repairSupplies -= .01;
+			hp += .01;
+		}
 		if (hp<0) {
 			alive = false;
 		}
@@ -205,10 +212,36 @@ public class Ship extends DrawableObj implements Collideable{
 			Ship owner = ((Cannonball) b).getOwner();
 			if (owner != this) {
 				System.out.println("HP is"+hp);
-				hp-=impulse.getNormalImpulses()[0];
+				hp-=impulse.getNormalImpulses()[0]*DAMAGEFACTOR;
 			}
+		} else if (b instanceof LootCrate) {
+			LootCrate c = (LootCrate) b;
+			getLoot(c.contents, c.quantaty);
 		}
 		
+	}
+	int openSlots() {
+		int count = 0;
+		for (Slot s : slots) {
+			if (s == null) {
+				count++;
+			}
+		}
+		return count;
+		
+	}
+	void getLoot(String loot,int quantity) {
+		if (loot.equals("repair supplies")){
+			repairSupplies += quantity*5;
+		} else if (loot.equals("crew")) {
+			//TODO
+		} else if (loot.equals("cannons")) {
+			for (int i = 0; i<quantity; i++) {
+				if (openSlots() > 0){
+					
+				}
+			}
+		}
 	}
 	public float getCannonSpeed() {
 		float speedTotal = 0;
@@ -240,9 +273,14 @@ public class Ship extends DrawableObj implements Collideable{
 	}
 	public void delete() {
 		LovePirates.world.destroyBody(body);
-		int debriesAmount = (int) (3*length*width);
+		int lootAmount = (int) (length*width) + 1;
+		int debriesAmount = lootAmount*7;
 		for (int i = 0 ; i <= debriesAmount; i++) {
-			LovePirates.debries.add(new Debries((float) (body.getPosition().x+(Math.random()*i*.2-.5)),(float) (body.getPosition().y+(Math.random()*i*.2-.5))));
+			LovePirates.debries.add(new Debries((float) (body.getPosition().x+((Math.random()-.5)*Math.sqrt(i))),(float) (body.getPosition().y+((Math.random()-.5)*Math.sqrt(i))), false));
+		}
+		for (int i = 0; i < lootAmount; i++) {
+			LovePirates.debries.add(new LootCrate((float) (body.getPosition().x+((Math.random()-.5)*Math.sqrt(i))),(float) (body.getPosition().y+((Math.random()-.5)*Math.sqrt(i))), "repair supplies", 1));
+
 		}
 		
 		

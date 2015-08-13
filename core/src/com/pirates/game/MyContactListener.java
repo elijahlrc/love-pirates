@@ -58,6 +58,13 @@ public class MyContactListener implements ContactListener {
 				((Collideable) o).handlePostCollide(contact, impulse);
 			}
 		}
+		Fixture g = contact.getFixtureB();
+		Object p = g.getUserData();
+		if (p != null){
+			if (p instanceof Collideable) {
+				((Collideable) p).handlePostCollide(contact, impulse);
+			}
+		}
 	}
 
 }

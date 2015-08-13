@@ -29,7 +29,7 @@ public class LovePirates extends ApplicationAdapter {
 	static Ship playerShip;
 	static int width;
 	static int height;
-	static int TILESIZE = 32;
+	static int TILESIZE = 16;
 	static float SEALEVEL = .73f;
 	static boolean DEBUGPRINTOUT = false;
 	static TextureRegion land;
@@ -85,12 +85,11 @@ public class LovePirates extends ApplicationAdapter {
 		debugObjects = new HashSet<Vector2>();
 		debugShapeRenderer = new ShapeRenderer();
 		
-		camera = new OrthographicCamera(width/24,height/24);
+		camera = new OrthographicCamera(width/TILESIZE*.5f,height/TILESIZE*.5f);
 		inputProcessor = HandleUserInput.init();
 		Gdx.input.setInputProcessor(inputProcessor);
 		//box2d
-		Box2D.init();
-		
+		Box2D.init();		
 		world = new World(new Vector2(0, 0), true);
 		world.setContactListener(new MyContactListener());
 		//this number is performance sensitive and can create subtle collision bugs, beware
@@ -120,22 +119,25 @@ public class LovePirates extends ApplicationAdapter {
 		Texture shiptex = new Texture("ship.bmp");
 		Texture cannoballtext = new Texture("cannonball.png");
 		Texture debristext = new Texture("debris.png");
+		Texture lootCratetext = new Texture("crate.png");
+
 		debug = new Texture("debug.bmp");
 		textureRegions[1] = new TextureRegion(cannoballtext, cannoballtext.getWidth(), cannoballtext.getHeight());
 		textureRegions[0] = new TextureRegion(shiptex, shiptex.getWidth(), shiptex.getHeight()); //this is wrong
 		textureRegions[3] = new TextureRegion(debristext, debristext.getWidth(), debristext.getHeight());
-		
+		textureRegions[4] = new TextureRegion(lootCratetext, lootCratetext.getWidth(), lootCratetext.getHeight());
+
 		
 		tiles = new Texture("tiles.png");
 		tiles.setFilter(TextureFilter.Linear,TextureFilter.Linear);
-		land =  new TextureRegion(tiles,0,0,32,32);
-		sea =  new TextureRegion(tiles,32,32,32,32);
-		grass =  new TextureRegion(tiles,32,0,32,32);
-		ygrass =  new TextureRegion(tiles,64,0,32,32);
-		bgrass =  new TextureRegion(tiles,64,32,32,32);
-		dsea =  new TextureRegion(tiles,32,64,32,32);
-		lsea =  new TextureRegion(tiles,64,64,32,32);
-		sand =  new TextureRegion(tiles,0,32,32,32);
+		land =  new TextureRegion(tiles,0,0,TILESIZE,TILESIZE);
+		sea =  new TextureRegion(tiles,TILESIZE,TILESIZE,TILESIZE,TILESIZE);
+		grass =  new TextureRegion(tiles,TILESIZE,0,TILESIZE,TILESIZE);
+		ygrass =  new TextureRegion(tiles,2*TILESIZE,0,TILESIZE,TILESIZE);
+		bgrass =  new TextureRegion(tiles,2*TILESIZE,TILESIZE,TILESIZE,TILESIZE);
+		dsea =  new TextureRegion(tiles,TILESIZE,2*TILESIZE,TILESIZE,TILESIZE);
+		lsea =  new TextureRegion(tiles,2*TILESIZE,2*TILESIZE,TILESIZE,TILESIZE);
+		sand =  new TextureRegion(tiles,0,TILESIZE,TILESIZE,TILESIZE);
 		
 		map = noiseGen.getFullPerlinArray(MAPSIZE);
 		
@@ -143,13 +145,15 @@ public class LovePirates extends ApplicationAdapter {
 		MyUtils.visuliseArray(map,false);
 		
 		//					  x,y,turnrate,dragcoef,maxpower, length, width, cannons,hp
-		playerShip = ShipGenerator.genShip((int) Math.pow(2, MAPSIZE-1),100,1f,1f,4f,3,1f,20,100);
+		playerShip = ShipGenerator.genShip((int) Math.pow(2, MAPSIZE-1),100,1f,1f,5,2,.75f,5,20);
 		while (map[(int) playerShip.getPos().x][(int) playerShip.getPos().y]>SEALEVEL) {
 			playerShip.setPos((int) playerShip.getPos().x+10, (int) playerShip.getPos().y);
 		}
 		playerShip.setControler(new PlayerController());
 		ships.add(playerShip);
-
+		for (int i = 0; i<100; i++) {
+			TresureChestGen.genChest();
+		}
 		
 		/*
 		  for (int i = 0; i<20; i++) {
@@ -221,6 +225,7 @@ public class LovePirates extends ApplicationAdapter {
 
 		
 		for (Debries debrie : debries){
+			debrie.tick();
 			x = debrie.getPos().x;
 			y = debrie.getPos().y;
 			index = debrie.getSpriteIndex();
@@ -242,20 +247,7 @@ public class LovePirates extends ApplicationAdapter {
 		debries.removeAll(debriesRemovalSet);
 		
 		while (ships.size()<100) {
-			int mapSize = (int) Math.pow(2, MAPSIZE);
-			float turnRate = (float) Math.abs(rand.nextGaussian()+1.5f);
-			float length = (float) Math.abs(rand.nextGaussian()*2)+1f;
-			float width = (length*rand.nextFloat()*.75f)+.25f;
-			float drag = (float) Math.abs(rand.nextGaussian()/4+1);
-			float power = (float) Math.abs(rand.nextGaussian()*length*2+4);
-			int cannons = (int) Math.abs(rand.nextGaussian()*length*2)+1;
-			float hp = (float) Math.abs((rand.nextGaussian()+1)*width*15+5);
-			//					 									 x,y,turnrate,dragcoef,maxpower, length, width, cannons,hp
-			Ship aiShip = ShipGenerator.genShip((int) (Math.random()*mapSize),(int) (Math.random()*mapSize),turnRate,drag,power,length,width,cannons,hp);
-			aiShip.setControler(new AiController(aiShip));
-			while (map[(int) aiShip.getPos().x][(int) aiShip.getPos().y]>SEALEVEL) {
-				aiShip.setPos((int) (Math.random()*mapSize),((int) Math.random()*mapSize));
-			}
+			Ship aiShip = RandomShipGen.GenRandomShip(1);
 			ships.add(aiShip);
 		}
 		
@@ -322,7 +314,7 @@ public class LovePirates extends ApplicationAdapter {
 		physicsPrefCount.start();
 		
 		
-		world.step(1/60f, 6, 2);
+		world.step(1/60f, 6, 4);
 		physicsPrefCount.stop();
 		
 		//this debug renderer seems to be very heavy

@@ -11,7 +11,7 @@ import com.badlogic.gdx.physics.box2d.*;
  * @author Elijah
  */
 public class Cannonball extends Projectile implements Collideable  {	
-	static final float LIFETIME = 50;
+	static final float LIFETIME = 100;
 	int number;
 	private float size;
 	private Body body;
@@ -20,7 +20,6 @@ public class Cannonball extends Projectile implements Collideable  {
 	CircleShape circleShape = new CircleShape();
 	private Fixture fixture;
 	private Ship owner;
-	private float realVel;
 	/**
 	 * 
 	 */
@@ -30,11 +29,12 @@ public class Cannonball extends Projectile implements Collideable  {
 		size = .3f;
 		this.owner = owner;
 		bodyDef = new BodyDef();
+		bodyDef.bullet = true;
 		fixtureDef = new FixtureDef();
 		bodyDef.type = BodyDef.BodyType.DynamicBody;
 		circleShape.setRadius(size/2);
 		fixtureDef.shape = circleShape;
-		fixtureDef.density = .5f;
+		fixtureDef.density = .2f;
 		fixtureDef.filter.categoryBits = LovePirates.PROJ_MASK;
 		fixtureDef.filter.maskBits = LovePirates.SHIP_MASK;
 
@@ -50,7 +50,7 @@ public class Cannonball extends Projectile implements Collideable  {
 		Vector2 realVel = velocity.cpy();
 		realVel.setLength(actualspeed);
 		realVel.setAngleRad(actualang);
-		body.setLinearDamping(.9f);
+		body.setLinearDamping(1.2f);
 		body.setLinearVelocity(realVel);
 
 	}
