@@ -25,15 +25,18 @@ public class Slot {
 		dir = slotDir;
 		owner = ownedBy;
 		side = fireSlot;
+		inslot = null;
 	}
 	void setContents(Equipment e) {
 		inslot = e;
 	}
 	void fire(ArrayList<FireingDirection> dirToFire) {
-		inslot.tick();
-		if ((dirToFire != null)&&(dirToFire.contains(side))) {
-			if (inslot.iswepon()) {
-				inslot.fire(dir, offset, owner);//how to handle this nicely?
+		if (inslot != null) {
+			inslot.tick();
+			if ((dirToFire != null)&&(dirToFire.contains(side))) {
+				if (inslot.iswepon()) {
+					inslot.fire(dir, offset, owner);//how to handle this nicely?
+				}
 			}
 		}
 	}
@@ -41,17 +44,19 @@ public class Slot {
 		inslot = e;
 	}
 	public float getProjSpeed() {
-		if (inslot.iswepon()) {
-			return inslot.getProjSpeed();
-		} else {
-			return 0f;
+		if (inslot  != null){
+			if (inslot.iswepon()) {
+				return inslot.getProjSpeed();
+			}
 		}
+		return 0f;
 	}
 	public float getProjLifetime() {
-		if (inslot.iswepon()) {
-			return inslot.getProjLifetime();
-		} else {
-			return 0f;
+		if (inslot  != null){
+			if (inslot.iswepon()) {
+				return inslot.getProjLifetime();
+			}
 		}
+		return 0;
 	}
 }

@@ -18,7 +18,7 @@ class MyUtils {
 				for (int j = 0; j<(a.length); j++) {
 					Color c = new Color();
 					double r = a[i][j];
-					if (r<.75) {
+					if (r<LovePirates.SEALEVEL) {
 						r = 0;
 					}
 					c.set((float) r, (float) a[i][j]/2, (float) a[i][j]/3,1f);

@@ -75,7 +75,7 @@ public class LovePirates extends ApplicationAdapter {
 		Gdx.graphics.setDisplayMode(Gdx.graphics.getDesktopDisplayMode().width, Gdx.graphics.getDesktopDisplayMode().height, true);
 
 		font = new BitmapFont();
-		font.setScale(1/16f);
+		font.setScale(1/32f);
 		font.setUseIntegerPositions(false);
 		rand = new Random();
 		shipPrefCount = new PerformanceCounter("ship");
@@ -151,7 +151,7 @@ public class LovePirates extends ApplicationAdapter {
 		}
 		playerShip.setControler(new PlayerController());
 		ships.add(playerShip);
-		for (int i = 0; i<100; i++) {
+		for (int i = 0; i<7000; i++) {
 			TresureChestGen.genChest();
 		}
 		
@@ -222,7 +222,13 @@ public class LovePirates extends ApplicationAdapter {
 		shipPrefCount.start();
 		TextureRegion t;
 		
+		//UI placeholder text stuff:
+		String ui;
+		ui = String.format("You have %d repair supplies %n" +
+						   "%d gold", Math.round(playerShip.repairSupplies),playerShip.gold);
+		font.drawWrapped(batch, ui, playerShip.getPos().x+20, playerShip.getPos().y+15, 10);
 
+		
 		
 		for (Debries debrie : debries){
 			debrie.tick();

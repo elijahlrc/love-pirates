@@ -32,14 +32,12 @@ public class AiController implements Controller {
 		this.owner = owner;
 		reverse = new Vector2(999,999);
 		rayCastHitLoc = new Vector2(0,0);
-		projectileSpeed = getCannonProjectileSpeed()*.65f;
+		projectileSpeed = getCannonProjectileSpeed();
 		projectileLifetime = getCannonProjectileLifetime();
 		projectileRange = projectileSpeed*projectileLifetime/60;
 		raycastCallback = new CollisionAvoidanceCallback(this);
 	}
 	
-	
-
 	@Override
 	/**
 	 * called every frame, updates raycasts, targets, and gets targetDeltaAngle and
@@ -50,13 +48,13 @@ public class AiController implements Controller {
 		if (target == null){
 			target = findTarget();
 		}
-		active = 64> owner.getPos().sub(targetPos()).len();
+		active = 64 > owner.getPos().sub(targetPos()).len();
 		if (active) {
 			castRays();
-			
 			getVecToTargetAndAngle();
 		}
 	}
+
 	private void getVecToTargetAndAngle() {
 		vecToTarget = targetPos().sub(owner.getPos());
 		//aim to hit player

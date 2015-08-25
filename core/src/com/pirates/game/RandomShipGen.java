@@ -14,7 +14,7 @@ public class RandomShipGen {
 		float width = (float) (Math.abs(length/4+rand.nextGaussian()*length/16));
 		float drag = (float) Math.abs(rand.nextGaussian()/4+1);
 		float power = (float) Math.abs(rand.nextGaussian()*length+level);
-		int cannons = (int) Math.abs(rand.nextGaussian()*length*level)+level;
+		int cannons = (int) Math.abs(rand.nextGaussian()*length)+level;
 		float hp = (float) Math.abs((rand.nextGaussian()+1)*width*5+5*width);
 		//					 									 x,y,turnrate,dragcoef,maxpower, length, width, cannons,hp
 		Ship aiShip = ShipGenerator.genShip(rand.nextInt(mapSize),rand.nextInt(mapSize),turnRate,drag,power,length,width,cannons,hp);

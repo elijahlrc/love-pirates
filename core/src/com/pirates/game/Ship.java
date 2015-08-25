@@ -3,6 +3,7 @@
  */
 package com.pirates.game;
 import java.util.ArrayList;
+import java.util.Random;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
@@ -32,9 +33,11 @@ public class Ship extends DrawableObj implements Collideable{
 	protected Slot[] slots;
 	private int PHYSICSBUFFER = 25;
 	private float hp;
+	private float maxhp;
 	boolean alive;
-
-	private float repairSupplies;
+	int gold;
+	Random rand;
+	float repairSupplies;
 	/**This class is the super for all ships
 	 * All ships have position vector "loc", velocity vector "vel", drag coefficient "dragcoef", and a "maxpower"
 	 * Perhaps the following things should be in some kind of ship data structure/class, 
@@ -45,9 +48,11 @@ public class Ship extends DrawableObj implements Collideable{
 	 * @param hp 
 	 * 
 	*/
-	Ship(int x, int y, float turnrate, float dragcoef, float maxpower,float len, float wid, float hp) {
+	Ship(int x, int y, float turnrate, float dragcoef, float maxpower,float len, float wid, float hp, float maxhp) {
 		this.hp = hp;
+		this.maxhp = maxhp;
 		alive = true;
+		gold = 0;
 		repairSupplies = 5f;
 		turnRate = turnrate;
 		maxPower = maxpower;
@@ -64,6 +69,7 @@ public class Ship extends DrawableObj implements Collideable{
 		PolygonShape shipshape = new PolygonShape();
 		float[] verts = {0,width/2,length/2, 0, 0, -width/2, -length/2, 0};
 		shipshape.set(verts);
+		rand = new Random();
 		
 		fixtureDef.shape = shipshape;
 		fixtureDef.density = 1f;
@@ -87,9 +93,9 @@ public class Ship extends DrawableObj implements Collideable{
 		controller.tick();
 		move();
 		fire();
-		if (repairSupplies > 0){
-			repairSupplies -= .01;
-			hp += .01;
+		if ((repairSupplies > 0)&&(hp <= maxhp)){
+			repairSupplies -= .002;
+			hp += .002;
 		}
 		if (hp<0) {
 			alive = false;
@@ -220,14 +226,24 @@ public class Ship extends DrawableObj implements Collideable{
 		}
 		
 	}
-	int openSlots() {
-		int count = 0;
+	/**
+	 * finds and returns a random slot
+	 * returns null if there are no open slots
+	 * @return
+	 */
+	Slot findOpenSlot() {
+		ArrayList<Slot> openslots = new ArrayList<Slot>();
+		int slotIndex;
 		for (Slot s : slots) {
-			if (s == null) {
-				count++;
+			if (s.inslot == null) {
+				openslots.add(s);
 			}
 		}
-		return count;
+		if (openslots.size() == 0) {
+			return null;
+		}
+		slotIndex = rand.nextInt(openslots.size());
+		return openslots.get(slotIndex);
 		
 	}
 	void getLoot(String loot,int quantity) {
@@ -236,18 +252,22 @@ public class Ship extends DrawableObj implements Collideable{
 		} else if (loot.equals("crew")) {
 			//TODO
 		} else if (loot.equals("cannons")) {
+			Slot s = null;
 			for (int i = 0; i<quantity; i++) {
-				if (openSlots() > 0){
-					
+				s = findOpenSlot();
+				if (s!=null) {
+					s.setContents(new Cannon());
 				}
 			}
+		} else if (loot.equals("treasure")) {
+			gold += quantity;
 		}
 	}
 	public float getCannonSpeed() {
 		float speedTotal = 0;
 		int weaponCount = 0;
 		for (Slot slot : slots) {
-			if (slot.getProjSpeed()>=0) {
+			if (slot.getProjSpeed()>0) {
 				weaponCount += 1;
 				speedTotal += slot.getProjSpeed();
 			}
