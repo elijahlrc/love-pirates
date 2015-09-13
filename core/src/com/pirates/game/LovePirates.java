@@ -67,8 +67,9 @@ public class LovePirates extends ApplicationAdapter {
 	static HashSet<Ship> shipRemovalSet;
 	static HashSet<Debries> debriesRemovalSet;
 	static PerlinNoiseGen noiseGen;
+	static Color seaTintColor = new Color();
 	private static Texture mapTexture;
-	Vector2 UI_POS = new Vector2(20,15);
+	Vector2 UI_POS = new Vector2(20,4.5f);
 	//static BodyDef bodyDef = new BodyDef();
 	//static FixtureDef fixtureDef = new FixtureDef();
 	public LovePirates(int w, int h){
@@ -109,7 +110,7 @@ public class LovePirates extends ApplicationAdapter {
 		mapTexture = MyUtils.visuliseArray(map, false);
 		//save map
 		MyUtils.visuliseArray(map,false);
-		for (int i = 0; i<7000; i++) {
+		for (int i = 0; i<70; i++) {
 			debries.add(TresureChestGen.genChest(map));
 		}
 	}
@@ -239,24 +240,33 @@ public class LovePirates extends ApplicationAdapter {
 					batch.draw(grass, i, j, 1, 1);
 				} else if (map[i][j] > SEALEVEL){
 					batch.draw(sand, i, j, 1, 1);
-				} else if (map[i][j] > SEALEVEL-.06){
-					batch.draw(lsea, i, j, 1, 1);
-				} else if (map[i][j] > .0){
+				} else {
+					float height = (float) map[i][j];
+					float darkness = (float) Math.max(Math.min(1.5*Math.pow(height,2), 1),.2);
+					seaTintColor.r = darkness;
+					seaTintColor.g = darkness;
+					seaTintColor.b = darkness;
+					seaTintColor.a = 1f;
+					batch.setColor(seaTintColor);
 					batch.draw(sea, i, j, 1, 1);
+					batch.setColor(Color.WHITE.tmp());
 				}
-
+				/*
+				*} else if (map[i][j] > SEALEVEL-.06){
+				*	batch.draw(lsea, i, j, 1, 1);
+				*} else if (map[i][j] > SEALEVEL-.12){
+				*	batch.draw(sea, i, j, 1, 1);
+				*} else {
+				*	batch.draw(dsea, i, j, 1, 1);
+				*}
+				*/
 			}
 		}
 		renderPrefCount.stop();
 		shipPrefCount.start();
 		TextureRegion t;
 		
-		//UI placeholder text stuff:
-		String ui;
-		ui = String.format("You have %d repair supplies %n" +
-						   "%d gold", Math.round(playerShip.repairSupplies),playerShip.gold);
 		
-		MyUtils.DrawText(ui, true, UI_POS,1);
 
 		for (Debries debrie : debries) {
 			debrie.tick();
@@ -336,9 +346,7 @@ public class LovePirates extends ApplicationAdapter {
 		int mapSpriteSize = 200;
 		int xpos = (int) Math.max(0, Math.min(playerPos.x-100,MAPSIZE-mapSpriteSize/2-1));
 		int ypos = (int) Math.max(0, Math.min(playerPos.y-100,MAPSIZE-mapSpriteSize/2-1));
-		//Color c = batch.getColor();
-		//c.a = .8f;
-		//batch.setColor(c.r, c.g, c.b, c.a);
+
 		batch.draw(mapTexture,
                 playerPos.x-mapSpriteSize/TILESIZE+width/(TILESIZE*4f),
                 playerPos.y-mapSpriteSize/TILESIZE+height/(TILESIZE*4f),
@@ -353,14 +361,16 @@ public class LovePirates extends ApplicationAdapter {
                 mapSpriteSize,
                 mapSpriteSize,
                 false, true);
-		//c.a = 1f;
-		//batch.setColor(c.r, c.g, c.b, c.a);
 		batch.draw(debug,
 				playerPos.x-mapSpriteSize/(2*TILESIZE) + width/(TILESIZE * 4f),
 				playerPos.y-mapSpriteSize/(2*TILESIZE) + height/(TILESIZE * 4f),
 				.5f,.5f);
 			
-
+		String ui;
+		ui = String.format("You have %d repair supplies %n" +
+						   "%d gold", Math.round(playerShip.repairSupplies),playerShip.gold);
+		
+		MyUtils.DrawText(ui, true, UI_POS,1);
 		
 		
 		batch.end();
