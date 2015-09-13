@@ -10,11 +10,14 @@ public class TresureChest extends LootCrate {
 
 	public TresureChest(float x, float y, int amount) {
 		super(x, y, "treasure", amount);
-		if (rand.nextFloat()>.5) {
+		float choice = rand.nextFloat();
+		if (choice> .7) {
 			contents = "treasure";
-		} else {
+		} else if (choice > .4){
 			contents = "cannons";
 			quantaty = (int) Math.ceil(amount/4f);
+		} else {
+			contents = "repair supplies";
 		}
 		fixture.setDensity(.01f);
 		Shape s = fixture.getShape();
@@ -28,12 +31,16 @@ public class TresureChest extends LootCrate {
 	@Override
 	public boolean handlePreCollide(Contact contact) {
 		Fixture f = contact.getFixtureB();
+		if (f == fixture) {
+			f = contact.getFixtureA();
+		}
 		Object b = f.getUserData();
 		if (b instanceof Debries){
 			return false;
 		} else if (f.getFilterData().categoryBits == LovePirates.LAND_MASK) {
 			return false;
 		}
+		
 		return true;
 	}
 

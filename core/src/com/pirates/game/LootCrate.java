@@ -28,13 +28,12 @@ public class LootCrate extends Debries implements Collideable {
 	}
 	@Override
 	public void handlePostCollide(Contact contact, ContactImpulse impulse) {
-		Fixture fix;
-		if (contact.getFixtureB() == fixture){
-			fix = contact.getFixtureA();
-		} else {
-			fix = contact.getFixtureA();
+		Fixture f;
+		f = contact.getFixtureA();
+		if (f == fixture){
+			f = contact.getFixtureB();
 		}
-		Object b = fix.getUserData();
+		Object b = f.getUserData();
 		if (b instanceof Ship){
 			alive = false;
 		}

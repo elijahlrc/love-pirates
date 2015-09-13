@@ -7,6 +7,7 @@ import java.util.Random;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
@@ -17,7 +18,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.PerformanceCounter;
 public class LovePirates extends ApplicationAdapter {
-	SpriteBatch batch;
+	static SpriteBatch batch;
 	static double[][] map;
 	static HandleUserInput inputProcessor;
 	static TextureRegion[] textureRegions;
@@ -42,7 +43,8 @@ public class LovePirates extends ApplicationAdapter {
 	static TextureRegion lsea;
 	static Texture debug;
 	static HashSet<Vector2> debugObjects;
-	static int MAPSIZE = 10;
+	static int MAPDEGREE = 10;
+	static int MAPSIZE = (int) Math.pow(2, MAPDEGREE);
 	static int COLLIDERPOOLSIZE = 6000;//maybe bigger
 	static float dt;
 	static World world;
@@ -60,9 +62,13 @@ public class LovePirates extends ApplicationAdapter {
 	final static short PROJ_MASK = 0x0004;
 	static ShapeRenderer debugShapeRenderer;
 	static BitmapFont font;
-	HashSet<Projectile> projRemovalSet;
-	HashSet<Ship> shipRemovalSet;
-	HashSet<Debries> debriesRemovalSet;
+	static int lvl;
+	static HashSet<Projectile> projRemovalSet;
+	static HashSet<Ship> shipRemovalSet;
+	static HashSet<Debries> debriesRemovalSet;
+	static PerlinNoiseGen noiseGen;
+	private static Texture mapTexture;
+	Vector2 UI_POS = new Vector2(20,15);
 	//static BodyDef bodyDef = new BodyDef();
 	//static FixtureDef fixtureDef = new FixtureDef();
 	public LovePirates(int w, int h){
@@ -70,14 +76,10 @@ public class LovePirates extends ApplicationAdapter {
 		width = w;
 		height = h;
 	}
-	@Override
-	public void create() {
-		Gdx.graphics.setDisplayMode(Gdx.graphics.getDesktopDisplayMode().width, Gdx.graphics.getDesktopDisplayMode().height, true);
+	
+	static void genWorld(int level) {
 
-		font = new BitmapFont();
-		font.setScale(1/32f);
-		font.setUseIntegerPositions(false);
-		rand = new Random();
+		lvl = level;
 		shipPrefCount = new PerformanceCounter("ship");
 		renderPrefCount = new PerformanceCounter("render");
 		physicsPrefCount = new PerformanceCounter("physics");
@@ -85,11 +87,6 @@ public class LovePirates extends ApplicationAdapter {
 		debugObjects = new HashSet<Vector2>();
 		debugShapeRenderer = new ShapeRenderer();
 		
-		camera = new OrthographicCamera(width/TILESIZE*.5f,height/TILESIZE*.5f);
-		inputProcessor = HandleUserInput.init();
-		Gdx.input.setInputProcessor(inputProcessor);
-		//box2d
-		Box2D.init();		
 		world = new World(new Vector2(0, 0), true);
 		world.setContactListener(new MyContactListener());
 		//this number is performance sensitive and can create subtle collision bugs, beware
@@ -98,20 +95,53 @@ public class LovePirates extends ApplicationAdapter {
 		projRemovalSet = new HashSet<Projectile>();
 		shipRemovalSet = new HashSet<Ship>();
 		debriesRemovalSet = new HashSet<Debries>();
+		
 		//debug renderer for physics rendering
 		debugRenderer = new Box2DDebugRenderer();
-		
-		
 		
 		//game state stuff
 		ships = new HashSet<Ship>();
 		projectiles = new HashSet<Projectile>();
 		debries = new HashSet<Debries>();
 		//sprite batch for efficient bliting
-		batch = new SpriteBatch();
+		
+		map = noiseGen.getFullPerlinArray(MAPDEGREE);
+		mapTexture = MyUtils.visuliseArray(map, false);
+		//save map
+		MyUtils.visuliseArray(map,false);
+		for (int i = 0; i<7000; i++) {
+			debries.add(TresureChestGen.genChest(map));
+		}
+	}
+	public static void nextWorld() {
+		genWorld(lvl+1);
+		ships.add(playerShip);
+		playerShip.bodyReInstantiate(world);
+		while (map[(int) playerShip.getPos().x][(int) playerShip.getPos().y]>SEALEVEL) {
+			playerShip.setPos((int) playerShip.getPos().x+10, (int) playerShip.getPos().y);
+		}
+		
+	}
+	
+	@Override
+	public void create() {
+		Gdx.graphics.setDisplayMode(Gdx.graphics.getDesktopDisplayMode().width, Gdx.graphics.getDesktopDisplayMode().height, true);
+
+		font = new BitmapFont();
+		font.setScale(1/32f);
+		font.setUseIntegerPositions(false);
+		rand = new Random();
+		
+		
+		camera = new OrthographicCamera(width/TILESIZE*.5f,height/TILESIZE*.5f);
+		inputProcessor = HandleUserInput.init();
+		Gdx.input.setInputProcessor(inputProcessor);
+		//box2d
+		Box2D.init();		
+		
 		
 		//map gen init
-		PerlinNoiseGen noiseGen =  PerlinNoiseGen.init();
+		noiseGen =  PerlinNoiseGen.init();
 		
 		//list of blitable images
 		textureRegions = new TextureRegion[99];
@@ -139,22 +169,19 @@ public class LovePirates extends ApplicationAdapter {
 		lsea =  new TextureRegion(tiles,2*TILESIZE,2*TILESIZE,TILESIZE,TILESIZE);
 		sand =  new TextureRegion(tiles,0,TILESIZE,TILESIZE,TILESIZE);
 		
-		map = noiseGen.getFullPerlinArray(MAPSIZE);
 		
-		//save map
-		MyUtils.visuliseArray(map,false);
 		
-		//					  x,y,turnrate,dragcoef,maxpower, length, width, cannons,hp
-		playerShip = ShipGenerator.genShip((int) Math.pow(2, MAPSIZE-1),100,1f,1f,5,2,.75f,5,20);
+		genWorld(1);
+		//ShipGenerator.genShip(x, y, turnRate, drag, power, length, width, cannons, slots, hp, maxhp)
+		playerShip = ShipGenerator.genShip(100, 500, 1, 1, 4, 2.5f, .75f, 20, 10, 5f, 10f,false);
+		playerShip.setControler(new PlayerController());
 		while (map[(int) playerShip.getPos().x][(int) playerShip.getPos().y]>SEALEVEL) {
 			playerShip.setPos((int) playerShip.getPos().x+10, (int) playerShip.getPos().y);
 		}
-		playerShip.setControler(new PlayerController());
 		ships.add(playerShip);
-		for (int i = 0; i<7000; i++) {
-			TresureChestGen.genChest();
-		}
 		
+		batch = new SpriteBatch();
+		batch.enableBlending();
 		/*
 		  for (int i = 0; i<20; i++) {
 			map = noiseGen.getFullPerlinArray(10);
@@ -186,7 +213,9 @@ public class LovePirates extends ApplicationAdapter {
 		camera.position.set(playerShip.getPos().x,playerShip.getPos().y,0);
 		camera.update();
 		batch.setProjectionMatrix(camera.combined);
+		
 		batch.begin();
+		
 		int index;
 		float x;
 		float y;
@@ -226,11 +255,10 @@ public class LovePirates extends ApplicationAdapter {
 		String ui;
 		ui = String.format("You have %d repair supplies %n" +
 						   "%d gold", Math.round(playerShip.repairSupplies),playerShip.gold);
-		font.drawWrapped(batch, ui, playerShip.getPos().x+20, playerShip.getPos().y+15, 10);
+		
+		MyUtils.DrawText(ui, true, UI_POS,1);
 
-		
-		
-		for (Debries debrie : debries){
+		for (Debries debrie : debries) {
 			debrie.tick();
 			x = debrie.getPos().x;
 			y = debrie.getPos().y;
@@ -244,7 +272,7 @@ public class LovePirates extends ApplicationAdapter {
 					   1f,1f,debrieRot,true);
 		}
 		
-		for (Debries debrie : debries){
+		for (Debries debrie : debries) {
 			if (debrie.alive == false) {
 				debriesRemovalSet.add(debrie);
 				debrie.delete();
@@ -253,10 +281,14 @@ public class LovePirates extends ApplicationAdapter {
 		debries.removeAll(debriesRemovalSet);
 		
 		while (ships.size()<100) {
-			Ship aiShip = RandomShipGen.GenRandomShip(1);
+			Ship aiShip;
+			if (rand.nextFloat() < .75) {
+				aiShip= RandomShipGen.GenRandomShip(lvl);
+			} else {
+				aiShip = RandomShipGen.GenRandomBossShip(lvl);
+			}
 			ships.add(aiShip);
 		}
-		
 		for (Ship ship : ships){
 			ship.tick();
 			x = ship.getPos().x;
@@ -265,8 +297,8 @@ public class LovePirates extends ApplicationAdapter {
 			float[] size = ship.getSize();
 			t = textureRegions[index];
 			float shipRotation = (float) (ship.getDir()*360/(2*Math.PI));
-			font.draw(batch, ((Float) ship.getHp()).toString(), ship.getPos().x, ship.getPos().y+3,0,3);
-
+			Vector2 hpDrawPos = ship.getPos().add(ship.getSize()[1],ship.getSize()[1]);
+			MyUtils.DrawText(((Integer) Math.round(ship.getHp())).toString(), false, hpDrawPos, 1);
 			batch.draw(t,x-size[0]/2,y-size[1]/2,
 					   size[0]/2,size[1]/2,
 					   size[0],size[1],
@@ -280,13 +312,8 @@ public class LovePirates extends ApplicationAdapter {
 			}
 		}
 		ships.removeAll(shipRemovalSet);
-
 		
-		
-		
-
-		
-		
+		MyUtils.renderText(batch);
 		
 		for (Vector2 debugLoc : debugObjects) {
 			batch.draw(debug,debugLoc.x, debugLoc.y,.2f,.2f);
@@ -302,9 +329,42 @@ public class LovePirates extends ApplicationAdapter {
 					   t.getRegionWidth()/2, t.getRegionHeight()/2, 
 					   size[0],size[1],
 					   1f,1f,0,true);
-			
 		}
+		
+		
+		//Draw UI/minimap
+		int mapSpriteSize = 200;
+		int xpos = (int) Math.max(0, Math.min(playerPos.x-100,MAPSIZE-mapSpriteSize/2-1));
+		int ypos = (int) Math.max(0, Math.min(playerPos.y-100,MAPSIZE-mapSpriteSize/2-1));
+		//Color c = batch.getColor();
+		//c.a = .8f;
+		//batch.setColor(c.r, c.g, c.b, c.a);
+		batch.draw(mapTexture,
+                playerPos.x-mapSpriteSize/TILESIZE+width/(TILESIZE*4f),
+                playerPos.y-mapSpriteSize/TILESIZE+height/(TILESIZE*4f),
+                0,0,
+                mapSpriteSize,
+                mapSpriteSize,
+                1f/(TILESIZE),
+                1f/(TILESIZE),
+                0,
+                xpos,
+                ypos,
+                mapSpriteSize,
+                mapSpriteSize,
+                false, true);
+		//c.a = 1f;
+		//batch.setColor(c.r, c.g, c.b, c.a);
+		batch.draw(debug,
+				playerPos.x-mapSpriteSize/(2*TILESIZE) + width/(TILESIZE * 4f),
+				playerPos.y-mapSpriteSize/(2*TILESIZE) + height/(TILESIZE * 4f),
+				.5f,.5f);
+			
+
+		
+		
 		batch.end();
+		
 		for (Projectile proj : projectiles){
 			if (proj.dead == true) {
 				projRemovalSet.add(proj);
@@ -348,4 +408,6 @@ public class LovePirates extends ApplicationAdapter {
 			}
 		}
 	}
+
+	
 }

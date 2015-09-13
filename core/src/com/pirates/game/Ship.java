@@ -19,7 +19,7 @@ public class Ship extends DrawableObj implements Collideable{
 	
 	
 	static final int NUM_SLOTS = 0;
-	static final float DAMAGEFACTOR = 3;
+	static final float DAMAGEFACTOR = 6;
 	Controller controller;
 	private float maxPower;
 	private float turnRate;
@@ -53,7 +53,7 @@ public class Ship extends DrawableObj implements Collideable{
 		this.maxhp = maxhp;
 		alive = true;
 		gold = 0;
-		repairSupplies = 5f;
+		repairSupplies = 0f;
 		turnRate = turnrate;
 		maxPower = maxpower;
 		width = wid;
@@ -62,9 +62,28 @@ public class Ship extends DrawableObj implements Collideable{
 		bodyDef.position.set(x,y);
 		bodyDef.type = BodyDef.BodyType.DynamicBody;
 		bodyDef.active = true;
-		bodyDef.angularDamping = 3f;
+		bodyDef.angularDamping = 5f;
 		bodyDef.linearDamping = dragcoef;
 		body = LovePirates.world.createBody(bodyDef);
+		body.setAwake(true);
+		PolygonShape shipshape = new PolygonShape();
+		float[] verts = {0,width/2,length/2, 0, 0, -width/2, -length/2, 0};
+		shipshape.set(verts);
+		rand = new Random();
+		
+		fixtureDef.shape = shipshape;
+		fixtureDef.density = 1f;
+		fixtureDef.friction = .1f;
+		fixtureDef.restitution = .2f;
+		fixtureDef.filter.categoryBits = LovePirates.SHIP_MASK;
+		fixtureDef.filter.maskBits = LovePirates.LAND_MASK | LovePirates.SHIP_MASK | LovePirates.PROJ_MASK;
+		fixture = body.createFixture(fixtureDef);
+		fixture.setUserData(this);
+		//shapes must be disposed otherwise memory leak.
+		shipshape.dispose();
+	}
+	void bodyReInstantiate(World world) {
+		body = world.createBody(bodyDef);
 		body.setAwake(true);
 		PolygonShape shipshape = new PolygonShape();
 		float[] verts = {0,width/2,length/2, 0, 0, -width/2, -length/2, 0};
@@ -209,23 +228,36 @@ public class Ship extends DrawableObj implements Collideable{
 	@Override
 	public void handleBeginContact(Contact contact) {
 		// TODO Auto-generated method stub
-		
 	}
 	@Override
 	public void handlePostCollide(Contact contact, ContactImpulse impulse) {
 		Object b = contact.getFixtureB().getUserData();
+		Object a = contact.getFixtureA().getUserData();
+		
 		if (b instanceof Cannonball){
 			Ship owner = ((Cannonball) b).getOwner();
 			if (owner != this) {
-				System.out.println("HP is"+hp);
-				hp-=impulse.getNormalImpulses()[0]*DAMAGEFACTOR;
+				Float dmg = impulse.getNormalImpulses()[0]*DAMAGEFACTOR;
+				MyUtils.DrawText(((Float) (Math.round(dmg*10)/10f)).toString(), false, ((Cannonball) b).getPos(), (int) ((Cannonball) b).lifetime);
+				hp -= dmg;
 			}
 		} else if (b instanceof LootCrate) {
 			LootCrate c = (LootCrate) b;
 			getLoot(c.contents, c.quantaty);
 		}
-		
+		if (a instanceof Cannonball){
+			Ship owner = ((Cannonball) a).getOwner();
+			if (owner != this) {
+				Float dmg = impulse.getNormalImpulses()[0]*DAMAGEFACTOR;
+				MyUtils.DrawText(((Float) (Math.round(dmg*10)/10f)).toString(), false, ((Cannonball) a).getPos(), (int) ((Cannonball) a).lifetime);
+				hp -= dmg;
+			}
+		} else if (a instanceof LootCrate) {
+			LootCrate c = (LootCrate) a;
+			getLoot(c.contents, c.quantaty);
+		}
 	}
+
 	/**
 	 * finds and returns a random slot
 	 * returns null if there are no open slots
@@ -246,7 +278,8 @@ public class Ship extends DrawableObj implements Collideable{
 		return openslots.get(slotIndex);
 		
 	}
-	void getLoot(String loot,int quantity) {
+	void getLoot(String loot,Integer quantity) {
+		MyUtils.DrawText("The chest contains "+quantity.toString()+" "+loot, false, getPos(), 150);
 		if (loot.equals("repair supplies")){
 			repairSupplies += quantity*5;
 		} else if (loot.equals("crew")) {
@@ -261,6 +294,8 @@ public class Ship extends DrawableObj implements Collideable{
 			}
 		} else if (loot.equals("treasure")) {
 			gold += quantity;
+		} else {
+			System.out.println("WARNING, getloot got an un-handled loot type:    " + loot);
 		}
 	}
 	public float getCannonSpeed() {
@@ -291,6 +326,18 @@ public class Ship extends DrawableObj implements Collideable{
 		}
 		return lifetimeTotal/weaponCount;
 	}
+	public String pickLootType() {
+		float choice = rand.nextFloat();
+		if (choice> .7) {
+			return "repair supplies";
+		} else if (choice > .5) {
+			return "cannons";
+		} else if (choice > .3) {
+			return "crew";
+		} else {
+			return "treasure";
+		}
+	}
 	public void delete() {
 		LovePirates.world.destroyBody(body);
 		int lootAmount = (int) (length*width) + 1;
@@ -299,7 +346,7 @@ public class Ship extends DrawableObj implements Collideable{
 			LovePirates.debries.add(new Debries((float) (body.getPosition().x+((Math.random()-.5)*Math.sqrt(i))),(float) (body.getPosition().y+((Math.random()-.5)*Math.sqrt(i))), false));
 		}
 		for (int i = 0; i < lootAmount; i++) {
-			LovePirates.debries.add(new LootCrate((float) (body.getPosition().x+((Math.random()-.5)*Math.sqrt(i))),(float) (body.getPosition().y+((Math.random()-.5)*Math.sqrt(i))), "repair supplies", 1));
+			LovePirates.debries.add(new LootCrate((float) (body.getPosition().x+((Math.random()-.5)*Math.sqrt(i))),(float) (body.getPosition().y+((Math.random()-.5)*Math.sqrt(i))), pickLootType(), 1));
 
 		}
 		

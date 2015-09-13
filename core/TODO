@@ -1,0 +1,33 @@
+Short term goals:
+	//UI work, font, system for displaying text during game play, i.e. damage numbers and loot pickup messages.
+	minimap
+Long term Critical features:
+	General QOL:
+		Nice font implemented
+		UI for inventory management.
+		UI which is on screen during game play, including health, loot pickups, damage
+	Content:
+		ship variety
+		weapon variety
+		world variety-biomes, forests, towns, etc
+	Progression:
+		Levels with scaling ships.
+		Changing gamefeel:
+			As level increases art changes, weapons improve, perhapse Ai becomes more deadly.
+	Graphics:
+		Find/higher/profit share with an artist.
+		Particle effects:
+			Wakes
+			Cannons firing
+			Cannons impacting
+			Birds?
+			Crew?
+	Sound:
+		All of it, need a sound person
+		
+	
+Long term long shot features.
+	Crew
+	Shops
+	missions
+	Tilting ships for 3d effect (as in sunless sea).

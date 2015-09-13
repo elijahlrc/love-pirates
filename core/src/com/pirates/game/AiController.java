@@ -33,7 +33,7 @@ public class AiController implements Controller {
 		reverse = new Vector2(999,999);
 		rayCastHitLoc = new Vector2(0,0);
 		projectileSpeed = getCannonProjectileSpeed();
-		projectileLifetime = getCannonProjectileLifetime();
+		projectileLifetime = getCannonProjectileLifetime()*2;//fudge factor
 		projectileRange = projectileSpeed*projectileLifetime/60;
 		raycastCallback = new CollisionAvoidanceCallback(this);
 	}
@@ -65,8 +65,8 @@ public class AiController implements Controller {
 		//causes the ships to fire in front of you, but not too far in front. lower number means farther in front.
 		Vector2 predictedVecToTarget = vecToTarget.cpy();
 		predictedVecToTarget.add(targetVel.setLength(targetVel.len()*travelTime));
-		LovePirates.debugObjects.add(owner.getPos().add(vecToTarget));
-		LovePirates.debugObjects.add(owner.getPos().add(predictedVecToTarget));
+		//LovePirates.debugObjects.add(owner.getPos().add(vecToTarget));
+		//LovePirates.debugObjects.add(owner.getPos().add(predictedVecToTarget));
 		
 		//now get ether left or right side to face target:
 		targetDeltaAngle = predictedVecToTarget.angleRad(ownerAngle);

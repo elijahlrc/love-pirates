@@ -94,7 +94,11 @@ public class Debries extends DrawableObj implements Collideable{
 
 	@Override
 	public boolean handlePreCollide(Contact contact) {
-		Object b = contact.getFixtureB().getUserData();
+		Fixture f = contact.getFixtureB();
+		if (f == fixture) {
+			f = contact.getFixtureA();
+		}
+		Object b = f.getUserData();
 		if (b instanceof Debries){
 			return false;
 		}
