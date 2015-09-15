@@ -11,7 +11,7 @@ import com.badlogic.gdx.physics.box2d.*;
  * @author Elijah
  *
  */
-public class Ship extends DrawableObj implements Collideable{
+public class Ship extends DrawableObj implements Collideable, Target{
 	/**
 	 * @author Elijah
 	 *

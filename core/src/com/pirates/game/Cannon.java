@@ -51,7 +51,7 @@ public class Cannon extends Equipment {
 
 	@Override
 	float getProjSpeed() {
-		return fireSpeed;
+		return fireSpeed*.5f;
 	}
 
 	@Override

@@ -69,13 +69,14 @@ public class LovePirates extends ApplicationAdapter {
 	static PerlinNoiseGen noiseGen;
 	static Color seaTintColor = new Color();
 	private static Texture mapTexture;
+	static int mapSpriteSize = 250;
+
 	Vector2 UI_POS = new Vector2(20,4.5f);
 	//static BodyDef bodyDef = new BodyDef();
 	//static FixtureDef fixtureDef = new FixtureDef();
-	public LovePirates(int w, int h){
+	public LovePirates(){
 		super();
-		width = w;
-		height = h;
+		
 	}
 	
 	static void genWorld(int level) {
@@ -127,7 +128,8 @@ public class LovePirates extends ApplicationAdapter {
 	@Override
 	public void create() {
 		Gdx.graphics.setDisplayMode(Gdx.graphics.getDesktopDisplayMode().width, Gdx.graphics.getDesktopDisplayMode().height, true);
-
+		width = Gdx.graphics.getDesktopDisplayMode().width;
+		height = Gdx.graphics.getDesktopDisplayMode().height;
 		font = new BitmapFont();
 		font.setScale(1/32f);
 		font.setUseIntegerPositions(false);
@@ -159,7 +161,7 @@ public class LovePirates extends ApplicationAdapter {
 		textureRegions[4] = new TextureRegion(lootCratetext, lootCratetext.getWidth(), lootCratetext.getHeight());
 
 		
-		tiles = new Texture("tiles.png");
+		tiles = new Texture("tiles2.png");
 		tiles.setFilter(TextureFilter.Linear,TextureFilter.Linear);
 		land =  new TextureRegion(tiles,0,0,TILESIZE,TILESIZE);
 		sea =  new TextureRegion(tiles,TILESIZE,TILESIZE,TILESIZE,TILESIZE);
@@ -174,7 +176,7 @@ public class LovePirates extends ApplicationAdapter {
 		
 		genWorld(1);
 		//ShipGenerator.genShip(x, y, turnRate, drag, power, length, width, cannons, slots, hp, maxhp)
-		playerShip = ShipGenerator.genShip(100, 500, 1, 1, 4, 2.5f, .75f, 20, 10, 5f, 10f,false);
+		playerShip = ShipGenerator.genShip(10, 10, 1, 1, 4, 2.5f, .75f, 8, 10, 5f, 10f,false);
 		playerShip.setControler(new PlayerController());
 		while (map[(int) playerShip.getPos().x][(int) playerShip.getPos().y]>SEALEVEL) {
 			playerShip.setPos((int) playerShip.getPos().x+10, (int) playerShip.getPos().y);
@@ -243,12 +245,12 @@ public class LovePirates extends ApplicationAdapter {
 				} else {
 					float height = (float) map[i][j];
 					float darkness = (float) Math.max(Math.min(1.5*Math.pow(height,2), 1),.2);
-					seaTintColor.r = darkness;
-					seaTintColor.g = darkness;
+					seaTintColor.r = darkness/2;
+					seaTintColor.g = darkness/2;
 					seaTintColor.b = darkness;
-					seaTintColor.a = 1f;
+					seaTintColor.a = 1;
 					batch.setColor(seaTintColor);
-					batch.draw(sea, i, j, 1, 1);
+					batch.draw(lsea, i, j, 1, 1);
 					batch.setColor(Color.WHITE.tmp());
 				}
 				/*
@@ -290,9 +292,9 @@ public class LovePirates extends ApplicationAdapter {
 		}
 		debries.removeAll(debriesRemovalSet);
 		
-		while (ships.size()<100) {
+		while (ships.size()<50) {
 			Ship aiShip;
-			if (rand.nextFloat() < .75) {
+			if (rand.nextFloat() < .9) {
 				aiShip= RandomShipGen.GenRandomShip(lvl);
 			} else {
 				aiShip = RandomShipGen.GenRandomBossShip(lvl);
@@ -343,10 +345,10 @@ public class LovePirates extends ApplicationAdapter {
 		
 		
 		//Draw UI/minimap
-		int mapSpriteSize = 200;
-		int xpos = (int) Math.max(0, Math.min(playerPos.x-100,MAPSIZE-mapSpriteSize/2-1));
-		int ypos = (int) Math.max(0, Math.min(playerPos.y-100,MAPSIZE-mapSpriteSize/2-1));
-
+		//int xpos = (int) Math.max(0, Math.min(playerPos.x-mapSpriteSize/2,MAPSIZE-mapSpriteSize/2-1));
+		//int ypos = (int) Math.max(0, Math.min(playerPos.y-mapSpriteSize/2,MAPSIZE-mapSpriteSize/2-1));
+		int xpos = (int) (playerPos.x-mapSpriteSize/2);
+		int ypos = (int) (playerPos.y-mapSpriteSize/2);
 		batch.draw(mapTexture,
                 playerPos.x-mapSpriteSize/TILESIZE+width/(TILESIZE*4f),
                 playerPos.y-mapSpriteSize/TILESIZE+height/(TILESIZE*4f),
@@ -361,11 +363,22 @@ public class LovePirates extends ApplicationAdapter {
                 mapSpriteSize,
                 mapSpriteSize,
                 false, true);
-		batch.draw(debug,
+		/* batch.draw(debug,
 				playerPos.x-mapSpriteSize/(2*TILESIZE) + width/(TILESIZE * 4f),
 				playerPos.y-mapSpriteSize/(2*TILESIZE) + height/(TILESIZE * 4f),
 				.5f,.5f);
-			
+				*/
+		for (Ship ship : ships){
+			x = ship.getPos().x;
+			y = ship.getPos().y;
+			if ((x>playerPos.x - mapSpriteSize/2 && x<playerPos.x + mapSpriteSize/2) &&
+			    (y>playerPos.y - mapSpriteSize/2 && y<playerPos.y + mapSpriteSize/2)) {
+				batch.draw(debug,
+					x/TILESIZE+playerPos.x -playerPos.x/TILESIZE + width/(TILESIZE*4f)-mapSpriteSize/(2*TILESIZE),
+					y/TILESIZE+playerPos.y -playerPos.y/TILESIZE + height/(TILESIZE*4f)-mapSpriteSize/(2*TILESIZE),
+					.25f, .25f);
+			}
+		}
 		String ui;
 		ui = String.format("You have %d repair supplies %n" +
 						   "%d gold", Math.round(playerShip.repairSupplies),playerShip.gold);

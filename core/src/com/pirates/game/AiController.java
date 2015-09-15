@@ -4,6 +4,7 @@
 package com.pirates.game;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import com.badlogic.gdx.math.Vector2;
 
@@ -16,7 +17,9 @@ public class AiController implements Controller {
 	/**
 	 * 
 	 */
-	private Object target;
+	private static final int targetCounterReset = 1000;
+	private int targetcounter;
+	private Target target;
 	private Ship owner;
 	private Vector2 vecToTarget;
 	private float projectileSpeed;
@@ -27,8 +30,14 @@ public class AiController implements Controller {
 	private Vector2 reverse;
 	private CollisionAvoidanceCallback raycastCallback;
 	private boolean active;
+	static Random rand = new Random();
+	private boolean agressive;
+	float w;
 	AiController(Ship owner) {
+		targetcounter = 0;
+		w = LovePirates.width/(2*LovePirates.TILESIZE);
 		active = false;
+		agressive = false;
 		this.owner = owner;
 		reverse = new Vector2(999,999);
 		rayCastHitLoc = new Vector2(0,0);
@@ -44,14 +53,31 @@ public class AiController implements Controller {
 	 * VecToTarget. In short, updates the AI's perception of the world.
 	 */
 	public void tick() {
+		targetcounter -= 1;
+		if (targetcounter <= 0){
+			targetcounter = targetCounterReset;
+			findTarget();
+		}
 		rayCastHitLoc =null;
-		if (target == null){
+		if (target == null){//this does not know if a target is dead, so will keep attacking where player died!
 			target = findTarget();
 		}
-		active = 64 > owner.getPos().sub(targetPos()).len();
+		active = LovePirates.mapSpriteSize/Math.sqrt(2) > owner.getPos().sub(LovePirates.playerShip.getPos()).len();
 		if (active) {
-			castRays();
 			getVecToTargetAndAngle();
+			castRays();
+			if (agressive && w < owner.getPos().sub(targetPos()).len()) {
+				agressive = false;
+				target = findTarget();
+			} else if (!agressive && w > owner.getPos().sub(LovePirates.playerShip.getPos()).len()) {
+				agressive = true;
+				target = findTarget();
+				
+			} else if (!agressive && w > owner.getPos().sub(targetPos()).len()) {
+				target = findTarget();
+			}
+			
+			
 		}
 	}
 
@@ -60,7 +86,7 @@ public class AiController implements Controller {
 		//aim to hit player
 		Vector2 ownerAngle = new Vector2(1,1);
 		ownerAngle.setAngleRad(owner.getDir());
-		Vector2 targetVel = ((Ship) target).getVel().sub(owner.getVel());
+		Vector2 targetVel = target.getVel().sub(owner.getVel());
 		float travelTime = vecToTarget.len()/(projectileSpeed*1.5f);//1.5 is fudge factor which 
 		//causes the ships to fire in front of you, but not too far in front. lower number means farther in front.
 		Vector2 predictedVecToTarget = vecToTarget.cpy();
@@ -70,12 +96,23 @@ public class AiController implements Controller {
 		
 		//now get ether left or right side to face target:
 		targetDeltaAngle = predictedVecToTarget.angleRad(ownerAngle);
+
 	}
-	private Object findTarget() {
-		return LovePirates.playerShip;
+	private Target findTarget() {
+		Vector2 v;
+		if (agressive) {
+			return LovePirates.playerShip;
+		} else {
+			v = new Vector2(rand.nextInt(LovePirates.MAPSIZE),rand.nextInt(LovePirates.MAPSIZE));
+			while (LovePirates.map[(int) v.x][(int) v.y]>LovePirates.SEALEVEL) {
+				v.x = rand.nextInt(LovePirates.MAPSIZE);
+				v.y = rand.nextInt(LovePirates.MAPSIZE);
+			}
+			return new AiTargetLoc(v);
+		}
 	}
 	private Vector2 targetPos(){
-		return LovePirates.playerShip.getPos();
+		return target.getPos();
 	}
 	private float getCannonProjectileSpeed() {
 		return owner.getCannonSpeed();
@@ -83,7 +120,6 @@ public class AiController implements Controller {
 	private float getCannonProjectileLifetime() {
 		return owner.getCannonballLifetime();
 	}
-	
 	void rayCastCatcher(Vector2 CollisionLoc) {
 		float dist = owner.getPos().sub(CollisionLoc).len();
 		if (rayCastHitLoc != null) {
@@ -162,8 +198,7 @@ public class AiController implements Controller {
 		// TODO Auto-generated method stub
 		if (active) {
 			if (rayCastHitLoc == null) {
-				if (vecToTarget.len() < projectileRange) {
-					
+				if (vecToTarget.len() < projectileRange) {	
 					if (targetDeltaAngle > 0) {
 						//maybe put a -.05 in flowing line to stop the ship from going left right left right
 						//when it is close to aiming correctly
@@ -240,7 +275,7 @@ public class AiController implements Controller {
 	 */
 	@Override
 	public ArrayList<FireingDirection> getFireDir() {
-		if (active) {
+		if (agressive) {
 			ArrayList<FireingDirection> fireDirs = new ArrayList<FireingDirection>();
 			if (vecToTarget.len() < projectileRange) {
 				if ((targetDeltaAngle > (Math.PI/2-.05)) && (targetDeltaAngle < (Math.PI/2+.05))) {

@@ -37,7 +37,12 @@ public class RandomShipGen {
 		aiShip= ShipGenerator.genShip(rand.nextInt(mapSize),rand.nextInt(mapSize),turnRate,drag,power,length,width,cannons,cannons,hp,hp,false);
 		aiShip.setControler(new AiController(aiShip));
 		while (LovePirates.map[(int) aiShip.getPos().x][(int) aiShip.getPos().y]>LovePirates.SEALEVEL) {
-			aiShip.setPos(rand.nextInt(mapSize),rand.nextInt(mapSize));
+			while (true) {
+				aiShip.setPos(rand.nextInt(mapSize),rand.nextInt(mapSize));
+				if (rand.nextFloat() < Math.pow(LovePirates.map[(int) aiShip.getPos().x][(int) aiShip.getPos().y],3)) {
+					break;
+				}
+			}
 		}
 		return aiShip;
 		
