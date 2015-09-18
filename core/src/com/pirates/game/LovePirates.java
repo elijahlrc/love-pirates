@@ -71,7 +71,9 @@ public class LovePirates extends ApplicationAdapter {
 	private static Texture mapTexture;
 	static int mapSpriteSize = 250;
 
-	Vector2 UI_POS = new Vector2(20,4.5f);
+	Vector2 UI_POS1 = new Vector2(20,0.5f);
+	Vector2 UI_POS2 = new Vector2(20,-.5f);
+
 	//static BodyDef bodyDef = new BodyDef();
 	//static FixtureDef fixtureDef = new FixtureDef();
 	public LovePirates(){
@@ -111,7 +113,7 @@ public class LovePirates extends ApplicationAdapter {
 		mapTexture = MyUtils.visuliseArray(map, false);
 		//save map
 		MyUtils.visuliseArray(map,false);
-		for (int i = 0; i<70; i++) {
+		for (int i = 0; i<700; i++) {
 			debries.add(TresureChestGen.genChest(map));
 		}
 	}
@@ -175,8 +177,8 @@ public class LovePirates extends ApplicationAdapter {
 		
 		
 		genWorld(1);
-		//ShipGenerator.genShip(x, y, turnRate, drag, power, length, width, cannons, slots, hp, maxhp)
-		playerShip = ShipGenerator.genShip(10, 10, 1, 1, 4, 2.5f, .75f, 8, 10, 5f, 10f,false);
+		//ShipGenerator.genShip(x, y, turnRate, drag, power, length, width, cannons, slots, hp, maxhp, boss, gunnars, maxgunners, sailors, maxsailors)
+		playerShip = ShipGenerator.genShip(100, 400, 1, 1, 4, 2.5f, .75f, 8, 10, 5f, 10f,false,8,40,0,50);
 		playerShip.setControler(new PlayerController());
 		while (map[(int) playerShip.getPos().x][(int) playerShip.getPos().y]>SEALEVEL) {
 			playerShip.setPos((int) playerShip.getPos().x+10, (int) playerShip.getPos().y);
@@ -383,8 +385,11 @@ public class LovePirates extends ApplicationAdapter {
 		ui = String.format("You have %d repair supplies %n" +
 						   "%d gold", Math.round(playerShip.repairSupplies),playerShip.gold);
 		
-		MyUtils.DrawText(ui, true, UI_POS,1);
-		
+		MyUtils.DrawText(ui, true, UI_POS1,1);
+		ui = String.format("You have %d sailors and " +
+				   "%d cannonears", playerShip.sailors,playerShip.gunners);
+
+		MyUtils.DrawText(ui, true, UI_POS2,1);
 		
 		batch.end();
 		

@@ -15,13 +15,16 @@ public class RandomShipGen {
 		float sdLen = meanLen*.25f;
 		float length = (float) Math.max(1.5f, helperGauss(meanLen,sdLen));
 		
+		int sailors = (int) Math.abs((length*5*helperGauss(1,.3f)));
+		int maxSailors = sailors*2;
+		
 		float meanWid = .375f*meanLen;
 		float sdWid = .2f*meanWid;
 		float width = (float) Math.max(.5f, helperGauss(meanWid,sdWid));
 		
 		
 		float drag = 1.5f;//constant for now, see if this is useful to change later
-		float meanPower = (float) (Math.log(length)*3);
+		float meanPower = (float) (Math.log(length)*6);
 		float sdPower = .3f*meanPower;
 		float power = (float) Math.max(3f, helperGauss(meanPower,sdPower));
 		
@@ -32,9 +35,11 @@ public class RandomShipGen {
 		float meanCannons = 5*(level+length)-10;
 		float sdCannons = .25f*meanCannons;
 		int cannons = (int) Math.max(helperGauss(meanCannons,sdCannons), 2);
-		
+		int gunners = (int) Math.min(cannons*5, cannons*helperGauss(.5f,.15f));
+
 		Ship aiShip;
-		aiShip= ShipGenerator.genShip(rand.nextInt(mapSize),rand.nextInt(mapSize),turnRate,drag,power,length,width,cannons,cannons,hp,hp,false);
+		aiShip= ShipGenerator.genShip(rand.nextInt(mapSize),rand.nextInt(mapSize),turnRate,
+				drag,power,length,width,cannons,cannons,hp,hp,false, gunners, cannons*5, sailors, maxSailors);
 		aiShip.setControler(new AiController(aiShip));
 		while (LovePirates.map[(int) aiShip.getPos().x][(int) aiShip.getPos().y]>LovePirates.SEALEVEL) {
 			while (true) {
@@ -59,9 +64,12 @@ public class RandomShipGen {
 		float sdWid = .2f*meanWid;
 		float width = (float) Math.max(.5f, helperGauss(meanWid,sdWid));
 		
+		//basline of 10 salors per length
+		int sailors = (int) Math.abs((length*10*helperGauss(1,.3f)));
+		int maxSailors = sailors*2;
 		
 		float drag = 1.5f;//constant for now, see if this is useful to change later
-		float meanPower = (float) (Math.log(length)*3);
+		float meanPower = (float) (Math.log(length)*10);
 		float sdPower = .3f*meanPower;
 		float power = (float) Math.max(3f, helperGauss(meanPower,sdPower));
 		
@@ -69,12 +77,16 @@ public class RandomShipGen {
 		float sdHp = .1f*meanHp;
 		float hp = (float) Math.max(helperGauss(meanHp,sdHp), 2);
 		
+		//max of 5 gunners per cannon
 		float meanCannons = 5*(level+length)-10;
 		float sdCannons = .25f*meanCannons;
-		int cannons = (int) Math.max(helperGauss(meanCannons,sdCannons), 2);
+		int cannons = (int) Math.max(helperGauss(meanCannons,sdCannons), 4);
+		int gunners = (int) Math.max(Math.min(cannons*5, cannons*helperGauss(.5f,.3f)),2);
+
 		
 		Ship aiShip;
-		aiShip = ShipGenerator.genShip(rand.nextInt(mapSize),rand.nextInt(mapSize),turnRate,drag,power,length,width,cannons,cannons,hp,hp,true);
+		aiShip = ShipGenerator.genShip(rand.nextInt(mapSize),rand.nextInt(mapSize),turnRate,drag,power,
+				length,width,cannons,cannons,hp,hp,true,gunners, cannons*5, sailors, maxSailors);
 		aiShip.setControler(new AiController(aiShip));
 		while (LovePirates.map[(int) aiShip.getPos().x][(int) aiShip.getPos().y]>LovePirates.SEALEVEL) {
 			aiShip.setPos(rand.nextInt(mapSize),rand.nextInt(mapSize));

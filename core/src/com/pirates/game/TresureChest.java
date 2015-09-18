@@ -11,9 +11,9 @@ public class TresureChest extends LootCrate {
 	public TresureChest(float x, float y, int amount) {
 		super(x, y, "treasure", amount);
 		float choice = rand.nextFloat();
-		if (choice> .7) {
+		if (choice> .6) {
 			contents = "treasure";
-		} else if (choice > .4){
+		} else if (choice > .25){
 			contents = "cannons";
 			quantaty = (int) Math.ceil(amount/4f);
 		} else {

@@ -34,10 +34,16 @@ public class Ship extends DrawableObj implements Collideable, Target{
 	private int PHYSICSBUFFER = 25;
 	private float hp;
 	private float maxhp;
+	int sailors;
+	private int maxSailors;
+	int gunners;
+	private int maxGunners;
+	private float baseTurnRate;
 	boolean alive;
 	int gold;
 	Random rand;
 	float repairSupplies;
+	private float reloadSpeed;
 	/**This class is the super for all ships
 	 * All ships have position vector "loc", velocity vector "vel", drag coefficient "dragcoef", and a "maxpower"
 	 * Perhaps the following things should be in some kind of ship data structure/class, 
@@ -48,13 +54,20 @@ public class Ship extends DrawableObj implements Collideable, Target{
 	 * @param hp 
 	 * 
 	*/
-	Ship(int x, int y, float turnrate, float dragcoef, float maxpower,float len, float wid, float hp, float maxhp) {
+	Ship(int x, int y, float turnrate, float dragcoef, float maxpower,float len, float wid,
+			float hp, float maxhp,int gunners,int maxGunners,int sailors, int maxSailors) {
 		this.hp = hp;
 		this.maxhp = maxhp;
+		this.gunners = gunners;
+		this.sailors = sailors;
+		this.maxGunners = maxGunners;
+		this.maxSailors = maxSailors;
+		reloadSpeed = 1;
 		alive = true;
 		gold = 0;
 		repairSupplies = 0f;
-		turnRate = turnrate;
+		baseTurnRate = turnrate;
+		turnRate = baseTurnRate/2 + baseTurnRate*sailors/(length*20);
 		maxPower = maxpower;
 		width = wid;
 		length = len;
@@ -121,9 +134,38 @@ public class Ship extends DrawableObj implements Collideable, Target{
 		}
 	}
 	void clearTerrain() {
-		
-		
+
 	}
+	void getReloadSpeed() {
+		reloadSpeed = ((float)findNumberOfCannons())/(float) gunners;
+	}
+	void getTurnRate() {
+		turnRate = baseTurnRate/2 + baseTurnRate*sailors/(length*20);
+	}
+
+	void addCrew(int number, String type){
+		if (type.equals("sailors")) {
+			if (sailors + number <= maxSailors) {
+				sailors += number;
+				getTurnRate();
+			} else {
+				sailors = maxSailors;
+				getTurnRate();
+			}
+		} else if (type.equals("gunners")) {
+			if (gunners + number <= maxGunners) {
+				gunners += number;
+				getReloadSpeed();
+			} else {
+				gunners = maxGunners;
+				getReloadSpeed();
+				
+			}
+		} else {
+			System.out.println("WARNING, BAD VALUE PASSED TO addCrew()");
+		}
+	}
+	
 	private void updateColidors() {
 		if (controller.getActive()) {
 			int x = (int) getPos().x;
@@ -190,7 +232,7 @@ public class Ship extends DrawableObj implements Collideable, Target{
 	void fire() {
 		ArrayList<FireingDirection> fireDirs = controller.getFireDir();
 		for (Slot s : slots) {
-			s.fire(fireDirs);
+			s.fire(fireDirs,reloadSpeed);
 		}
 	}
 	public void setPos(int x,int y){
@@ -276,14 +318,26 @@ public class Ship extends DrawableObj implements Collideable, Target{
 		}
 		slotIndex = rand.nextInt(openslots.size());
 		return openslots.get(slotIndex);
-		
 	}
+	int findNumberOfCannons() {
+		int slotNumber = 0;
+		for (Slot s : slots) {
+			if (s.inslot != null) {
+				slotNumber += 1;
+			}
+		}
+		return slotNumber;
+	}
+	
+	
 	void getLoot(String loot,Integer quantity) {
 		MyUtils.DrawText("The chest contains "+quantity.toString()+" "+loot, false, getPos(), 150);
 		if (loot.equals("repair supplies")){
 			repairSupplies += quantity*5;
-		} else if (loot.equals("crew")) {
-			//TODO
+		} else if (loot.equals("cannoneers")) {
+			addCrew(quantity,"gunners");
+		} else if (loot.equals("sailors")) {
+			addCrew(quantity,"sailors");
 		} else if (loot.equals("cannons")) {
 			Slot s = null;
 			for (int i = 0; i<quantity; i++) {
@@ -330,10 +384,12 @@ public class Ship extends DrawableObj implements Collideable, Target{
 		float choice = rand.nextFloat();
 		if (choice> .7) {
 			return "repair supplies";
-		} else if (choice > .5) {
+		} else if (choice > .55) {
 			return "cannons";
+		} else if (choice > .45) {
+			return "sailors";
 		} else if (choice > .3) {
-			return "crew";
+			return "cannoneers";
 		} else {
 			return "treasure";
 		}

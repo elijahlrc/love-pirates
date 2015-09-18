@@ -2,6 +2,7 @@ Short term goals:
 	//UI work, font, system for displaying text during game play, i.e. damage numbers and loot pickup messages.
 	//minimap
 	//Ai improvements
+	crew
 Long term Critical features:
 	General QOL:
 		Nice font implemented

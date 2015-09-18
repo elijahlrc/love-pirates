@@ -15,10 +15,12 @@ public class Cannon extends Equipment {
 	 */
 	private float countdown;
 	private float fireSpeed;
+	private float reloadTime;
 	private static Random rand = new Random();
 	public Cannon() {
 		countdown = 0;
 		fireSpeed = 25f;
+		reloadTime = 5;
 	}
 
 	@Override
@@ -27,7 +29,7 @@ public class Cannon extends Equipment {
 	}
 	@Override
 	void fire(float dir, Vector2 offset, Ship owner) {
-		if (countdown < 0) {
+		if (countdown <= 0) {
 			Vector2 offsetVec = offset.cpy().rotateRad(owner.getDir());
 			Vector2 firepos = owner.getPos().add(offsetVec);
 			Vector2 vel = new Vector2(1,1);
@@ -36,14 +38,14 @@ public class Cannon extends Equipment {
 			vel.setAngleRad((float) dir + owner.getDir());
 			vel.add(owner.getVel());
 			LovePirates.projectiles.add(new Cannonball(firepos,vel,owner));
-			countdown += 120;
+			countdown += reloadTime;
 		}
 	}
 
 	@Override
-	void tick() {
+	void tick(float reloadSpeed) {
 		if (countdown >= 0) {
-			countdown -= .5 + rand.nextFloat();
+			countdown -= (.5+rand.nextFloat())/(reloadSpeed*60f);
 		}
 		// TODO Auto-generated method stub
 		

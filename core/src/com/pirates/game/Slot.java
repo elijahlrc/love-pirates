@@ -30,9 +30,9 @@ public class Slot {
 	void setContents(Equipment e) {
 		inslot = e;
 	}
-	void fire(ArrayList<FireingDirection> dirToFire) {
+	void fire(ArrayList<FireingDirection> dirToFire,float reloadSpeed) {
 		if (inslot != null) {
-			inslot.tick();
+			inslot.tick(reloadSpeed);
 			if ((dirToFire != null)&&(dirToFire.contains(side))) {
 				if (inslot.iswepon()) {
 					inslot.fire(dir, offset, owner);//how to handle this nicely?
