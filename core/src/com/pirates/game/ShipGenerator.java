@@ -8,7 +8,8 @@ public class ShipGenerator {
 	//later add type of cannon two the genship function
 	// cannons var represents cannnos per side
 	static Ship genShip(int x, int y, float turnRate, float drag, float power,  float length, 
-			float width, int cannons, int numSlots, float hp, float maxhp, boolean boss, int gunners,int maxGunners,int sailors, int maxSailors) {
+			float width, int cannons,int buckshotcannons, int numSlots, float hp, float maxhp, boolean boss, 
+			int gunners,int maxGunners,int sailors, int maxSailors) {
 		float massFactor = length*width;
 		Ship returnShip;
 		float turnMassFactor = (float) Math.pow(massFactor, 1.25);
@@ -34,9 +35,18 @@ public class ShipGenerator {
 		returnShip.slots = slots;//this is pretty hacky, make setter. TODO
 
 		for (int i=0; i<cannons; i += 1){
-			Equipment gun = new Cannon();
+			Equipment gun;
 			Slot slot = returnShip.findOpenSlot();
 			if (slot != null){
+				gun = new Cannon();
+				slot.setContents(gun);
+			}
+		}
+		for (int i=0; i<buckshotcannons; i += 1){
+			Equipment gun;
+			Slot slot = returnShip.findOpenSlot();
+			if (slot != null){
+				gun = new BuckshotCannon();
 				slot.setContents(gun);
 			}
 		}
@@ -47,24 +57,24 @@ public class ShipGenerator {
 	
 	/**This constructor will create a fully crewed non boss ship*/
 	static Ship genShip(int x, int y, float turnRate, float drag, float power,  
-			float length, float width, int cannons, int numSlots, float hp, int maxSailors) {
-		return genShip(x,y,turnRate,drag,power,length,width,cannons,numSlots,hp,hp, 
+			float length, float width, int cannons,int buckshotcannons, int numSlots, float hp, int maxSailors) {
+		return genShip(x,y,turnRate,drag,power,length,width,cannons,buckshotcannons,numSlots,hp,hp, 
 				cannons*5, cannons*5, maxSailors, maxSailors);
 
 	}
 	
 	/**generates a non boss ship setting hp to max hp*/
 	static Ship genShip(int x, int y, float turnRate, float drag, float power,  
-			float length, float width, int cannons, int numSlots, float hp, 
+			float length, float width, int cannons,int buckshotcannons, int numSlots, float hp, 
 			int gunners,int maxGunners,int sailors, int maxSailors) {
-		return genShip(x,y,turnRate,drag,power,length,width,cannons,numSlots,hp,hp,
+		return genShip(x,y,turnRate,drag,power,length,width,cannons,buckshotcannons,numSlots,hp,hp,
 				gunners, maxGunners, sailors, maxSailors);
 	}
 	/**generates a non boss ship*/
 	static Ship genShip(int x, int y, float turnRate, float drag, float power, 
-			float length, float width, int cannons, int numSlots, float hp, 
+			float length, float width, int cannons,int buckshotcannons, int numSlots, float hp, 
 			float maxhp,int gunners,int maxGunners,int sailors, int maxSailors) {
-		return genShip(x,y,turnRate,drag,power,length,width,cannons,numSlots,hp,maxhp,false, 
+		return genShip(x,y,turnRate,drag,power,length,width,cannons,buckshotcannons,numSlots,hp,maxhp,false, 
 				gunners,maxGunners, sailors,  maxSailors);
 	}
 

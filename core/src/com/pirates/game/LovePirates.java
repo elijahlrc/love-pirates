@@ -70,9 +70,16 @@ public class LovePirates extends ApplicationAdapter {
 	static Color seaTintColor = new Color();
 	private static Texture mapTexture;
 	static int mapSpriteSize = 250;
-
-	Vector2 UI_POS1 = new Vector2(20,0.5f);
-	Vector2 UI_POS2 = new Vector2(20,-.5f);
+	public static Ui UI;
+	
+	static Vector2 UI_POS1 = new Vector2(20,0.5f);
+	static Vector2 UI_POS2 = new Vector2(20,-.5f);
+	
+	
+	//Ship factories
+	//called like basicShipGen.genShip(level);
+	static ShipGen basicShipGen = new BasicShipGen();
+	static ShipGen bossShipGen = new BossShipGen();
 
 	//static BodyDef bodyDef = new BodyDef();
 	//static FixtureDef fixtureDef = new FixtureDef();
@@ -113,7 +120,7 @@ public class LovePirates extends ApplicationAdapter {
 		mapTexture = MyUtils.visuliseArray(map, false);
 		//save map
 		MyUtils.visuliseArray(map,false);
-		for (int i = 0; i<700; i++) {
+		for (int i = 0; i<70; i++) {
 			debries.add(TresureChestGen.genChest(map));
 		}
 	}
@@ -143,7 +150,7 @@ public class LovePirates extends ApplicationAdapter {
 		Gdx.input.setInputProcessor(inputProcessor);
 		//box2d
 		Box2D.init();		
-		
+		Ui.init();
 		
 		//map gen init
 		noiseGen =  PerlinNoiseGen.init();
@@ -155,12 +162,16 @@ public class LovePirates extends ApplicationAdapter {
 		Texture cannoballtext = new Texture("cannonball.png");
 		Texture debristext = new Texture("debris.png");
 		Texture lootCratetext = new Texture("crate.png");
+		Texture whiteCircle = new Texture("whileCircle.png");
+		Texture buckshotSprite = new Texture("buckshot.png");
 
 		debug = new Texture("debug.bmp");
 		textureRegions[1] = new TextureRegion(cannoballtext, cannoballtext.getWidth(), cannoballtext.getHeight());
 		textureRegions[0] = new TextureRegion(shiptex, shiptex.getWidth(), shiptex.getHeight()); //this is wrong
 		textureRegions[3] = new TextureRegion(debristext, debristext.getWidth(), debristext.getHeight());
 		textureRegions[4] = new TextureRegion(lootCratetext, lootCratetext.getWidth(), lootCratetext.getHeight());
+		textureRegions[5] = new TextureRegion(whiteCircle, whiteCircle.getWidth(), whiteCircle.getHeight());
+		textureRegions[6] = new TextureRegion(buckshotSprite, buckshotSprite.getWidth(), buckshotSprite.getHeight());
 
 		
 		tiles = new Texture("tiles2.png");
@@ -177,8 +188,8 @@ public class LovePirates extends ApplicationAdapter {
 		
 		
 		genWorld(1);
-		//ShipGenerator.genShip(x, y, turnRate, drag, power, length, width, cannons, slots, hp, maxhp, boss, gunnars, maxgunners, sailors, maxsailors)
-		playerShip = ShipGenerator.genShip(100, 400, 1, 1, 4, 2.5f, .75f, 8, 10, 5f, 10f,false,8,40,0,50);
+		//ShipGenerator.genShip(x, y, turnRate, drag, power, length, width, cannons,buckshot, slots, hp, maxhp, boss, gunnars, maxgunners, sailors, maxsailors)
+		playerShip = ShipGenerator.genShip(100, 400, 1, 1, 4, 2.5f, .75f, 4,8, 10, 5f, 20,false,10,40,12,50);
 		playerShip.setControler(new PlayerController());
 		while (map[(int) playerShip.getPos().x][(int) playerShip.getPos().y]>SEALEVEL) {
 			playerShip.setPos((int) playerShip.getPos().x+10, (int) playerShip.getPos().y);
@@ -297,9 +308,9 @@ public class LovePirates extends ApplicationAdapter {
 		while (ships.size()<50) {
 			Ship aiShip;
 			if (rand.nextFloat() < .9) {
-				aiShip= RandomShipGen.GenRandomShip(lvl);
+				aiShip= basicShipGen.genShip(lvl);
 			} else {
-				aiShip = RandomShipGen.GenRandomBossShip(lvl);
+				aiShip = bossShipGen.genShip(lvl);
 			}
 			ships.add(aiShip);
 		}
@@ -388,8 +399,10 @@ public class LovePirates extends ApplicationAdapter {
 		MyUtils.DrawText(ui, true, UI_POS1,1);
 		ui = String.format("You have %d sailors and " +
 				   "%d cannonears", playerShip.sailors,playerShip.gunners);
-
+		
 		MyUtils.DrawText(ui, true, UI_POS2,1);
+		
+		Ui.drawShipIcon(batch,playerShip,-26,-13);
 		
 		batch.end();
 		
