@@ -140,10 +140,32 @@ public class Ship extends DrawableObj implements Collideable, Target{
 		reloadSpeed = ((float)findNumberOfCannons())/(float) gunners;
 	}
 	void getTurnRate() {
-		turnRate = baseTurnRate/2 + baseTurnRate*sailors/(length*20);
+		turnRate = baseTurnRate/16 + baseTurnRate*sailors/(length*10);
 	}
 
 	void addCrew(int number, String type){
+		if (type.equals("sailors")) {
+			if (sailors + number <= maxSailors) {
+				sailors += number;
+				getTurnRate();
+			} else {
+				sailors = maxSailors;
+				getTurnRate();
+			}
+		} else if (type.equals("gunners")) {
+			if (gunners + number <= maxGunners) {
+				gunners += number;
+				getReloadSpeed();
+			} else {
+				gunners = maxGunners;
+				getReloadSpeed();
+				
+			}
+		} else {
+			System.out.println("WARNING, BAD VALUE PASSED TO addCrew()");
+		}
+	}
+	void removeCrew(int number, String type) {
 		if (type.equals("sailors")) {
 			if (sailors + number <= maxSailors) {
 				sailors += number;
@@ -282,18 +304,23 @@ public class Ship extends DrawableObj implements Collideable, Target{
 				Float dmg = impulse.getNormalImpulses()[0]*DAMAGEFACTOR;
 				MyUtils.DrawText(((Float) (Math.round(dmg*10)/10f)).toString(), false, ((Cannonball) b).getPos(), (int) ((Cannonball) b).lifetime);
 				hp -= dmg;
+				sailors -= (int) Math.max(rand.nextGaussian()*dmg,0);
+				gunners -= (int) Math.max(rand.nextGaussian()*dmg,0);
+
 			}
+		} else if (b instanceof Buckshot){
+				Ship owner = ((Buckshot) b).getOwner();
+				if (owner != this) {
+					Float dmg = impulse.getNormalImpulses()[0]*DAMAGEFACTOR/4;
+					//MyUtils.DrawText(((Float) (Math.round(dmg*10)/10f)).toString(), false, ((Buckshot) b).getPos(), (int) ((Buckshot) b).lifetime);
+					hp -= dmg;
+					sailors -= (int) Math.max(rand.nextGaussian()*dmg*10,0);
+					gunners -= (int) Math.max(rand.nextGaussian()*dmg*10,0);
+				}
+
 		} else if (b instanceof LootCrate) {
 			LootCrate c = (LootCrate) b;
 			getLoot(c.contents, c.quantaty);
-		}
-		if (a instanceof Cannonball){
-			Ship owner = ((Cannonball) a).getOwner();
-			if (owner != this) {
-				Float dmg = impulse.getNormalImpulses()[0]*DAMAGEFACTOR;
-				MyUtils.DrawText(((Float) (Math.round(dmg*10)/10f)).toString(), false, ((Cannonball) a).getPos(), (int) ((Cannonball) a).lifetime);
-				hp -= dmg;
-			}
 		} else if (a instanceof LootCrate) {
 			LootCrate c = (LootCrate) a;
 			getLoot(c.contents, c.quantaty);
@@ -335,15 +362,23 @@ public class Ship extends DrawableObj implements Collideable, Target{
 		if (loot.equals("repair supplies")){
 			repairSupplies += quantity*5;
 		} else if (loot.equals("cannoneers")) {
-			addCrew(quantity,"gunners");
+			addCrew(quantity*2,"gunners");
 		} else if (loot.equals("sailors")) {
-			addCrew(quantity,"sailors");
+			addCrew(quantity*2,"sailors");
 		} else if (loot.equals("cannons")) {
 			Slot s = null;
 			for (int i = 0; i<quantity; i++) {
 				s = findOpenSlot();
 				if (s!=null) {
 					s.setContents(new Cannon());
+				}
+			}
+		} else if (loot.equals("buckshot cannons")) {
+			Slot s = null;
+			for (int i = 0; i<quantity; i++) {
+				s = findOpenSlot();
+				if (s!=null) {
+					s.setContents(new BuckshotCannon());
 				}
 			}
 		} else if (loot.equals("treasure")) {
@@ -382,13 +417,15 @@ public class Ship extends DrawableObj implements Collideable, Target{
 	}
 	public String pickLootType() {
 		float choice = rand.nextFloat();
-		if (choice> .7) {
+		if (choice> .85) {
 			return "repair supplies";
-		} else if (choice > .55) {
+		} else if (choice > .75) {
 			return "cannons";
-		} else if (choice > .45) {
+		} else if (choice > .625) {
+			return "buckshot cannons";
+		} else if (choice > .5) {
 			return "sailors";
-		} else if (choice > .3) {
+		} else if (choice > .25) {
 			return "cannoneers";
 		} else {
 			return "treasure";
@@ -396,7 +433,7 @@ public class Ship extends DrawableObj implements Collideable, Target{
 	}
 	public void delete() {
 		LovePirates.world.destroyBody(body);
-		int lootAmount = (int) (length*width) + 1;
+		int lootAmount = (int) (2*(length*width) + 1);
 		int debriesAmount = lootAmount*7;
 		for (int i = 0 ; i <= debriesAmount; i++) {
 			LovePirates.debries.add(new Debries((float) (body.getPosition().x+((Math.random()-.5)*Math.sqrt(i))),(float) (body.getPosition().y+((Math.random()-.5)*Math.sqrt(i))), false));

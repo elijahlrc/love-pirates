@@ -101,7 +101,7 @@ class MyUtils {
 	 * @param lifetime
 	 */
 	static void DrawText(String text, Boolean relative, Vector2 pos, int lifetime) {
-		textList.add(new DrawableText(text, relative, pos, lifetime));
+		textList.add(new DrawableText(text, relative, pos.cpy(), lifetime));
 	}
 		
 	

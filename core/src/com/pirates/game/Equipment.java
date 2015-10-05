@@ -9,10 +9,11 @@ import com.badlogic.gdx.math.Vector2;
  * @author Elijah
  */
 public abstract class Equipment {
+	protected float countdown;
+
 	/**
 	 * @return true if equipment is a weapon
 	 */
-	
 	abstract boolean iswepon();
 	/**
 	 * this method basically just constructs particles with the appropriate params.

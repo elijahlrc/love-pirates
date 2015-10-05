@@ -8,7 +8,7 @@ import java.util.Random;
  * @author Elijah
  *
  */
-public class Cannon extends Equipment {
+public class BuckshotCannon extends Equipment {
 
 	/**
 	 * 
@@ -16,10 +16,10 @@ public class Cannon extends Equipment {
 	private float fireSpeed;
 	private float reloadTime;
 	private static Random rand = new Random();
-	public Cannon() {
+	public BuckshotCannon() {
 		countdown = 0;
-		fireSpeed = 25f;
-		reloadTime = 5;
+		fireSpeed = 40f;
+		reloadTime = 2.5f;
 	}
 
 	@Override
@@ -32,11 +32,15 @@ public class Cannon extends Equipment {
 			Vector2 offsetVec = offset.cpy().rotateRad(owner.getDir());
 			Vector2 firepos = owner.getPos().add(offsetVec);
 			Vector2 vel = new Vector2(1,1);
-			float exitVel = (float) (rand.nextGaussian()*2+fireSpeed);
+			float exitVel = (float) (rand.nextGaussian()*6+fireSpeed);
 			vel.setLength(exitVel);
-			vel.setAngleRad((float) dir + owner.getDir());
 			vel.add(owner.getVel());
-			LovePirates.projectiles.add(new Cannonball(firepos,vel,owner));
+			for (int i = 1; i <= 5; i++) {
+				float angleoffset = (rand.nextFloat()-.5f)/5f;
+				vel.setAngleRad((float) dir + owner.getDir()+angleoffset);
+				LovePirates.projectiles.add(new Buckshot(firepos,vel,owner));
+			}
+			
 			countdown += reloadTime;
 		}
 	}
@@ -47,7 +51,6 @@ public class Cannon extends Equipment {
 			countdown -= (.5+rand.nextFloat())/(reloadSpeed*60f);
 		}
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
@@ -57,7 +60,6 @@ public class Cannon extends Equipment {
 
 	@Override
 	float getProjLifetime() {
-		
 		return Cannonball.LIFETIME;
 	}
 	
