@@ -5,9 +5,24 @@ public class BossShipGen extends ShipGen {
 	public BossShipGen() {
 		// TODO Auto-generated constructor stub
 	}
-	@Override
 	Ship genShip(int level) {
 		int mapSize = LovePirates.MAPSIZE;
+		int x = rand.nextInt(mapSize);
+		int y = rand.nextInt(mapSize);
+		while (LovePirates.map[x][y]>LovePirates.SEALEVEL) {				
+			if (rand.nextFloat() < Math.pow(LovePirates.map[x][y],3)) {
+				break;
+				
+			}
+			x = rand.nextInt(mapSize);
+			y = rand.nextInt(mapSize);
+		}
+		Ship aiShip = genShip(level,x,y);
+		
+		return aiShip;
+	}
+	@Override
+	Ship genShip(int level,int x,int y) {
 		float turnRate = (float) (Math.abs(rand.nextGaussian()/2)+.5f);
 		
 		float meanLen = (float) Math.max(4, (2*Math.log(level)+2));
@@ -39,12 +54,9 @@ public class BossShipGen extends ShipGen {
 
 			
 		Ship aiShip;
-		aiShip = ShipGenerator.genShip(rand.nextInt(mapSize),rand.nextInt(mapSize),turnRate,drag,power,
+		aiShip = ShipGenerator.genShip(x,y,turnRate,drag,power,
 				length,width,cannons,cannons,cannons,hp,hp,true,gunners, cannons*5, sailors, maxSailors);
 		aiShip.setControler(new AiController(aiShip));
-		while (LovePirates.map[(int) aiShip.getPos().x][(int) aiShip.getPos().y]>LovePirates.SEALEVEL) {
-			aiShip.setPos(rand.nextInt(mapSize),rand.nextInt(mapSize));
-		}
 		return aiShip;	
 	}
 }

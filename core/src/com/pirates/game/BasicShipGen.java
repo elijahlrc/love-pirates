@@ -1,11 +1,28 @@
 package com.pirates.game;
 
 class BasicShipGen extends ShipGen{
-	@Override
+	
 	Ship genShip(int level) {
+		int mapSize = LovePirates.MAPSIZE;
+		int x = rand.nextInt(mapSize);
+		int y = rand.nextInt(mapSize);
+		while (LovePirates.map[x][y]>LovePirates.SEALEVEL) {				
+			if (rand.nextFloat() < Math.pow(LovePirates.map[x][y],3)) {
+				break;
+				
+			}
+			x = rand.nextInt(mapSize);
+			y = rand.nextInt(mapSize);
+		}
+		Ship aiShip = genShip(level,x,y);
+		
+		return aiShip;
+
+	}
+	@Override
+	Ship genShip(int level,int x,int y) {
 		int cannons = 0;
 		int buckshotcannons = 0;
-		int mapSize = LovePirates.MAPSIZE;
 		float turnRate = (float) (Math.abs(rand.nextGaussian()/2)+.5f);
 		
 		float meanLen = (float) Math.max(2, (2*Math.log(level)+1));
@@ -40,19 +57,12 @@ class BasicShipGen extends ShipGen{
 		int gunners = (int) Math.max((cannons+buckshotcannons)*.75,
 									  Math.min((cannons+buckshotcannons)*5,
 											  (cannons+buckshotcannons)*helperGauss(2f,1f)));
-
+		
 		Ship aiShip;
-		aiShip= ShipGenerator.genShip(rand.nextInt(mapSize),rand.nextInt(mapSize),turnRate,
+		aiShip= ShipGenerator.genShip(x,y,turnRate,
 				drag,power,length,width,cannons,buckshotcannons,cannons+buckshotcannons,hp,hp,false, gunners, cannons*5, sailors, maxSailors);
 		aiShip.setControler(new AiController(aiShip));
-		while (LovePirates.map[(int) aiShip.getPos().x][(int) aiShip.getPos().y]>LovePirates.SEALEVEL) {
-			while (true) {
-				aiShip.setPos(rand.nextInt(mapSize),rand.nextInt(mapSize));
-				if (rand.nextFloat() < Math.pow(LovePirates.map[(int) aiShip.getPos().x][(int) aiShip.getPos().y],3)) {
-					break;
-				}
-			}
-		}
+		aiShip.getLoot("repair supplies", (int) Math.ceil(hp/10));
 		return aiShip;
 	}
 }

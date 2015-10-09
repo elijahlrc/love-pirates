@@ -65,6 +65,7 @@ public class LovePirates extends ApplicationAdapter {
 	static int lvl;
 	static HashSet<Projectile> projRemovalSet;
 	static HashSet<Ship> shipRemovalSet;
+	static HashSet<Ship> shipwreckAdditionSet;
 	static HashSet<Debries> debriesRemovalSet;
 	static PerlinNoiseGen noiseGen;
 	static Color seaTintColor = new Color();
@@ -105,6 +106,7 @@ public class LovePirates extends ApplicationAdapter {
 		colliderPool = new ColliderPool(COLLIDERPOOLSIZE);
 		projRemovalSet = new HashSet<Projectile>();
 		shipRemovalSet = new HashSet<Ship>();
+		shipwreckAdditionSet = new HashSet<Ship>();
 		debriesRemovalSet = new HashSet<Debries>();
 		
 		//debug renderer for physics rendering
@@ -159,6 +161,7 @@ public class LovePirates extends ApplicationAdapter {
 		textureRegions = new TextureRegion[99];
 		//this next line is bad, should be part of the spritesheet and a texture region
 		Texture shiptex = new Texture("ship.bmp");
+		Texture deadShiptex = new Texture("deadship.png");
 		Texture cannoballtext = new Texture("cannonball.png");
 		Texture debristext = new Texture("debris.png");
 		Texture lootCratetext = new Texture("crate.png");
@@ -168,6 +171,7 @@ public class LovePirates extends ApplicationAdapter {
 		debug = new Texture("debug.bmp");
 		textureRegions[1] = new TextureRegion(cannoballtext, cannoballtext.getWidth(), cannoballtext.getHeight());
 		textureRegions[0] = new TextureRegion(shiptex, shiptex.getWidth(), shiptex.getHeight()); //this is wrong
+		textureRegions[7] = new TextureRegion(deadShiptex, deadShiptex.getWidth(), deadShiptex.getHeight());
 		textureRegions[3] = new TextureRegion(debristext, debristext.getWidth(), debristext.getHeight());
 		textureRegions[4] = new TextureRegion(lootCratetext, lootCratetext.getWidth(), lootCratetext.getHeight());
 		textureRegions[5] = new TextureRegion(whiteCircle, whiteCircle.getWidth(), whiteCircle.getHeight());
@@ -189,7 +193,9 @@ public class LovePirates extends ApplicationAdapter {
 		
 		genWorld(1);
 		//ShipGenerator.genShip(x, y, turnRate, drag, power, length, width, cannons,buckshot, slots, hp, maxhp, boss, gunnars, maxgunners, sailors, maxsailors)
-		playerShip = ShipGenerator.genShip(100, 400, 1, 1, 4, 2.5f, .75f, 4,8, 10, 5f, 20,false,10,40,12,50);
+		//playerShip = ShipGenerator.genShip(100, 400, 1, 1, 4, 2.5f, .75f, 4,8, 10, 5f, 20,false,10,40,12,50);
+		playerShip = ShipGenerator.genShip(100, 400, 2, 1, 16, 2.5f, .75f, 10,0, 10, 20f, 20,false,20,40,30,50);
+
 		playerShip.setControler(new PlayerController());
 		while (map[(int) playerShip.getPos().x][(int) playerShip.getPos().y]>SEALEVEL) {
 			playerShip.setPos((int) playerShip.getPos().x+10, (int) playerShip.getPos().y);
@@ -319,7 +325,7 @@ public class LovePirates extends ApplicationAdapter {
 			x = ship.getPos().x;
 			y = ship.getPos().y;
 			index = ship.getSpriteIndex();
-			float[] size = ship.getSize();
+			float[] size = ship.getSpriteSize();
 			t = textureRegions[index];
 			float shipRotation = (float) (ship.getDir()*360/(2*Math.PI));
 			Vector2 hpDrawPos = ship.getPos().add(ship.getSize()[1],ship.getSize()[1]);
@@ -333,11 +339,20 @@ public class LovePirates extends ApplicationAdapter {
 		for (Ship ship : ships){
 			if (ship.alive == false) {
 				shipRemovalSet.add(ship);
+				if (ship.isWreck() == false) 
+					shipwreckAdditionSet.add(ship);
 				ship.delete();
 			}
 		}
+		for (Ship s:shipwreckAdditionSet){
+			ships.add(DeadShipGen.genShip(s));
+		}
+		for (Ship s:shipRemovalSet) {
+			world.destroyBody(s.getBody());
+		}
 		ships.removeAll(shipRemovalSet);
-		
+		shipRemovalSet.clear();
+		shipwreckAdditionSet.clear();
 		MyUtils.renderText(batch);
 		
 		for (Vector2 debugLoc : debugObjects) {

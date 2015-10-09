@@ -29,6 +29,8 @@ public class Ship extends DrawableObj implements Collideable, Target{
 	private Fixture fixture;
 	private float width;
 	private float length;
+	private float spriteWidth;
+	private float spriteLength;
 	private Body body;
 	protected Slot[] slots;
 	private int PHYSICSBUFFER = 25;
@@ -44,6 +46,7 @@ public class Ship extends DrawableObj implements Collideable, Target{
 	Random rand;
 	float repairSupplies;
 	private float reloadSpeed;
+	private boolean isWreck;
 	/**This class is the super for all ships
 	 * All ships have position vector "loc", velocity vector "vel", drag coefficient "dragcoef", and a "maxpower"
 	 * Perhaps the following things should be in some kind of ship data structure/class, 
@@ -63,14 +66,17 @@ public class Ship extends DrawableObj implements Collideable, Target{
 		this.maxGunners = maxGunners;
 		this.maxSailors = maxSailors;
 		reloadSpeed = 1;
+		isWreck = false;
 		alive = true;
 		gold = 0;
 		repairSupplies = 0f;
 		baseTurnRate = turnrate;
-		turnRate = baseTurnRate/2 + baseTurnRate*sailors/(length*20);
-		maxPower = maxpower;
 		width = wid;
 		length = len;
+		spriteWidth = width;
+		spriteLength = length;
+		turnRate = baseTurnRate/2 + baseTurnRate*sailors/(length*20);
+		maxPower = maxpower;
 		slots = new Slot[NUM_SLOTS];
 		bodyDef.position.set(x,y);
 		bodyDef.type = BodyDef.BodyType.DynamicBody;
@@ -96,7 +102,7 @@ public class Ship extends DrawableObj implements Collideable, Target{
 		shipshape.dispose();
 	}
 	void bodyReInstantiate(World world) {
-		body = world.createBody(bodyDef);
+		setBody(world.createBody(bodyDef));
 		body.setAwake(true);
 		PolygonShape shipshape = new PolygonShape();
 		float[] verts = {0,width/2,length/2, 0, 0, -width/2, -length/2, 0};
@@ -142,6 +148,7 @@ public class Ship extends DrawableObj implements Collideable, Target{
 	void getTurnRate() {
 		turnRate = baseTurnRate/16 + baseTurnRate*sailors/(length*10);
 	}
+	
 
 	void addCrew(int number, String type){
 		if (type.equals("sailors")) {
@@ -164,6 +171,9 @@ public class Ship extends DrawableObj implements Collideable, Target{
 		} else {
 			System.out.println("WARNING, BAD VALUE PASSED TO addCrew()");
 		}
+	}
+	float getMaxHp() {
+		return maxhp;
 	}
 	void removeCrew(int number, String type) {
 		if (type.equals("sailors")) {
@@ -257,26 +267,42 @@ public class Ship extends DrawableObj implements Collideable, Target{
 			s.fire(fireDirs,reloadSpeed);
 		}
 	}
-	public void setPos(int x,int y){
+	void setPos(int x,int y){
 		body.setTransform(x, y, getDir());
 	}
-				
+	void setPos(float x,float y){
+		body.setTransform(x, y, getDir());
+	}
+	void setDir(float a) {
+		body.setTransform(body.getPosition(),a);
+	}
 	public Vector2 getPos() {
 		return body.getPosition().cpy();
 	}
 	public Vector2 getVel() {
 		return body.getLinearVelocity().cpy();
 	}
-	public float getDir() {
+	float getDir() {
 		return body.getAngle();
 	}
 	public float[] getSize() {
 		float[] size =  {length, width};
 		return size;
 	}
+	void setSpriteSize(float len, float wid) {
+		spriteLength = len;
+		spriteWidth = wid;
+	}
+	float [] getSpriteSize() {
+		float[] size =  {spriteLength, spriteWidth};
+		return size;
+	}
 	@Override
 	public int getSpriteIndex() {
 		return spriteIndex;
+	}
+	public void setSpriteIndex(int i) {
+		spriteIndex = i;
 	}
 	@Override
 	public boolean handlePreCollide(Contact contact) {
@@ -432,21 +458,39 @@ public class Ship extends DrawableObj implements Collideable, Target{
 		}
 	}
 	public void delete() {
-		LovePirates.world.destroyBody(body);
+		
+		//DeadShipGen.genShip(this);
+		//old loot style
+		
 		int lootAmount = (int) (2*(length*width) + 1);
-		int debriesAmount = lootAmount*7;
-		for (int i = 0 ; i <= debriesAmount; i++) {
-			LovePirates.debries.add(new Debries((float) (body.getPosition().x+((Math.random()-.5)*Math.sqrt(i))),(float) (body.getPosition().y+((Math.random()-.5)*Math.sqrt(i))), false));
-		}
+		int debriesAmount = lootAmount*3;
+		//for (int i = 0 ; i <= debriesAmount; i++) {
+		//	LovePirates.debries.add(new Debries((float) (body.getPosition().x+((Math.random()-.5)*Math.sqrt(i))),(float) (body.getPosition().y+((Math.random()-.5)*Math.sqrt(i))), false));
+		//}
+		/*
 		for (int i = 0; i < lootAmount; i++) {
 			LovePirates.debries.add(new LootCrate((float) (body.getPosition().x+((Math.random()-.5)*Math.sqrt(i))),(float) (body.getPosition().y+((Math.random()-.5)*Math.sqrt(i))), pickLootType(), 1));
-
 		}
+		*/
+		
+		
 		
 		
 	}
-	public float getHp() {
+	float getHp() {
 		return hp;
+	}
+	boolean isWreck() {
+		return isWreck;
+	}
+	void setWreck(boolean wreck) {
+		isWreck = wreck;
+	}
+	public Body getBody() {
+		return body;
+	}
+	public void setBody(Body body) {
+		this.body = body;
 	}
 	
 	

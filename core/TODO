@@ -3,7 +3,10 @@ Short term goals:
 	//minimap
 	//Ai improvements
 	//Ui improvements
+	Loot mechanics in ev nova style (ie, limetd loot from each ship)
+
 	crew
+		carpenders
 Long term Critical features:
 	General QOL:
 		Nice font implemented
@@ -36,3 +39,7 @@ Long term long shot features.
 	Shops
 	missions
 	Tilting ships for 3d effect (as in sunless sea).
+	
+	
+BUGGS::
+	When a ship gets stuck in land the whole game lags. Also ships get stuck in lagg	
