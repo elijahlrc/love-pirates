@@ -33,6 +33,10 @@ public class DeadShipGen {
 		aiShip.setDir(s.getDir());
 		System.out.println(aiShip.getDir());
 		aiShip.setSpriteSize(length*2f, width*2f);
+		//maybe this should have a setter. for now, janky.
+		//also maybe a more robust inventory system is a better way to handle this.
+		aiShip.slots = s.slots;
+		
 		return aiShip;
 	}
 

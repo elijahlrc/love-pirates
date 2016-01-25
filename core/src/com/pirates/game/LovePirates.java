@@ -1,4 +1,5 @@
 package com.pirates.game;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 
 import java.util.HashSet;
@@ -7,6 +8,7 @@ import java.util.Random;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
@@ -16,11 +18,16 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.PerformanceCounter;
+import com.badlogic.gdx.InputMultiplexer;
 public class LovePirates extends ApplicationAdapter {
 	static SpriteBatch batch;
 	static double[][] map;
-	static HandleUserInput inputProcessor;
 	static TextureRegion[] textureRegions;
 	static Texture tiles;
 	static HashSet<Projectile> projectiles;
@@ -72,6 +79,9 @@ public class LovePirates extends ApplicationAdapter {
 	private static Texture mapTexture;
 	static int mapSpriteSize = 250;
 	public static Ui UI;
+	static LootScreen lootScreen;
+	private static Skin skin;
+	static CStage stage;
 	
 	static Vector2 UI_POS1 = new Vector2(20,0.5f);
 	static Vector2 UI_POS2 = new Vector2(20,-.5f);
@@ -138,6 +148,7 @@ public class LovePirates extends ApplicationAdapter {
 	
 	@Override
 	public void create() {
+		stage = new CStage();
 		Gdx.graphics.setDisplayMode(Gdx.graphics.getDesktopDisplayMode().width, Gdx.graphics.getDesktopDisplayMode().height, true);
 		width = Gdx.graphics.getDesktopDisplayMode().width;
 		height = Gdx.graphics.getDesktopDisplayMode().height;
@@ -148,10 +159,9 @@ public class LovePirates extends ApplicationAdapter {
 		
 		
 		camera = new OrthographicCamera(width/TILESIZE*.5f,height/TILESIZE*.5f);
-		inputProcessor = HandleUserInput.init();
-		Gdx.input.setInputProcessor(inputProcessor);
+		Gdx.input.setInputProcessor(stage);
 		//box2d
-		Box2D.init();		
+		Box2D.init();
 		Ui.init();
 		
 		//map gen init
@@ -189,7 +199,7 @@ public class LovePirates extends ApplicationAdapter {
 		lsea =  new TextureRegion(tiles,2*TILESIZE,2*TILESIZE,TILESIZE,TILESIZE);
 		sand =  new TextureRegion(tiles,0,TILESIZE,TILESIZE,TILESIZE);
 		
-		
+        
 		
 		genWorld(1);
 		//ShipGenerator.genShip(x, y, turnRate, drag, power, length, width, cannons,buckshot, slots, hp, maxhp, boss, gunnars, maxgunners, sailors, maxsailors)
@@ -204,6 +214,16 @@ public class LovePirates extends ApplicationAdapter {
 		
 		batch = new SpriteBatch();
 		batch.enableBlending();
+		
+		
+		
+		FileHandle skinfile = Gdx.files.internal("uiskin.json");
+		
+		skin = new Skin(skinfile);
+        stage = new CStage();
+        lootScreen = new LootScreen(skin, stage);
+        
+        
 		/*
 		  for (int i = 0; i<20; i++) {
 			map = noiseGen.getFullPerlinArray(10);
@@ -419,6 +439,8 @@ public class LovePirates extends ApplicationAdapter {
 		
 		Ui.drawShipIcon(batch,playerShip,-26,-13);
 		
+		
+		stage.draw();
 		batch.end();
 		
 		for (Projectile proj : projectiles){

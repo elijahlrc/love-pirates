@@ -42,7 +42,7 @@ public class BossShipGen extends ShipGen {
 		float sdPower = .3f*meanPower;
 		float power = (float) Math.max(3f, helperGauss(meanPower,sdPower));
 			
-		float meanHp = width*length*level+2;
+		float meanHp = width*length*level*6+10;
 		float sdHp = .1f*meanHp;
 		float hp = (float) Math.max(helperGauss(meanHp,sdHp), 2);
 			

@@ -42,7 +42,7 @@ class BasicShipGen extends ShipGen{
 		float sdPower = .3f*meanPower;
 		float power = (float) Math.max(3f, helperGauss(meanPower,sdPower));
 		
-		float meanHp = width*length*level*4+2;
+		float meanHp = width*length*level*4+5;
 		float sdHp = .2f*meanHp;
 		float hp = (float) Math.max(helperGauss(meanHp,sdHp), 2);
 		if (rand.nextFloat()>.25) {

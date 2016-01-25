@@ -14,6 +14,6 @@ public class HtmlLauncher extends GwtApplication {
 
         @Override
         public ApplicationListener getApplicationListener () {
-                return new LovePirates(1000,1000);
+                return new LovePirates();
         }
 }

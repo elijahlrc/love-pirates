@@ -1,12 +1,14 @@
 package com.pirates.game;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputProcessor;
 
 import java.util.ArrayList;
 class PlayerController implements Controller {
-	HandleUserInput inputProcessor;
+	CStage inputProcessor;
 	PlayerController () {
-		inputProcessor = LovePirates.inputProcessor;
+		inputProcessor = LovePirates.stage;
 	}
 	@Override
 	public Direction getTurn() {

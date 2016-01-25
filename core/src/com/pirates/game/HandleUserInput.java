@@ -1,42 +1,22 @@
 package com.pirates.game;
 
 import com.badlogic.gdx.InputProcessor;
-import java.util.HashSet;
-class HandleUserInput implements InputProcessor {
-	/**There will be lots of fields here which will
-	 * allow the handle user input thing to be asked what user input is being gathered
-	 * so some external thing will say
-	 * if (inputProcessor.forward) {
-	 * 		//go forward
-	 * }
-	 * Hope that makes sense
-	 * Fields are below. Methods below will edit these fields.
-	 */
 
-	HashSet<Integer> keysDown;
-	private static HandleUserInput instantiated= null;
-	private HandleUserInput() {
-		keysDown = new HashSet<Integer>();
+public class HandleUserInput implements InputProcessor {
+
+	public HandleUserInput() {
+		// TODO Auto-generated constructor stub
 	}
-	//I'm loving this new singleton thing
-	//bet i'm realize i'm over using it or doing it wrong later, lol.
-	static HandleUserInput init() {
-		if (instantiated == null)
-			instantiated = new HandleUserInput();
-		else {
-			throw new RuntimeException("user input already instantiated");
-		}
-		return instantiated;
-	}
+
 	@Override
 	public boolean keyDown(int keycode) {
-		keysDown.add(keycode);
+		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public boolean keyUp(int keycode) {
-		keysDown.remove(keycode);
+		// TODO Auto-generated method stub
 		return false;
 	}
 
