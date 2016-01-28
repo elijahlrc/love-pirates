@@ -148,7 +148,7 @@ public class LovePirates extends ApplicationAdapter {
 	
 	@Override
 	public void create() {
-		stage = new CStage();
+		
 		Gdx.graphics.setDisplayMode(Gdx.graphics.getDesktopDisplayMode().width, Gdx.graphics.getDesktopDisplayMode().height, true);
 		width = Gdx.graphics.getDesktopDisplayMode().width;
 		height = Gdx.graphics.getDesktopDisplayMode().height;
@@ -159,7 +159,6 @@ public class LovePirates extends ApplicationAdapter {
 		
 		
 		camera = new OrthographicCamera(width/TILESIZE*.5f,height/TILESIZE*.5f);
-		Gdx.input.setInputProcessor(stage);
 		//box2d
 		Box2D.init();
 		Ui.init();
@@ -199,12 +198,21 @@ public class LovePirates extends ApplicationAdapter {
 		lsea =  new TextureRegion(tiles,2*TILESIZE,2*TILESIZE,TILESIZE,TILESIZE);
 		sand =  new TextureRegion(tiles,0,TILESIZE,TILESIZE,TILESIZE);
 		
+        //stage handles input and is used to draw UI
+		stage = new CStage();
+        Gdx.input.setInputProcessor(stage);
+        FileHandle skinfile = Gdx.files.internal("uiskin.json");
+		skin = new Skin(skinfile);
         
-		
+        lootScreen = new LootScreen(skin, stage);
+        
+        
 		genWorld(1);
-		//ShipGenerator.genShip(x, y, turnRate, drag, power, length, width, cannons,buckshot, slots, hp, maxhp, boss, gunnars, maxgunners, sailors, maxsailors)
-		//playerShip = ShipGenerator.genShip(100, 400, 1, 1, 4, 2.5f, .75f, 4,8, 10, 5f, 20,false,10,40,12,50);
-		playerShip = ShipGenerator.genShip(100, 400, 2, 1, 16, 2.5f, .75f, 10,0, 10, 20f, 20,false,20,40,30,50);
+		//ShipGenerator.genShip			   (x,    y, turnRate, drag, power, length, width, cannons,buckshot, slots, hp, maxhp, boss, gunnars, maxgunners, sailors, maxsailors)
+		//playerShip = ShipGenerator.genShip(100, 400, .9f, 		1.5f, 10,     2f,    .75f,   10,    0,		 10, 	7f,  20,   false,15,      40,         30,       50);
+		playerShip = ShipGenerator.genShip(100, 400,  1, 		1,   5,      2.5f,  .75f,   10,    0, 		 10,    10f, 20,   false,15,      40,         20,       50);
+		//playerShip = ShipGenerator.genShip(100, 400, 1f, 		.75f, 5,     1.5f,    .75f,   0,    25,		 25, 	7f,  20,   false,30,      40,         45,       50);
+		//playerShip = ShipGenerator.genShip(100, 400, .75f, 		5f, 15,     2.5f,    1.5f,   25,    0,		 25, 	15f,  20,   false,30,      40,         25,       50);
 
 		playerShip.setControler(new PlayerController());
 		while (map[(int) playerShip.getPos().x][(int) playerShip.getPos().y]>SEALEVEL) {
@@ -217,11 +225,7 @@ public class LovePirates extends ApplicationAdapter {
 		
 		
 		
-		FileHandle skinfile = Gdx.files.internal("uiskin.json");
 		
-		skin = new Skin(skinfile);
-        stage = new CStage();
-        lootScreen = new LootScreen(skin, stage);
         
         
 		/*
@@ -440,9 +444,9 @@ public class LovePirates extends ApplicationAdapter {
 		Ui.drawShipIcon(batch,playerShip,-26,-13);
 		
 		
-		stage.draw();
-		batch.end();
 		
+		batch.end();
+		stage.draw();
 		for (Projectile proj : projectiles){
 			if (proj.dead == true) {
 				projRemovalSet.add(proj);

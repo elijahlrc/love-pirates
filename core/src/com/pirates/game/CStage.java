@@ -11,6 +11,7 @@ public class CStage extends Stage {
 	}
 	
 	public boolean keyDown(int keyCode) {
+		System.out.println(keyCode);
 		keysDown.add(keyCode);
 		return super.keyDown(keyCode);
 	}
