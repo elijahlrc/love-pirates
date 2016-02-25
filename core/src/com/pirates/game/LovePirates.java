@@ -50,9 +50,9 @@ public class LovePirates extends ApplicationAdapter {
 	static TextureRegion lsea;
 	static Texture debug;
 	static HashSet<Vector2> debugObjects;
-	static int MAPDEGREE = 10;
+	static int MAPDEGREE = 9;
 	static int MAPSIZE = (int) Math.pow(2, MAPDEGREE);
-	static int COLLIDERPOOLSIZE = 6000;//maybe bigger
+	static int COLLIDERPOOLSIZE = 15000;//maybe bigger
 	static float dt;
 	static World world;
 	static ColliderPool colliderPool;
@@ -77,12 +77,12 @@ public class LovePirates extends ApplicationAdapter {
 	static PerlinNoiseGen noiseGen;
 	static Color seaTintColor = new Color();
 	private static Texture mapTexture;
-	static int mapSpriteSize = 250;
+	static int mapSpriteSize = 200;
 	public static Ui UI;
 	static LootScreen lootScreen;
 	private static Skin skin;
 	static CStage stage;
-	
+	static final int numShips = 15;
 	static Vector2 UI_POS1 = new Vector2(20,0.5f);
 	static Vector2 UI_POS2 = new Vector2(20,-.5f);
 	
@@ -210,9 +210,9 @@ public class LovePirates extends ApplicationAdapter {
 		genWorld(1);
 		//ShipGenerator.genShip			   (x,    y, turnRate, drag, power, length, width, cannons,buckshot, slots, hp, maxhp, boss, gunnars, maxgunners, sailors, maxsailors)
 		//playerShip = ShipGenerator.genShip(100, 400, .9f, 		1.5f, 10,     2f,    .75f,   10,    0,		 10, 	7f,  20,   false,15,      40,         30,       50);
-		playerShip = ShipGenerator.genShip(100, 400,  1, 		1,   5,      2.5f,  .75f,   10,    0, 		 10,    10f, 20,   false,15,      40,         20,       50);
+		//playerShip = ShipGenerator.genShip(100, 400,  1, 		1,   5,      2.5f,  .75f,   10,    0, 		 10,    10f, 20,   false,15,      40,         20,       50);
 		//playerShip = ShipGenerator.genShip(100, 400, 1f, 		.75f, 5,     1.5f,    .75f,   0,    25,		 25, 	7f,  20,   false,30,      40,         45,       50);
-		//playerShip = ShipGenerator.genShip(100, 400, .75f, 		5f, 15,     2.5f,    1.5f,   25,    0,		 25, 	15f,  20,   false,30,      40,         25,       50);
+		playerShip = ShipGenerator.genShip(100, 400, .75f, 		5f, 15,     2.5f,    1.5f,   25,    0,		 25, 	15f,  20,   false,30,      40,         25,       50);
 
 		playerShip.setControler(new PlayerController());
 		while (map[(int) playerShip.getPos().x][(int) playerShip.getPos().y]>SEALEVEL) {
@@ -335,7 +335,7 @@ public class LovePirates extends ApplicationAdapter {
 		}
 		debries.removeAll(debriesRemovalSet);
 		
-		while (ships.size()<50) {
+		while (ships.size()<numShips) {
 			Ship aiShip;
 			if (rand.nextFloat() < .9) {
 				aiShip= basicShipGen.genShip(lvl);

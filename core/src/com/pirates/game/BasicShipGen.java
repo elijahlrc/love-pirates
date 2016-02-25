@@ -7,12 +7,9 @@ class BasicShipGen extends ShipGen{
 		int x = rand.nextInt(mapSize);
 		int y = rand.nextInt(mapSize);
 		while (LovePirates.map[x][y]>LovePirates.SEALEVEL) {				
-			if (rand.nextFloat() < Math.pow(LovePirates.map[x][y],3)) {
-				break;
-				
-			}
-			x = rand.nextInt(mapSize);
-			y = rand.nextInt(mapSize);
+				x = rand.nextInt(mapSize);
+				y = rand.nextInt(mapSize);
+
 		}
 		Ship aiShip = genShip(level,x,y);
 		

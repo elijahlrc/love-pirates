@@ -33,6 +33,11 @@ public class AiController implements Controller {
 	static Random rand = new Random();
 	private boolean agressive;
 	float w;
+	
+	enum Modes {AGRESIVE, BACKINGUP};
+	//Modes mode = AGRESIVE;
+	int backupCount = 0;
+	
 	AiController(Ship owner) {
 		targetcounter = 0;
 		w = LovePirates.width/(2*LovePirates.TILESIZE);
@@ -57,6 +62,12 @@ public class AiController implements Controller {
 		if (targetcounter <= 0){
 			targetcounter = targetCounterReset;
 			findTarget();
+		}
+		
+		if (backupCount != 0) {
+			backupCount -= 1;
+		} else {
+			
 		}
 		rayCastHitLoc =null;
 		if (target == null){//this does not know if a target is dead, so will keep attacking where player died!
@@ -149,8 +160,8 @@ public class AiController implements Controller {
 	private void castRays() {
 		Vector2 leftVec;
 		Vector2 rightVec;
-		Vector2 leftOffset = new Vector2(owner.getSize()[1],0);
-		Vector2 rightOffset= new Vector2(owner.getSize()[1],0);
+		Vector2 leftOffset = new Vector2(owner.getSize()[1]/1.5f,0);
+		Vector2 rightOffset= new Vector2(owner.getSize()[1]/1.5f,0);
 		leftOffset.setAngleRad((float) (owner.getDir()+Math.PI/2)).add(owner.getPos());
 		rightOffset.setAngleRad((float) (owner.getDir()-Math.PI/2)).add(owner.getPos());
 		Vector2 forwardRaycastPos = new Vector2(1,1);

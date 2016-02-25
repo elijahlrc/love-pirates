@@ -472,9 +472,9 @@ public class Ship extends DrawableObj implements Collideable, Target{
 		
 		int lootAmount = (int) (2*(length*width) + 1);
 		int debriesAmount = lootAmount*3;
-		//for (int i = 0 ; i <= debriesAmount; i++) {
-		//	LovePirates.debries.add(new Debries((float) (body.getPosition().x+((Math.random()-.5)*Math.sqrt(i))),(float) (body.getPosition().y+((Math.random()-.5)*Math.sqrt(i))), false));
-		//}
+		for (int i = 0 ; i <= debriesAmount; i++) {
+			LovePirates.debries.add(new Debries((float) (body.getPosition().x+((Math.random()-.5)*Math.sqrt(i))),(float) (body.getPosition().y+((Math.random()-.5)*Math.sqrt(i))), false));
+		}
 		/*
 		for (int i = 0; i < lootAmount; i++) {
 			LovePirates.debries.add(new LootCrate((float) (body.getPosition().x+((Math.random()-.5)*Math.sqrt(i))),(float) (body.getPosition().y+((Math.random()-.5)*Math.sqrt(i))), pickLootType(), 1));
