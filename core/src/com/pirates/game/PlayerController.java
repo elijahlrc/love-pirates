@@ -8,6 +8,7 @@ class PlayerController implements Controller {
 	PlayerController () {
 		inputProcessor = LovePirates.stage;
 	}
+	
 	@Override
 	public Direction getTurn() {
 		if (inputProcessor.keysDown.contains(Input.Keys.A)) {
@@ -34,19 +35,43 @@ class PlayerController implements Controller {
 	}
 
 	@Override
-	public ArrayList<FireingDirection> getFireDir() {
-		ArrayList<FireingDirection> dirs = new ArrayList<FireingDirection>();
+	public ArrayList<FiringDirection> getFireDir() {
+		ArrayList<FiringDirection> dirs = new ArrayList<FiringDirection>();
 		if (inputProcessor.keysDown.contains(Input.Keys.Q)) {
-			dirs.add(FireingDirection.LEFT);
+			dirs.add(FiringDirection.LEFT);
 		}
 		if (inputProcessor.keysDown.contains(Input.Keys.E)) {
-			dirs.add(FireingDirection.RIGHT);
+			dirs.add(FiringDirection.RIGHT);
 		}
 		if (inputProcessor.keysDown.contains(Input.Keys.SPACE)) {
-			dirs.add(FireingDirection.FORWARD);
+			dirs.add(FiringDirection.FORWARD);
 		}
+		
+		
+		if (inputProcessor.isClicking) {
+			// TODO: change FiringDirection enum?
+			// TODO: determine which side of the screen to fire on based on player position
+			//dirs.add(inputProcessor.mousePosition);
+			
+		}
+		
+		
+		
+		
+		
 		return dirs;
 	}
+	
+	// Listener for quitting game with ESC
+	// TODO: Figure out if we should keep this in PlayerController
+	public boolean sendQuit() {
+		if (inputProcessor.keysDown.contains(Input.Keys.ESCAPE)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 	@Override
 	public void tick() {
 		// TODO Auto-generated method stub

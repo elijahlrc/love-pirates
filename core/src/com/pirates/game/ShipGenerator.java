@@ -24,8 +24,8 @@ public class ShipGenerator {
 			float yOffset = width/2;
 			float xOffset = (((float) i)/numSlots)*length-length/2;
 			int sizeOfSlot = 1;//set this later
-			slots[2*i] = new Slot(xOffset,yOffset,sizeOfSlot,(float) (Math.PI/2f),FireingDirection.LEFT,returnShip);
-			slots[2*i+1] = new Slot(xOffset,-yOffset,sizeOfSlot,(float) (3*Math.PI/2f),FireingDirection.RIGHT,returnShip);
+			slots[2*i] = new Slot(xOffset,yOffset,sizeOfSlot,(float) (Math.PI/2f),FiringDirection.LEFT,returnShip);
+			slots[2*i+1] = new Slot(xOffset,-yOffset,sizeOfSlot,(float) (3*Math.PI/2f),FiringDirection.RIGHT,returnShip);
 		}
 		if (cannons>numSlots*2) {
 			System.out.println("too many cannons");

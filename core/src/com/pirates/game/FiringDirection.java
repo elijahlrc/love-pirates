@@ -6,6 +6,6 @@ package com.pirates.game;
  * @author Elijah
  *
  */
-enum FireingDirection {
+enum FiringDirection {
 LEFT, RIGHT, FORWARD, BACKWARD
 }
