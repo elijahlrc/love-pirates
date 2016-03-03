@@ -25,6 +25,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.PerformanceCounter;
 import com.badlogic.gdx.InputMultiplexer;
+/*
+ * getPower() and getTurn() get called by ships to see what they should do
+ */
 public class LovePirates extends ApplicationAdapter {
 	static SpriteBatch batch;
 	static double[][] map;
@@ -82,7 +85,7 @@ public class LovePirates extends ApplicationAdapter {
 	static LootScreen lootScreen;
 	private static Skin skin;
 	static CStage stage;
-	static final int numShips = 15;
+	static final int numShips = 40;
 	static Vector2 UI_POS1 = new Vector2(20,0.5f);
 	static Vector2 UI_POS2 = new Vector2(20,-.5f);
 	
@@ -211,8 +214,9 @@ public class LovePirates extends ApplicationAdapter {
 		//ShipGenerator.genShip			   (x,    y, turnRate, drag, power, length, width, cannons,buckshot, slots, hp, maxhp, boss, gunnars, maxgunners, sailors, maxsailors)
 		//playerShip = ShipGenerator.genShip(100, 400, .9f, 		1.5f, 10,     2f,    .75f,   10,    0,		 10, 	7f,  20,   false,15,      40,         30,       50);
 		//playerShip = ShipGenerator.genShip(100, 400,  1, 		1,   5,      2.5f,  .75f,   10,    0, 		 10,    10f, 20,   false,15,      40,         20,       50);
-		//playerShip = ShipGenerator.genShip(100, 400, 1f, 		.75f, 5,     1.5f,    .75f,   0,    25,		 25, 	7f,  20,   false,30,      40,         45,       50);
-		playerShip = ShipGenerator.genShip(100, 400, .75f, 		5f, 15,     2.5f,    1.5f,   25,    0,		 25, 	15f,  20,   false,30,      40,         25,       50);
+		playerShip = ShipGenerator.genShip(100, 400, .65f, 		.70f, 10,     1.5f,    .75f,   0,    25,		 25, 	15f,  20,   false,30,      40,         45,       50);
+		//playerShip = ShipGenerator.genShip(100, 400, .75f, 		5f, 15,     2.5f,    1.5f,   25,    0,		 25, 	15f,  20,   false,30,      40,         25,       50);
+		//playerShip = basicShipGen.genShip(1,0,0);
 
 		playerShip.setControler(new PlayerController());
 		while (map[(int) playerShip.getPos().x][(int) playerShip.getPos().y]>SEALEVEL) {

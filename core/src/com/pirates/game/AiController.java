@@ -34,9 +34,11 @@ public class AiController implements Controller {
 	private boolean agressive;
 	float w;
 	
-	enum Modes {AGRESIVE, BACKINGUP};
-	//Modes mode = AGRESIVE;
+	enum Modes {AGRESIVE, BACKINGUP}
+	Modes mode = Modes.AGRESIVE;
 	int backupCount = 0;
+	int maxBackupCount = 100;
+	private float rangeFactor = 1.5f;
 	
 	AiController(Ship owner) {
 		targetcounter = 0;
@@ -47,8 +49,8 @@ public class AiController implements Controller {
 		reverse = new Vector2(999,999);
 		rayCastHitLoc = new Vector2(0,0);
 		projectileSpeed = getCannonProjectileSpeed();
-		projectileLifetime = getCannonProjectileLifetime()*2;//fudge factor
-		projectileRange = projectileSpeed*projectileLifetime/60;
+		projectileLifetime = getCannonProjectileLifetime();
+		projectileRange = rangeFactor*projectileSpeed*projectileLifetime/60;
 		raycastCallback = new CollisionAvoidanceCallback(this);
 	}
 	
@@ -63,11 +65,25 @@ public class AiController implements Controller {
 			targetcounter = targetCounterReset;
 			findTarget();
 		}
-		
-		if (backupCount != 0) {
+		Vector2 numbOffset = new Vector2(0,1);
+		if (LovePirates.DEBUGPRINTOUT) {
+			MyUtils.DrawText(mode.toString(), false, owner.getPos(), 0);
+			MyUtils.DrawText("BackupCount = "+backupCount, false, owner.getPos().add(numbOffset), 0);
+		}
+
+		if ((backupCount < 0) && (mode == Modes.AGRESIVE)){
+			backupCount = maxBackupCount;
+			mode = Modes.BACKINGUP;
+		} else if ((rayCastHitLoc != null) && (mode == Modes.AGRESIVE)) {
 			backupCount -= 1;
-		} else {
-			
+		} else if ((rayCastHitLoc == null) && (mode == Modes.AGRESIVE)){
+			backupCount = maxBackupCount;			
+		} else if (mode == Modes.BACKINGUP) {
+			backupCount -= 1;
+			if (backupCount < 0) {
+				backupCount = maxBackupCount;
+				mode = Modes.AGRESIVE;
+			}
 		}
 		rayCastHitLoc =null;
 		if (target == null){//this does not know if a target is dead, so will keep attacking where player died!
@@ -206,7 +222,23 @@ public class AiController implements Controller {
 	 */
 	@Override
 	public Direction getTurn() {
-		// TODO Auto-generated method stub
+		if (mode == Modes.BACKINGUP) {
+			if (targetDeltaAngle > 0) {
+				//maybe put a -.05 in flowing line to stop the ship from going left right left right
+				//when it is close to aiming correctly
+				if (targetDeltaAngle > Math.PI/2) {
+					return Direction.LEFT;
+				} else if (targetDeltaAngle < Math.PI/2) {
+					return Direction.RIGHT;
+				}
+			} else {
+				if (targetDeltaAngle > -Math.PI/2) {
+					return Direction.RIGHT;
+				} else if (targetDeltaAngle < -Math.PI/2) {
+					return Direction.LEFT;
+				}
+			}
+		}
 		if (active) {
 			if (rayCastHitLoc == null) {
 				if (vecToTarget.len() < projectileRange) {	
@@ -262,23 +294,30 @@ public class AiController implements Controller {
 	 */
 	@Override
 	public float getPower() {
-		
 		if (active){
-			if (rayCastHitLoc == reverse) {
-				return -1;
-			}
-			if (rayCastHitLoc == null) {
-				if (vecToTarget.len() < projectileRange/1.5) {
-					return 1;
-				} else {
-					return .75f;
+			if (mode == Modes.AGRESIVE) {
+				if (rayCastHitLoc == reverse) {
+					return -1;
 				}
-			} else {
-				return .5f;
+				if (rayCastHitLoc == null) {
+					if (vecToTarget.len() < projectileRange/1.5) {
+						return 1;
+					} else {
+						return .75f;
+					}
+				} else {
+					return .5f;
+				}
+			} else if (mode == Modes.BACKINGUP) {
+				//if (rayCastHitLoc == reverse) { 
+				return -.2f;
+				//}
 			}
 		} else {
 			return 0;
 		}
+		System.out.println("WARNING, AI controller power is returning 0 when it shouldn't be!");
+		return 0;
 	}
 
 	/* (non-Javadoc)

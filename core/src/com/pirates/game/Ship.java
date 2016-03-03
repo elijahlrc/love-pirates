@@ -403,7 +403,7 @@ public class Ship extends DrawableObj implements Collideable, Target{
 			Slot s = null;
 			for (int i = 0; i<quantity; i++) {
 				s = findOpenSlot();
-				if (s!=null) {
+				if (s != null) {
 					s.setContents(new Cannon());
 				}
 			}
