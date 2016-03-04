@@ -22,7 +22,7 @@ public class ShipGenerator {
 		
 		for (int i=0; i<numSlots; i += 1) {
 			float yOffset = width/2;
-			float xOffset = (((float) i)/numSlots)*length-length/2;
+			float xOffset = ((i+.5f)/numSlots)*length-length/2;
 			int sizeOfSlot = 1;//set this later
 			slots[2*i] = new Slot(xOffset,yOffset,sizeOfSlot,(float) (Math.PI/2f),FireingDirection.LEFT,returnShip);
 			slots[2*i+1] = new Slot(xOffset,-yOffset,sizeOfSlot,(float) (3*Math.PI/2f),FireingDirection.RIGHT,returnShip);

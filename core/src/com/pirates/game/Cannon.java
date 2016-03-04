@@ -18,7 +18,7 @@ public class Cannon extends Equipment {
 	private static Random rand = new Random();
 	public Cannon() {
 		countdown = 0;
-		fireSpeed = 25f;
+		fireSpeed = 20f;
 		reloadTime = 5;
 	}
 

@@ -34,7 +34,7 @@ public class Cannonball extends Projectile implements Collideable  {
 		bodyDef.type = BodyDef.BodyType.DynamicBody;
 		circleShape.setRadius(size/2);
 		fixtureDef.shape = circleShape;
-		fixtureDef.density = .2f;
+		fixtureDef.density = .3f;
 		fixtureDef.filter.categoryBits = LovePirates.PROJ_MASK;
 		fixtureDef.filter.maskBits = LovePirates.SHIP_MASK;
 
@@ -50,7 +50,7 @@ public class Cannonball extends Projectile implements Collideable  {
 		Vector2 realVel = velocity.cpy();
 		realVel.setLength(actualspeed);
 		realVel.setAngleRad(actualang);
-		body.setLinearDamping(1.2f);
+		body.setLinearDamping(1.5f);
 		body.setLinearVelocity(realVel);
 
 	}

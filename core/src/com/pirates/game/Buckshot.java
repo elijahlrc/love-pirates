@@ -26,7 +26,7 @@ public class Buckshot extends Projectile implements Collideable  {
 	Buckshot(Vector2 position, Vector2 velocity, Ship owner) {
 		dead = false;
 		lifetime = LIFETIME;
-		size = .3f;
+		size = .2f;
 		this.owner = owner;
 		bodyDef = new BodyDef();
 		bodyDef.bullet = true;
@@ -34,7 +34,7 @@ public class Buckshot extends Projectile implements Collideable  {
 		bodyDef.type = BodyDef.BodyType.DynamicBody;
 		circleShape.setRadius(size/2);
 		fixtureDef.shape = circleShape;
-		fixtureDef.density = .075f;
+		fixtureDef.density = .06f;
 		fixtureDef.filter.categoryBits = LovePirates.PROJ_MASK;
 		fixtureDef.filter.maskBits = LovePirates.SHIP_MASK;
 
@@ -50,7 +50,7 @@ public class Buckshot extends Projectile implements Collideable  {
 		Vector2 realVel = velocity.cpy();
 		realVel.setLength(actualspeed);
 		realVel.setAngleRad(actualang);
-		body.setLinearDamping(3f);
+		body.setLinearDamping(4f);
 		body.setLinearVelocity(realVel);
 
 	}

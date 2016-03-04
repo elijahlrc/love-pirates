@@ -18,7 +18,7 @@ public class BuckshotCannon extends Equipment {
 	private static Random rand = new Random();
 	public BuckshotCannon() {
 		countdown = 0;
-		fireSpeed = 40f;
+		fireSpeed = 30f;
 		reloadTime = 2.5f;
 	}
 

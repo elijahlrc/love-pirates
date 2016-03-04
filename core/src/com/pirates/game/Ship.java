@@ -340,8 +340,8 @@ public class Ship extends DrawableObj implements Collideable, Target{
 				Float dmg = impulse.getNormalImpulses()[0]*DAMAGEFACTOR;
 				MyUtils.DrawText(((Float) (Math.round(dmg*10)/10f)).toString(), false, ((Cannonball) b).getPos(), (int) ((Cannonball) b).lifetime);
 				hp -= dmg;
-				sailors -= (int) Math.max(rand.nextGaussian()*dmg,0);
-				gunners -= (int) Math.max(rand.nextGaussian()*dmg,0);
+				removeCrew((int) Math.max(rand.nextGaussian()*dmg,0),"sailors");
+				removeCrew((int) Math.max(rand.nextGaussian()*dmg,0),"gunners");
 
 			}
 		} else if (b instanceof Buckshot){
@@ -350,8 +350,8 @@ public class Ship extends DrawableObj implements Collideable, Target{
 					Float dmg = impulse.getNormalImpulses()[0]*DAMAGEFACTOR/4;
 					//MyUtils.DrawText(((Float) (Math.round(dmg*10)/10f)).toString(), false, ((Buckshot) b).getPos(), (int) ((Buckshot) b).lifetime);
 					hp -= dmg;
-					sailors -= (int) Math.max(rand.nextGaussian()*dmg*10,0);
-					gunners -= (int) Math.max(rand.nextGaussian()*dmg*10,0);
+					removeCrew((int) Math.max(rand.nextGaussian()*dmg,0),"sailors");
+					removeCrew((int) Math.max(rand.nextGaussian()*dmg,0),"gunners");
 				}
 
 		} else if (b instanceof LootCrate) {

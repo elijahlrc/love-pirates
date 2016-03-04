@@ -30,7 +30,7 @@ public class Ui {
 		Vector2 playerPos = LovePirates.playerShip.getPos();
 		float mapSizeInTiles = LovePirates.mapSpriteSize/LovePirates.TILESIZE;
 		int xpos = (int) (LovePirates.width/(LovePirates.TILESIZE*4) - mapSizeInTiles);
-		int ypos = (int) (LovePirates.height/(LovePirates.TILESIZE*4) - mapSizeInTiles);
+		int ypos = (int) (LovePirates.height/(LovePirates.TILESIZE*4) - mapSizeInTiles +1.2f);
 		int x_off = (int) (playerPos.x-LovePirates.mapSpriteSize/2);
 		int y_off = (int) (playerPos.y-LovePirates.mapSpriteSize/2);
 		b.draw(LovePirates.mapTexture,
