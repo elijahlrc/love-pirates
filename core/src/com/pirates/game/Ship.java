@@ -304,11 +304,21 @@ public class Ship extends DrawableObj implements Collideable, Target{
 	public void setSpriteIndex(int i) {
 		spriteIndex = i;
 	}
+	/*
+	 * these checks stop a ship from colliding with its own cannonballs
+	 * @see com.pirates.game.Collideable#handlePreCollide(com.badlogic.gdx.physics.box2d.Contact)
+	 */
 	@Override
 	public boolean handlePreCollide(Contact contact) {
 		Object b = contact.getFixtureB().getUserData();
 		if (b instanceof Cannonball){
 			Ship owner = ((Cannonball) b).getOwner();
+			if (owner == this) {
+				return false;
+			}
+		}
+		if (b instanceof Buckshot){
+			Ship owner = ((Buckshot) b).getOwner();
 			if (owner == this) {
 				return false;
 			}

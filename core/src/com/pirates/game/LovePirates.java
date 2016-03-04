@@ -79,21 +79,22 @@ public class LovePirates extends ApplicationAdapter {
 	static HashSet<Debries> debriesRemovalSet;
 	static PerlinNoiseGen noiseGen;
 	static Color seaTintColor = new Color();
-	private static Texture mapTexture;
+	static Texture mapTexture;
 	static int mapSpriteSize = 200;
 	public static Ui UI;
 	static LootScreen lootScreen;
 	private static Skin skin;
 	static CStage stage;
 	static final int numShips = 40;
-	static Vector2 UI_POS1 = new Vector2(20,0.5f);
-	static Vector2 UI_POS2 = new Vector2(20,-.5f);
+
 	
 	
 	//Ship factories
 	//called like basicShipGen.genShip(level);
 	static ShipGen basicShipGen = new BasicShipGen();
 	static ShipGen bossShipGen = new BossShipGen();
+	static Vector2 UI_POS1;
+	static Vector2 UI_POS2;
 
 	//static BodyDef bodyDef = new BodyDef();
 	//static FixtureDef fixtureDef = new FixtureDef();
@@ -158,15 +159,14 @@ public class LovePirates extends ApplicationAdapter {
 		font = new BitmapFont();
 		font.setScale(1/32f);
 		font.setUseIntegerPositions(false);
+		UI_POS1 = new Vector2(width/(TILESIZE*4f)-10,0.5f);
+		UI_POS2 = new Vector2(width/(TILESIZE*4f)-10,-.5f);
 		rand = new Random();
-		
-		
 		camera = new OrthographicCamera(width/TILESIZE*.5f,height/TILESIZE*.5f);
 		//box2d
 		Box2D.init();
 		Ui.init();
-		
-		//map gen init
+				//map gen init
 		noiseGen =  PerlinNoiseGen.init();
 		
 		//list of blitable images
@@ -398,54 +398,8 @@ public class LovePirates extends ApplicationAdapter {
 					   size[0],size[1],
 					   1f,1f,0,true);
 		}
-		
-		
-		//Draw UI/minimap
-		//int xpos = (int) Math.max(0, Math.min(playerPos.x-mapSpriteSize/2,MAPSIZE-mapSpriteSize/2-1));
-		//int ypos = (int) Math.max(0, Math.min(playerPos.y-mapSpriteSize/2,MAPSIZE-mapSpriteSize/2-1));
-		int xpos = (int) (playerPos.x-mapSpriteSize/2);
-		int ypos = (int) (playerPos.y-mapSpriteSize/2);
-		batch.draw(mapTexture,
-                playerPos.x-mapSpriteSize/TILESIZE+width/(TILESIZE*4f),
-                playerPos.y-mapSpriteSize/TILESIZE+height/(TILESIZE*4f),
-                0,0,
-                mapSpriteSize,
-                mapSpriteSize,
-                1f/(TILESIZE),
-                1f/(TILESIZE),
-                0,
-                xpos,
-                ypos,
-                mapSpriteSize,
-                mapSpriteSize,
-                false, true);
-		/* batch.draw(debug,
-				playerPos.x-mapSpriteSize/(2*TILESIZE) + width/(TILESIZE * 4f),
-				playerPos.y-mapSpriteSize/(2*TILESIZE) + height/(TILESIZE * 4f),
-				.5f,.5f);
-				*/
-		for (Ship ship : ships){
-			x = ship.getPos().x;
-			y = ship.getPos().y;
-			if ((x>playerPos.x - mapSpriteSize/2 && x<playerPos.x + mapSpriteSize/2) &&
-			    (y>playerPos.y - mapSpriteSize/2 && y<playerPos.y + mapSpriteSize/2)) {
-				batch.draw(debug,
-					x/TILESIZE+playerPos.x -playerPos.x/TILESIZE + width/(TILESIZE*4f)-mapSpriteSize/(2*TILESIZE),
-					y/TILESIZE+playerPos.y -playerPos.y/TILESIZE + height/(TILESIZE*4f)-mapSpriteSize/(2*TILESIZE),
-					.25f, .25f);
-			}
-		}
-		String ui;
-		ui = String.format("You have %d repair supplies %n" +
-						   "%d gold", Math.round(playerShip.repairSupplies),playerShip.gold);
-		
-		MyUtils.DrawText(ui, true, UI_POS1,1);
-		ui = String.format("You have %d sailors and " +
-				   "%d cannonears", playerShip.sailors,playerShip.gunners);
-		
-		MyUtils.DrawText(ui, true, UI_POS2,1);
-		
-		Ui.drawShipIcon(batch,playerShip,-26,-13);
+
+		Ui.draw(batch);
 		
 		
 		

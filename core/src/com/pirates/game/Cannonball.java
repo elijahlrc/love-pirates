@@ -90,7 +90,6 @@ public class Cannonball extends Projectile implements Collideable  {
 	@Override
 	
 	int getSpriteIndex() {
-		//TODO no sprite exists yet :-(
 		return 1;
 	}
 	

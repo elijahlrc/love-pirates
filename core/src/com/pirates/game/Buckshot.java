@@ -34,7 +34,7 @@ public class Buckshot extends Projectile implements Collideable  {
 		bodyDef.type = BodyDef.BodyType.DynamicBody;
 		circleShape.setRadius(size/2);
 		fixtureDef.shape = circleShape;
-		fixtureDef.density = .1f;
+		fixtureDef.density = .075f;
 		fixtureDef.filter.categoryBits = LovePirates.PROJ_MASK;
 		fixtureDef.filter.maskBits = LovePirates.SHIP_MASK;
 
