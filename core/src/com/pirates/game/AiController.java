@@ -45,6 +45,7 @@ public class AiController implements Controller {
 		w = LovePirates.width/(2*LovePirates.TILESIZE);
 		active = false;
 		agressive = false;
+		target = findTarget();
 		this.owner = owner;
 		reverse = new Vector2(999,999);
 		rayCastHitLoc = new Vector2(0,0);
@@ -52,6 +53,7 @@ public class AiController implements Controller {
 		projectileLifetime = getCannonProjectileLifetime();
 		projectileRange = rangeFactor*projectileSpeed*projectileLifetime/60;
 		raycastCallback = new CollisionAvoidanceCallback(this);
+		
 	}
 	
 	@Override
@@ -63,7 +65,7 @@ public class AiController implements Controller {
 		targetcounter -= 1;
 		if (targetcounter <= 0){
 			targetcounter = targetCounterReset;
-			findTarget();
+			target = findTarget();
 		}
 		Vector2 numbOffset = new Vector2(0,1);
 		if (LovePirates.DEBUGPRINTOUT) {
@@ -129,13 +131,15 @@ public class AiController implements Controller {
 		Vector2 v;
 		if (agressive) {
 			return LovePirates.playerShip;
-		} else {
+		} else if (targetcounter <= 0) {
 			v = new Vector2(rand.nextInt(LovePirates.MAPSIZE),rand.nextInt(LovePirates.MAPSIZE));
 			while (LovePirates.map[(int) v.x][(int) v.y]>LovePirates.SEALEVEL) {
 				v.x = rand.nextInt(LovePirates.MAPSIZE);
 				v.y = rand.nextInt(LovePirates.MAPSIZE);
 			}
 			return new AiTargetLoc(v);
+		} else {
+			return target;
 		}
 	}
 	private Vector2 targetPos(){
@@ -353,6 +357,12 @@ public class AiController implements Controller {
 	@Override
 	public boolean getActive() {
 		return active;
+	}
+
+	@Override
+	public void setOwner(Ship s) {
+		this.owner = s;
+		
 	}
 
 

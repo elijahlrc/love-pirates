@@ -55,7 +55,7 @@ public class LovePirates extends ApplicationAdapter {
 	static HashSet<Vector2> debugObjects;
 	static int MAPDEGREE = 9;
 	static int MAPSIZE = (int) Math.pow(2, MAPDEGREE);
-	static int COLLIDERPOOLSIZE = 15000;//maybe bigger
+	static int COLLIDERPOOLSIZE = 15000;//maybe bigger?
 	static float dt;
 	static World world;
 	static ColliderPool colliderPool;
@@ -75,7 +75,6 @@ public class LovePirates extends ApplicationAdapter {
 	static int lvl;
 	static HashSet<Projectile> projRemovalSet;
 	static HashSet<Ship> shipRemovalSet;
-	static HashSet<Ship> shipwreckAdditionSet;
 	static HashSet<Debries> debriesRemovalSet;
 	static PerlinNoiseGen noiseGen;
 	static Color seaTintColor = new Color();
@@ -85,7 +84,7 @@ public class LovePirates extends ApplicationAdapter {
 	static LootScreen lootScreen;
 	private static Skin skin;
 	static CStage stage;
-	static final int numShips = 40;
+	static final int numShips = 30;
 
 	
 	
@@ -120,7 +119,6 @@ public class LovePirates extends ApplicationAdapter {
 		colliderPool = new ColliderPool(COLLIDERPOOLSIZE);
 		projRemovalSet = new HashSet<Projectile>();
 		shipRemovalSet = new HashSet<Ship>();
-		shipwreckAdditionSet = new HashSet<Ship>();
 		debriesRemovalSet = new HashSet<Debries>();
 		
 		//debug renderer for physics rendering
@@ -217,6 +215,7 @@ public class LovePirates extends ApplicationAdapter {
 		//playerShip = ShipGenerator.genShip(100, 400, .65f, 		.70f, 10,     1.5f,    .75f,   0,    25,		 25, 	15f,  20,   false,30,      40,         45,       50);
 		//playerShip = ShipGenerator.genShip(100, 400, .75f, 		5f, 15,     2.5f,    1.5f,   25,    0,		 25, 	15f,  20,   false,30,      40,         25,       50);
 		playerShip = basicShipGen.genShip(2,0,0);
+		playerShip.setPos(100, 400);
 
 		playerShip.setControler(new PlayerController());
 		while (map[(int) playerShip.getPos().x][(int) playerShip.getPos().y]>SEALEVEL) {
@@ -272,8 +271,8 @@ public class LovePirates extends ApplicationAdapter {
 		Vector2 playerPos = playerShip.getPos();
 		renderPrefCount.start();
 
-		/*seems that the preformance issues are from the following block of code :-(
-		 * where the land is rendered
+		/*
+		 * render land
 		 */
 		for (int i 		= (int)((playerPos.x)-(width/20)); 	   	i < ((int) (playerPos.x) + (width/20)); i++){
 			for (int j 	= (int)((playerPos.y)-(height/20)); 	j < ((int) (playerPos.y) + (height/20)); j++){
@@ -348,6 +347,9 @@ public class LovePirates extends ApplicationAdapter {
 			}
 			ships.add(aiShip);
 		}
+		/*
+		 * draw and tick ships
+		 */
 		for (Ship ship : ships){
 			ship.tick();
 			x = ship.getPos().x;
@@ -366,22 +368,29 @@ public class LovePirates extends ApplicationAdapter {
 		
 		for (Ship ship : ships){
 			if (ship.alive == false) {
-				shipRemovalSet.add(ship);
-				if (ship.isWreck() == false) 
-					shipwreckAdditionSet.add(ship);
-				ship.delete();
+				if (ship.isWreck()) {
+					shipRemovalSet.add(ship);
+					ship.delete();
+				} else {
+					ship.alive = true;
+					ship.setHp(ship.getMaxHp()/7.5f);
+					ship.setWreck();
+				}
 			}
-		}
-		for (Ship s:shipwreckAdditionSet){
-			ships.add(DeadShipGen.genShip(s));
 		}
 		for (Ship s:shipRemovalSet) {
 			world.destroyBody(s.getBody());
 		}
 		ships.removeAll(shipRemovalSet);
 		shipRemovalSet.clear();
-		shipwreckAdditionSet.clear();
 		MyUtils.renderText(batch);
+		
+		if (DEBUGPRINTOUT) {
+			MyUtils.DrawText("Player Alive = " + playerShip.alive, true, new Vector2(10,10), 0);
+			MyUtils.DrawText("Player wrecked = " + playerShip.isWreck(), true, new Vector2(10,11), 0);
+			MyUtils.DrawText("Player controller = " + playerShip.controller, true, new Vector2(10,12), 0);
+		}
+
 		
 		for (Vector2 debugLoc : debugObjects) {
 			batch.draw(debug,debugLoc.x, debugLoc.y,.2f,.2f);

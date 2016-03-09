@@ -125,13 +125,14 @@ public class Ship extends DrawableObj implements Collideable, Target{
 	 */
 	void setControler(Controller c){
 		controller = c;
+		controller.setOwner(this);
 	}
 	void tick(){
 		updateColidors();
 		controller.tick();
 		move();
 		fire();
-		if ((repairSupplies > 0)&&(hp <= maxhp)){
+		if ((repairSupplies > 0)&&(hp <= maxhp)&&(isWreck == false)){
 			repairSupplies -= .002;
 			hp += .002;
 		}
@@ -175,26 +176,29 @@ public class Ship extends DrawableObj implements Collideable, Target{
 	float getMaxHp() {
 		return maxhp;
 	}
+	void setHp(float h) {
+		hp = h;
+	}
 	void removeCrew(int number, String type) {
 		if (type.equals("sailors")) {
-			if (sailors + number <= maxSailors) {
-				sailors += number;
+			if (sailors - number > 0) {
+				sailors -= number;
 				getTurnRate();
 			} else {
-				sailors = maxSailors;
+				sailors = 0;
 				getTurnRate();
 			}
 		} else if (type.equals("gunners")) {
-			if (gunners + number <= maxGunners) {
-				gunners += number;
+			if (gunners - number > 0) {
+				gunners -= number;
 				getReloadSpeed();
 			} else {
-				gunners = maxGunners;
+				gunners = 0;
 				getReloadSpeed();
 				
 			}
 		} else {
-			System.out.println("WARNING, BAD VALUE PASSED TO addCrew()");
+			System.out.println("WARNING, BAD VALUE PASSED TO removeCrew()");
 		}
 	}
 	
@@ -303,6 +307,7 @@ public class Ship extends DrawableObj implements Collideable, Target{
 	}
 	public void setSpriteIndex(int i) {
 		spriteIndex = i;
+		setSpriteSize(this.length,this.width);
 	}
 	/*
 	 * these checks stop a ship from colliding with its own cannonballs
@@ -327,7 +332,6 @@ public class Ship extends DrawableObj implements Collideable, Target{
 	}
 	@Override
 	public void handleBeginContact(Contact contact) {
-		// TODO Auto-generated method stub
 	}
 	@Override
 	public void handlePostCollide(Contact contact, ContactImpulse impulse) {
@@ -501,14 +505,45 @@ public class Ship extends DrawableObj implements Collideable, Target{
 	boolean isWreck() {
 		return isWreck;
 	}
-	void setWreck(boolean wreck) {
-		isWreck = wreck;
+	void setWreck() {
+		isWreck = true;
+		controller = new StaticController(this);
+		this.isWreck = true;
+		this.setSpriteIndex(7);
+		this.setSpriteSize(length*2, width*2);
 	}
 	public Body getBody() {
 		return body;
 	}
 	public void setBody(Body body) {
 		this.body = body;
+	}
+	/*
+	 * set this ships controller to controller another ship, also gives your crew to them
+	 */
+	public void captureShip(Ship s) {
+		s.addCrew(gunners,"gunners");
+		s.addCrew(sailors,"sailors");
+		s.setControler(this.controller);
+		
+		s.alive = true;
+		this.setWreck();
+		
+		s.hp = (float) Math.ceil(s.maxhp/10);
+		s.repairSupplies += repairSupplies;
+		s.gold = gold;
+		s.setSpriteIndex(0);
+		s.setSpriteSize(s.length, s.width);
+		s.isWreck = false;
+		this.setWreck();
+		if (this == LovePirates.playerShip) {
+			LovePirates.playerShip = s;
+		}
+		
+	}
+	float getPower() {
+		
+		return maxPower;
 	}
 	
 	

@@ -47,7 +47,7 @@ class BasicShipGen extends ShipGen{
 			float sdCannons = .25f*meanCannons;
 			cannons = (int) Math.max(helperGauss(meanCannons,sdCannons), 2);
 		} else {
-			float meanBuckcannons = 2.5f*(level+length)-10;
+			float meanBuckcannons = 3*(level+length)-4;
 			float sdBuckcannons = .25f*meanBuckcannons;
 			buckshotcannons = (int) Math.max(helperGauss(meanBuckcannons,sdBuckcannons), 2);
 		}
@@ -55,7 +55,7 @@ class BasicShipGen extends ShipGen{
 		
 		Ship aiShip;
 		aiShip= ShipGenerator.genShip(x,y,turnRate,
-				drag,power,length,width,cannons,buckshotcannons,cannons+buckshotcannons,hp,hp,false, gunners, cannons*5, sailors, maxSailors);
+				drag,power,length,width,cannons,buckshotcannons,cannons+buckshotcannons,hp,hp,false, gunners, (cannons+buckshotcannons)*5, sailors, maxSailors);
 		aiShip.setControler(new AiController(aiShip));
 		aiShip.getLoot("repair supplies", (int) Math.ceil(hp/10));
 		return aiShip;

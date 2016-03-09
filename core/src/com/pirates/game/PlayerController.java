@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input;
 import java.util.ArrayList;
 class PlayerController implements Controller {
 	CStage inputProcessor;
+	private Ship owner;
 	PlayerController () {
 		inputProcessor = LovePirates.stage;
 	}
@@ -64,6 +65,11 @@ class PlayerController implements Controller {
 	}
 	public boolean getActive() {
 		return true;
+	}
+	@Override
+	public void setOwner(Ship s) {
+		this.owner = s;
+		
 	}
 
 }
