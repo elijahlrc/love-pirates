@@ -13,10 +13,9 @@ public class ShipGenerator {
 		float massFactor = length*width;
 		Ship returnShip;
 		float turnMassFactor = (float) Math.pow(massFactor, 1.25);
+		returnShip = new Ship(x,y,turnRate*turnMassFactor,drag,power*massFactor,length,width,hp, maxhp, gunners, maxGunners, sailors, maxSailors);
 		if (boss) {
-			returnShip = new BossShip(x,y,turnRate*turnMassFactor,drag,power*massFactor,length,width,hp, maxhp, gunners, maxGunners, sailors, maxSailors);
-		} else {
-			returnShip = new Ship(x,y,turnRate*turnMassFactor,drag,power*massFactor,length,width,hp, maxhp, gunners, maxGunners, sailors, maxSailors);
+			returnShip.boss = true;
 		}
 		Slot[] slots = new Slot[numSlots*2];
 		

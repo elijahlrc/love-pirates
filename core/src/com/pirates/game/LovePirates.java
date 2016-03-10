@@ -170,14 +170,14 @@ public class LovePirates extends ApplicationAdapter {
 		//list of blitable images
 		textureRegions = new TextureRegion[99];
 		//this next line is bad, should be part of the spritesheet and a texture region
-		Texture shiptex = new Texture("ship.bmp");
-		Texture deadShiptex = new Texture("deadship.png");
+		Texture shiptex = new Texture("placeholder ship.png");
+		Texture deadShiptex = new Texture("placeholder ship broken.png");
 		Texture cannoballtext = new Texture("cannonball.png");
 		Texture debristext = new Texture("debris.png");
 		Texture lootCratetext = new Texture("crate.png");
 		Texture whiteCircle = new Texture("whileCircle.png");
 		Texture buckshotSprite = new Texture("buckshot.png");
-
+		shiptex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 		debug = new Texture("debug.bmp");
 		textureRegions[1] = new TextureRegion(cannoballtext, cannoballtext.getWidth(), cannoballtext.getHeight());
 		textureRegions[0] = new TextureRegion(shiptex, shiptex.getWidth(), shiptex.getHeight()); //this is wrong

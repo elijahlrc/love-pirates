@@ -47,6 +47,7 @@ public class Ship extends DrawableObj implements Collideable, Target{
 	float repairSupplies;
 	private float reloadSpeed;
 	private boolean isWreck;
+	boolean boss;
 	/**This class is the super for all ships
 	 * All ships have position vector "loc", velocity vector "vel", drag coefficient "dragcoef", and a "maxpower"
 	 * Perhaps the following things should be in some kind of ship data structure/class, 
@@ -78,6 +79,7 @@ public class Ship extends DrawableObj implements Collideable, Target{
 		turnRate = baseTurnRate/2 + baseTurnRate*sailors/(length*20);
 		maxPower = maxpower;
 		slots = new Slot[NUM_SLOTS];
+		boss = false;
 		bodyDef.position.set(x,y);
 		bodyDef.type = BodyDef.BodyType.DynamicBody;
 		bodyDef.active = true;
@@ -484,16 +486,19 @@ public class Ship extends DrawableObj implements Collideable, Target{
 		//DeadShipGen.genShip(this);
 		//old loot style
 		
-		int lootAmount = (int) (2*(length*width) + 1);
+		int lootAmount = (int) (2*(length*width));
 		int debriesAmount = lootAmount*3;
 		for (int i = 0 ; i <= debriesAmount; i++) {
 			LovePirates.debries.add(new Debries((float) (body.getPosition().x+((Math.random()-.5)*Math.sqrt(i))),(float) (body.getPosition().y+((Math.random()-.5)*Math.sqrt(i))), false));
 		}
-		/*
+		if (boss && this != LovePirates.playerShip) {
+			LovePirates.nextWorld();
+		}
+		
 		for (int i = 0; i < lootAmount; i++) {
 			LovePirates.debries.add(new LootCrate((float) (body.getPosition().x+((Math.random()-.5)*Math.sqrt(i))),(float) (body.getPosition().y+((Math.random()-.5)*Math.sqrt(i))), pickLootType(), 1));
 		}
-		*/
+		
 		
 		
 		
@@ -506,6 +511,11 @@ public class Ship extends DrawableObj implements Collideable, Target{
 		return isWreck;
 	}
 	void setWreck() {
+		int lootAmount = (int) (2*(length*width));
+		int debriesAmount = lootAmount*2;
+		for (int i = 0 ; i <= debriesAmount; i++) {
+			LovePirates.debries.add(new Debries((float) (body.getPosition().x+((Math.random()-.5)*Math.sqrt(i))),(float) (body.getPosition().y+((Math.random()-.5)*Math.sqrt(i))), false));
+		}
 		isWreck = true;
 		controller = new StaticController(this);
 		this.isWreck = true;

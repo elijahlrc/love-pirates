@@ -42,7 +42,7 @@ public class AiController implements Controller {
 	
 	AiController(Ship owner) {
 		targetcounter = 0;
-		w = LovePirates.width/(2*LovePirates.TILESIZE);
+		w = LovePirates.width/LovePirates.TILESIZE;
 		active = false;
 		agressive = false;
 		target = findTarget();
@@ -92,13 +92,14 @@ public class AiController implements Controller {
 			target = findTarget();
 		}
 		active = LovePirates.mapSpriteSize/Math.sqrt(2) > owner.getPos().sub(LovePirates.playerShip.getPos()).len();
+		
 		if (active) {
 			getVecToTargetAndAngle();
 			castRays();
 			if (agressive && w < owner.getPos().sub(targetPos()).len()) {
 				agressive = false;
 				target = findTarget();
-			} else if (!agressive && w > owner.getPos().sub(LovePirates.playerShip.getPos()).len()) {
+			} else if (!agressive && w < owner.getPos().sub(LovePirates.playerShip.getPos()).len()) {
 				agressive = true;
 				target = findTarget();
 				
