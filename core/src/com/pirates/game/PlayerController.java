@@ -1,6 +1,9 @@
 package com.pirates.game;
 
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.math.Vector;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.ui.Table.Debug;
 
 import java.util.ArrayList;
 class PlayerController implements Controller {
@@ -49,10 +52,34 @@ class PlayerController implements Controller {
 		
 		
 		if (inputProcessor.isClicking) {
-			// TODO: change FiringDirection enum?
-			// TODO: determine which side of the screen to fire on based on player position
-			//dirs.add(inputProcessor.mousePosition);
+			// TODO: make it possible to fire when moving with keyboard
 			
+			// click position and player position
+			// TODO: simplify these variables
+			Vector2 target = inputProcessor.mousePosition.cpy();
+			Vector2 playerPos = new Vector2(LovePirates.width/LovePirates.TILESIZE*LovePirates.cameraScalingFactor,
+					LovePirates.height/LovePirates.TILESIZE*LovePirates.cameraScalingFactor);
+			
+			// direction where the projectiles should fire
+			Vector2 direction = target.sub(playerPos).scl(0.5f);
+			direction.y = -direction.y;		// TODO: fix this hack
+			
+			// make angle (in radians) positive, modulo by 2*pi, then divides by pi
+			float targetAngle = (float) (LovePirates.playerShip.getDir() - direction.angleRad() + 2*Math.PI);
+			targetAngle %= 2*Math.PI;
+			targetAngle /= Math.PI;
+			
+			//MyUtils.DrawText("direction: " + direction, true, new Vector2(7,7), 20);
+			//MyUtils.DrawText("target: " + target, true, new Vector2(5,5), 20);
+			MyUtils.DrawText("angle: " + targetAngle, true, direction, 40);
+			
+			// if clicks on left/right side of ship, fire on left/right
+			if (targetAngle < 1.7 && targetAngle > 1.3) {
+				dirs.add(FiringDirection.LEFT);
+			} else if (targetAngle < 0.7 && targetAngle > 0.3) {
+				dirs.add(FiringDirection.RIGHT);
+			}
+		
 		}
 		
 		

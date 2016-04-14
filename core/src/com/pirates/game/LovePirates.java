@@ -85,7 +85,7 @@ public class LovePirates extends ApplicationAdapter {
 	static final int numShips = 15;
 	static Vector2 UI_POS1 = new Vector2(20,0.5f);
 	static Vector2 UI_POS2 = new Vector2(20,-.5f);
-	
+	final static float cameraScalingFactor = 0.5f;
 	
 	//Ship factories
 	//called like basicShipGen.genShip(level);
@@ -157,8 +157,7 @@ public class LovePirates extends ApplicationAdapter {
 		font.setUseIntegerPositions(false);
 		rand = new Random();
 		
-		
-		camera = new OrthographicCamera(width/TILESIZE*.5f,height/TILESIZE*.5f);
+		camera = new OrthographicCamera(width/TILESIZE*cameraScalingFactor, height/TILESIZE*cameraScalingFactor);
 		//box2d
 		Box2D.init();
 		Ui.init();
