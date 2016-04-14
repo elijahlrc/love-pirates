@@ -85,9 +85,8 @@ public class LovePirates extends ApplicationAdapter {
 	private static Skin skin;
 	static CStage stage;
 	static final int numShips = 30;
+	final static float cameraScalingFactor = 0.5f;
 
-	
-	
 	//Ship factories
 	//called like basicShipGen.genShip(level);
 	static ShipGen basicShipGen = new BasicShipGen();
@@ -160,7 +159,9 @@ public class LovePirates extends ApplicationAdapter {
 		UI_POS1 = new Vector2(width/(TILESIZE*4f)-10,0.5f);
 		UI_POS2 = new Vector2(width/(TILESIZE*4f)-10,-.5f);
 		rand = new Random();
-		camera = new OrthographicCamera(width/TILESIZE*.5f,height/TILESIZE*.5f);
+
+		camera = new OrthographicCamera(width/TILESIZE*cameraScalingFactor, height/TILESIZE*cameraScalingFactor);
+
 		//box2d
 		Box2D.init();
 		Ui.init();

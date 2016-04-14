@@ -19,7 +19,7 @@ public class StaticController implements Controller {
 	}
 
 	@Override
-	public ArrayList<FireingDirection> getFireDir() {
+	public ArrayList<FiringDirection> getFireDir() {
 		return null;
 	}
 

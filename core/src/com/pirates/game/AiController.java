@@ -329,14 +329,14 @@ public class AiController implements Controller {
 	 * @see com.pirates.game.Controller#getFireDir()
 	 */
 	@Override
-	public ArrayList<FireingDirection> getFireDir() {
+	public ArrayList<FiringDirection> getFireDir() {
 		if (agressive) {
-			ArrayList<FireingDirection> fireDirs = new ArrayList<FireingDirection>();
+			ArrayList<FiringDirection> fireDirs = new ArrayList<FiringDirection>();
 			if (vecToTarget.len() < projectileRange) {
 				if ((targetDeltaAngle > (Math.PI/2-.05)) && (targetDeltaAngle < (Math.PI/2+.05))) {
-					fireDirs.add(FireingDirection.RIGHT);
+					fireDirs.add(FiringDirection.RIGHT);
 				} else if ((targetDeltaAngle < (-Math.PI/2+.05)) && (targetDeltaAngle > (-Math.PI/2-.05))) {
-					fireDirs.add(FireingDirection.LEFT);
+					fireDirs.add(FiringDirection.LEFT);
 				}
 			}
 			return fireDirs;
