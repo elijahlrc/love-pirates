@@ -13,16 +13,15 @@ public class ShipGenerator {
 		float massFactor = length*width;
 		Ship returnShip;
 		float turnMassFactor = (float) Math.pow(massFactor, 1.25);
+		returnShip = new Ship(x,y,turnRate*turnMassFactor,drag,power*massFactor,length,width,hp, maxhp, gunners, maxGunners, sailors, maxSailors);
 		if (boss) {
-			returnShip = new BossShip(x,y,turnRate*turnMassFactor,drag,power*massFactor,length,width,hp, maxhp, gunners, maxGunners, sailors, maxSailors);
-		} else {
-			returnShip = new Ship(x,y,turnRate*turnMassFactor,drag,power*massFactor,length,width,hp, maxhp, gunners, maxGunners, sailors, maxSailors);
+			returnShip.boss = true;
 		}
 		Slot[] slots = new Slot[numSlots*2];
 		
 		for (int i=0; i<numSlots; i += 1) {
 			float yOffset = width/2;
-			float xOffset = (((float) i)/numSlots)*length-length/2;
+			float xOffset = ((i+.5f)/numSlots)*length-length/2;
 			int sizeOfSlot = 1;//set this later
 			slots[2*i] = new Slot(xOffset,yOffset,sizeOfSlot,(float) (Math.PI/2f),FiringDirection.LEFT,returnShip);
 			slots[2*i+1] = new Slot(xOffset,-yOffset,sizeOfSlot,(float) (3*Math.PI/2f),FiringDirection.RIGHT,returnShip);

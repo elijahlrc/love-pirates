@@ -19,4 +19,5 @@ interface Controller {
 	void setProjectileSpeed(float projectileSpeed);
 	float getProjectileSpeed();
 	boolean getActive();
+	void setOwner(Ship s);
 }

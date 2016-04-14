@@ -25,6 +25,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.PerformanceCounter;
 import com.badlogic.gdx.InputMultiplexer;
+/*
+ * getPower() and getTurn() get called by ships to see what they should do
+ */
 public class LovePirates extends ApplicationAdapter {
 	static SpriteBatch batch;
 	static double[][] map;
@@ -52,7 +55,7 @@ public class LovePirates extends ApplicationAdapter {
 	static HashSet<Vector2> debugObjects;
 	static int MAPDEGREE = 9;
 	static int MAPSIZE = (int) Math.pow(2, MAPDEGREE);
-	static int COLLIDERPOOLSIZE = 15000;//maybe bigger
+	static int COLLIDERPOOLSIZE = 15000;//maybe bigger?
 	static float dt;
 	static World world;
 	static ColliderPool colliderPool;
@@ -72,25 +75,24 @@ public class LovePirates extends ApplicationAdapter {
 	static int lvl;
 	static HashSet<Projectile> projRemovalSet;
 	static HashSet<Ship> shipRemovalSet;
-	static HashSet<Ship> shipwreckAdditionSet;
 	static HashSet<Debries> debriesRemovalSet;
 	static PerlinNoiseGen noiseGen;
 	static Color seaTintColor = new Color();
-	private static Texture mapTexture;
+	static Texture mapTexture;
 	static int mapSpriteSize = 200;
 	public static Ui UI;
 	static LootScreen lootScreen;
 	private static Skin skin;
 	static CStage stage;
-	static final int numShips = 15;
-	static Vector2 UI_POS1 = new Vector2(20,0.5f);
-	static Vector2 UI_POS2 = new Vector2(20,-.5f);
+	static final int numShips = 30;
 	final static float cameraScalingFactor = 0.5f;
-	
+
 	//Ship factories
 	//called like basicShipGen.genShip(level);
 	static ShipGen basicShipGen = new BasicShipGen();
 	static ShipGen bossShipGen = new BossShipGen();
+	static Vector2 UI_POS1;
+	static Vector2 UI_POS2;
 
 	//static BodyDef bodyDef = new BodyDef();
 	//static FixtureDef fixtureDef = new FixtureDef();
@@ -116,7 +118,6 @@ public class LovePirates extends ApplicationAdapter {
 		colliderPool = new ColliderPool(COLLIDERPOOLSIZE);
 		projRemovalSet = new HashSet<Projectile>();
 		shipRemovalSet = new HashSet<Ship>();
-		shipwreckAdditionSet = new HashSet<Ship>();
 		debriesRemovalSet = new HashSet<Debries>();
 		
 		//debug renderer for physics rendering
@@ -155,27 +156,29 @@ public class LovePirates extends ApplicationAdapter {
 		font = new BitmapFont();
 		font.setScale(1/32f);
 		font.setUseIntegerPositions(false);
+		UI_POS1 = new Vector2(width/(TILESIZE*4f)-10,0.5f);
+		UI_POS2 = new Vector2(width/(TILESIZE*4f)-10,-.5f);
 		rand = new Random();
-		
+
 		camera = new OrthographicCamera(width/TILESIZE*cameraScalingFactor, height/TILESIZE*cameraScalingFactor);
+
 		//box2d
 		Box2D.init();
 		Ui.init();
-		
-		//map gen init
+				//map gen init
 		noiseGen =  PerlinNoiseGen.init();
 		
 		//list of blitable images
 		textureRegions = new TextureRegion[99];
 		//this next line is bad, should be part of the spritesheet and a texture region
-		Texture shiptex = new Texture("ship.bmp");
-		Texture deadShiptex = new Texture("deadship.png");
+		Texture shiptex = new Texture("placeholder ship.png");
+		Texture deadShiptex = new Texture("placeholder ship broken.png");
 		Texture cannoballtext = new Texture("cannonball.png");
 		Texture debristext = new Texture("debris.png");
 		Texture lootCratetext = new Texture("crate.png");
 		Texture whiteCircle = new Texture("whileCircle.png");
 		Texture buckshotSprite = new Texture("buckshot.png");
-
+		shiptex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 		debug = new Texture("debug.bmp");
 		textureRegions[1] = new TextureRegion(cannoballtext, cannoballtext.getWidth(), cannoballtext.getHeight());
 		textureRegions[0] = new TextureRegion(shiptex, shiptex.getWidth(), shiptex.getHeight()); //this is wrong
@@ -210,8 +213,10 @@ public class LovePirates extends ApplicationAdapter {
 		//ShipGenerator.genShip			   (x,    y, turnRate, drag, power, length, width, cannons,buckshot, slots, hp, maxhp, boss, gunnars, maxgunners, sailors, maxsailors)
 		//playerShip = ShipGenerator.genShip(100, 400, .9f, 		1.5f, 10,     2f,    .75f,   10,    0,		 10, 	7f,  20,   false,15,      40,         30,       50);
 		//playerShip = ShipGenerator.genShip(100, 400,  1, 		1,   5,      2.5f,  .75f,   10,    0, 		 10,    10f, 20,   false,15,      40,         20,       50);
-		//playerShip = ShipGenerator.genShip(100, 400, 1f, 		.75f, 5,     1.5f,    .75f,   0,    25,		 25, 	7f,  20,   false,30,      40,         45,       50);
-		playerShip = ShipGenerator.genShip(100, 400, .75f, 		5f, 15,     2.5f,    1.5f,   25,    0,		 25, 	15f,  20,   false,30,      40,         25,       50);
+		//playerShip = ShipGenerator.genShip(100, 400, .65f, 		.70f, 10,     1.5f,    .75f,   0,    25,		 25, 	15f,  20,   false,30,      40,         45,       50);
+		//playerShip = ShipGenerator.genShip(100, 400, .75f, 		5f, 15,     2.5f,    1.5f,   25,    0,		 25, 	15f,  20,   false,30,      40,         25,       50);
+		playerShip = basicShipGen.genShip(2,0,0);
+		playerShip.setPos(100, 400);
 
 		playerShip.setControler(new PlayerController());
 		while (map[(int) playerShip.getPos().x][(int) playerShip.getPos().y]>SEALEVEL) {
@@ -267,8 +272,8 @@ public class LovePirates extends ApplicationAdapter {
 		Vector2 playerPos = playerShip.getPos();
 		renderPrefCount.start();
 
-		/*seems that the preformance issues are from the following block of code :-(
-		 * where the land is rendered
+		/*
+		 * render land
 		 */
 		for (int i 		= (int)((playerPos.x)-(width/20)); 	   	i < ((int) (playerPos.x) + (width/20)); i++){
 			for (int j 	= (int)((playerPos.y)-(height/20)); 	j < ((int) (playerPos.y) + (height/20)); j++){
@@ -343,6 +348,9 @@ public class LovePirates extends ApplicationAdapter {
 			}
 			ships.add(aiShip);
 		}
+		/*
+		 * draw and tick ships
+		 */
 		for (Ship ship : ships){
 			ship.tick();
 			x = ship.getPos().x;
@@ -361,22 +369,29 @@ public class LovePirates extends ApplicationAdapter {
 		
 		for (Ship ship : ships){
 			if (ship.alive == false) {
-				shipRemovalSet.add(ship);
-				if (ship.isWreck() == false) 
-					shipwreckAdditionSet.add(ship);
-				ship.delete();
+				if (ship.isWreck()) {
+					shipRemovalSet.add(ship);
+					ship.delete();
+				} else {
+					ship.alive = true;
+					ship.setHp(ship.getMaxHp()/7.5f);
+					ship.setWreck();
+				}
 			}
-		}
-		for (Ship s:shipwreckAdditionSet){
-			ships.add(DeadShipGen.genShip(s));
 		}
 		for (Ship s:shipRemovalSet) {
 			world.destroyBody(s.getBody());
 		}
 		ships.removeAll(shipRemovalSet);
 		shipRemovalSet.clear();
-		shipwreckAdditionSet.clear();
 		MyUtils.renderText(batch);
+		
+		if (DEBUGPRINTOUT) {
+			MyUtils.DrawText("Player Alive = " + playerShip.alive, true, new Vector2(10,10), 0);
+			MyUtils.DrawText("Player wrecked = " + playerShip.isWreck(), true, new Vector2(10,11), 0);
+			MyUtils.DrawText("Player controller = " + playerShip.controller, true, new Vector2(10,12), 0);
+		}
+
 		
 		for (Vector2 debugLoc : debugObjects) {
 			batch.draw(debug,debugLoc.x, debugLoc.y,.2f,.2f);
@@ -393,54 +408,8 @@ public class LovePirates extends ApplicationAdapter {
 					   size[0],size[1],
 					   1f,1f,0,true);
 		}
-		
-		
-		//Draw UI/minimap
-		//int xpos = (int) Math.max(0, Math.min(playerPos.x-mapSpriteSize/2,MAPSIZE-mapSpriteSize/2-1));
-		//int ypos = (int) Math.max(0, Math.min(playerPos.y-mapSpriteSize/2,MAPSIZE-mapSpriteSize/2-1));
-		int xpos = (int) (playerPos.x-mapSpriteSize/2);
-		int ypos = (int) (playerPos.y-mapSpriteSize/2);
-		batch.draw(mapTexture,
-                playerPos.x-mapSpriteSize/TILESIZE+width/(TILESIZE*4f),
-                playerPos.y-mapSpriteSize/TILESIZE+height/(TILESIZE*4f),
-                0,0,
-                mapSpriteSize,
-                mapSpriteSize,
-                1f/(TILESIZE),
-                1f/(TILESIZE),
-                0,
-                xpos,
-                ypos,
-                mapSpriteSize,
-                mapSpriteSize,
-                false, true);
-		/* batch.draw(debug,
-				playerPos.x-mapSpriteSize/(2*TILESIZE) + width/(TILESIZE * 4f),
-				playerPos.y-mapSpriteSize/(2*TILESIZE) + height/(TILESIZE * 4f),
-				.5f,.5f);
-				*/
-		for (Ship ship : ships){
-			x = ship.getPos().x;
-			y = ship.getPos().y;
-			if ((x>playerPos.x - mapSpriteSize/2 && x<playerPos.x + mapSpriteSize/2) &&
-			    (y>playerPos.y - mapSpriteSize/2 && y<playerPos.y + mapSpriteSize/2)) {
-				batch.draw(debug,
-					x/TILESIZE+playerPos.x -playerPos.x/TILESIZE + width/(TILESIZE*4f)-mapSpriteSize/(2*TILESIZE),
-					y/TILESIZE+playerPos.y -playerPos.y/TILESIZE + height/(TILESIZE*4f)-mapSpriteSize/(2*TILESIZE),
-					.25f, .25f);
-			}
-		}
-		String ui;
-		ui = String.format("You have %d repair supplies %n" +
-						   "%d gold", Math.round(playerShip.repairSupplies),playerShip.gold);
-		
-		MyUtils.DrawText(ui, true, UI_POS1,1);
-		ui = String.format("You have %d sailors and " +
-				   "%d cannonears", playerShip.sailors,playerShip.gunners);
-		
-		MyUtils.DrawText(ui, true, UI_POS2,1);
-		
-		Ui.drawShipIcon(batch,playerShip,-26,-13);
+
+		Ui.draw(batch);
 		
 		
 		

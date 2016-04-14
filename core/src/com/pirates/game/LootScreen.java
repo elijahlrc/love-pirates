@@ -1,6 +1,7 @@
 package com.pirates.game;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -17,8 +18,10 @@ public class LootScreen {
 	static TextButton cargob;
 	static TextButton weponb;
 	static TextButton tresureb;
+	static TextButton captureb;
 	static Ship targetShip;
 	static int tries;
+	
 	LootScreen(Skin skin, CStage stage) {
 		LootScreen.skin = skin;
 		LootScreen.stage = stage;
@@ -35,14 +38,16 @@ public class LootScreen {
 		targetShip = s;
 		stage.clear();
 		tries = 1;
-		float xCenterPos = (s.getPos().x-LovePirates.playerShip.getPos().x)*
+		float xCenterPos = (targetShip.getPos().x-LovePirates.playerShip.getPos().x)*
 				LovePirates.TILESIZE+LovePirates.width/2;
-		float yCenterPos = (s.getPos().y-LovePirates.playerShip.getPos().y)*
+		float yCenterPos = (targetShip.getPos().y-LovePirates.playerShip.getPos().y)*
 				LovePirates.TILESIZE+LovePirates.height/2;
 		crewb = new TextButton("Conscript enemy crew", skin, "default");
 		cargob = new TextButton("Loot cargo", skin, "default");
 		weponb = new TextButton("Try to steal enemy cannons", skin, "default");
 		tresureb = new TextButton("Just take the treasure", skin, "default");
+		captureb = new TextButton("Capture the ship!!!!", skin, "default");
+
 	    crewb.setWidth(width);
 	    crewb.setHeight(height);
 	    crewb.setPosition(xCenterPos+offset,yCenterPos+offset);
@@ -62,7 +67,7 @@ public class LootScreen {
 	    cargob.addListener(new ClickListener(){
 	        @Override 
 	        public void clicked(InputEvent event, float x, float y){
-	        	looter.getLoot("repair supplies", (int) Math.ceil(s.getSize()[0]*s.getSize()[1]/5));
+	        	looter.getLoot("repair supplies", (int) Math.ceil(targetShip.getSize()[0]*targetShip.getSize()[1]/5));
 	        	killLootScreen();
 	        }
 	    });
@@ -90,10 +95,26 @@ public class LootScreen {
 	        	killLootScreen();
 	        }
 	    });
+	    
+	    captureb.setWidth(width);
+	    captureb.setHeight(height);
+	    captureb.setPosition(xCenterPos,yCenterPos+offset*1.5f);
+	    
+	    captureb.addListener(new ClickListener(){
+	        @Override 
+	        public void clicked(InputEvent event, float x, float y){
+	        	looter.captureShip(targetShip);
+	        	//killLootScreen();
+	        	stage.clear();
+	        }
+	    });
+	    
 	    stage.addActor(crewb);
 	    stage.addActor(cargob);
 	    stage.addActor(weponb);
 	    stage.addActor(tresureb);
-		}
+	    stage.addActor(captureb);
+	}
 	
+		
 }

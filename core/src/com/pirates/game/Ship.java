@@ -47,6 +47,7 @@ public class Ship extends DrawableObj implements Collideable, Target{
 	float repairSupplies;
 	private float reloadSpeed;
 	private boolean isWreck;
+	boolean boss;
 	/**This class is the super for all ships
 	 * All ships have position vector "loc", velocity vector "vel", drag coefficient "dragcoef", and a "maxpower"
 	 * Perhaps the following things should be in some kind of ship data structure/class, 
@@ -78,6 +79,7 @@ public class Ship extends DrawableObj implements Collideable, Target{
 		turnRate = baseTurnRate/2 + baseTurnRate*sailors/(length*20);
 		maxPower = maxpower;
 		slots = new Slot[NUM_SLOTS];
+		boss = false;
 		bodyDef.position.set(x,y);
 		bodyDef.type = BodyDef.BodyType.DynamicBody;
 		bodyDef.active = true;
@@ -125,13 +127,14 @@ public class Ship extends DrawableObj implements Collideable, Target{
 	 */
 	void setControler(Controller c){
 		controller = c;
+		controller.setOwner(this);
 	}
 	void tick(){
 		updateColidors();
 		controller.tick();
 		move();
 		fire();
-		if ((repairSupplies > 0)&&(hp <= maxhp)){
+		if ((repairSupplies > 0)&&(hp <= maxhp)&&(isWreck == false)){
 			repairSupplies -= .002;
 			hp += .002;
 		}
@@ -175,26 +178,29 @@ public class Ship extends DrawableObj implements Collideable, Target{
 	float getMaxHp() {
 		return maxhp;
 	}
+	void setHp(float h) {
+		hp = h;
+	}
 	void removeCrew(int number, String type) {
 		if (type.equals("sailors")) {
-			if (sailors + number <= maxSailors) {
-				sailors += number;
+			if (sailors - number > 0) {
+				sailors -= number;
 				getTurnRate();
 			} else {
-				sailors = maxSailors;
+				sailors = 0;
 				getTurnRate();
 			}
 		} else if (type.equals("gunners")) {
-			if (gunners + number <= maxGunners) {
-				gunners += number;
+			if (gunners - number > 0) {
+				gunners -= number;
 				getReloadSpeed();
 			} else {
-				gunners = maxGunners;
+				gunners = 0;
 				getReloadSpeed();
 				
 			}
 		} else {
-			System.out.println("WARNING, BAD VALUE PASSED TO addCrew()");
+			System.out.println("WARNING, BAD VALUE PASSED TO removeCrew()");
 		}
 	}
 	
@@ -303,7 +309,12 @@ public class Ship extends DrawableObj implements Collideable, Target{
 	}
 	public void setSpriteIndex(int i) {
 		spriteIndex = i;
+		setSpriteSize(this.length,this.width);
 	}
+	/*
+	 * these checks stop a ship from colliding with its own cannonballs
+	 * @see com.pirates.game.Collideable#handlePreCollide(com.badlogic.gdx.physics.box2d.Contact)
+	 */
 	@Override
 	public boolean handlePreCollide(Contact contact) {
 		Object b = contact.getFixtureB().getUserData();
@@ -313,11 +324,16 @@ public class Ship extends DrawableObj implements Collideable, Target{
 				return false;
 			}
 		}
+		if (b instanceof Buckshot){
+			Ship owner = ((Buckshot) b).getOwner();
+			if (owner == this) {
+				return false;
+			}
+		}
 		return true;
 	}
 	@Override
 	public void handleBeginContact(Contact contact) {
-		// TODO Auto-generated method stub
 	}
 	@Override
 	public void handlePostCollide(Contact contact, ContactImpulse impulse) {
@@ -330,8 +346,8 @@ public class Ship extends DrawableObj implements Collideable, Target{
 				Float dmg = impulse.getNormalImpulses()[0]*DAMAGEFACTOR;
 				MyUtils.DrawText(((Float) (Math.round(dmg*10)/10f)).toString(), false, ((Cannonball) b).getPos(), (int) ((Cannonball) b).lifetime);
 				hp -= dmg;
-				sailors -= (int) Math.max(rand.nextGaussian()*dmg,0);
-				gunners -= (int) Math.max(rand.nextGaussian()*dmg,0);
+				removeCrew((int) Math.max(rand.nextGaussian()*dmg,0),"sailors");
+				removeCrew((int) Math.max(rand.nextGaussian()*dmg,0),"gunners");
 
 			}
 		} else if (b instanceof Buckshot){
@@ -340,8 +356,8 @@ public class Ship extends DrawableObj implements Collideable, Target{
 					Float dmg = impulse.getNormalImpulses()[0]*DAMAGEFACTOR/4;
 					//MyUtils.DrawText(((Float) (Math.round(dmg*10)/10f)).toString(), false, ((Buckshot) b).getPos(), (int) ((Buckshot) b).lifetime);
 					hp -= dmg;
-					sailors -= (int) Math.max(rand.nextGaussian()*dmg*10,0);
-					gunners -= (int) Math.max(rand.nextGaussian()*dmg*10,0);
+					removeCrew((int) Math.max(rand.nextGaussian()*dmg,0),"sailors");
+					removeCrew((int) Math.max(rand.nextGaussian()*dmg,0),"gunners");
 				}
 
 		} else if (b instanceof LootCrate) {
@@ -403,7 +419,7 @@ public class Ship extends DrawableObj implements Collideable, Target{
 			Slot s = null;
 			for (int i = 0; i<quantity; i++) {
 				s = findOpenSlot();
-				if (s!=null) {
+				if (s != null) {
 					s.setContents(new Cannon());
 				}
 			}
@@ -470,16 +486,19 @@ public class Ship extends DrawableObj implements Collideable, Target{
 		//DeadShipGen.genShip(this);
 		//old loot style
 		
-		int lootAmount = (int) (2*(length*width) + 1);
+		int lootAmount = (int) (2*(length*width));
 		int debriesAmount = lootAmount*3;
 		for (int i = 0 ; i <= debriesAmount; i++) {
 			LovePirates.debries.add(new Debries((float) (body.getPosition().x+((Math.random()-.5)*Math.sqrt(i))),(float) (body.getPosition().y+((Math.random()-.5)*Math.sqrt(i))), false));
 		}
-		/*
+		if (boss && this != LovePirates.playerShip) {
+			LovePirates.nextWorld();
+		}
+		
 		for (int i = 0; i < lootAmount; i++) {
 			LovePirates.debries.add(new LootCrate((float) (body.getPosition().x+((Math.random()-.5)*Math.sqrt(i))),(float) (body.getPosition().y+((Math.random()-.5)*Math.sqrt(i))), pickLootType(), 1));
 		}
-		*/
+		
 		
 		
 		
@@ -491,14 +510,50 @@ public class Ship extends DrawableObj implements Collideable, Target{
 	boolean isWreck() {
 		return isWreck;
 	}
-	void setWreck(boolean wreck) {
-		isWreck = wreck;
+	void setWreck() {
+		int lootAmount = (int) (2*(length*width));
+		int debriesAmount = lootAmount*2;
+		for (int i = 0 ; i <= debriesAmount; i++) {
+			LovePirates.debries.add(new Debries((float) (body.getPosition().x+((Math.random()-.5)*Math.sqrt(i))),(float) (body.getPosition().y+((Math.random()-.5)*Math.sqrt(i))), false));
+		}
+		isWreck = true;
+		controller = new StaticController(this);
+		this.isWreck = true;
+		this.setSpriteIndex(7);
+		this.setSpriteSize(length*2, width*2);
 	}
 	public Body getBody() {
 		return body;
 	}
 	public void setBody(Body body) {
 		this.body = body;
+	}
+	/*
+	 * set this ships controller to controller another ship, also gives your crew to them
+	 */
+	public void captureShip(Ship s) {
+		s.addCrew(gunners,"gunners");
+		s.addCrew(sailors,"sailors");
+		s.setControler(this.controller);
+		
+		s.alive = true;
+		this.setWreck();
+		
+		s.hp = (float) Math.ceil(s.maxhp/10);
+		s.repairSupplies += repairSupplies;
+		s.gold = gold;
+		s.setSpriteIndex(0);
+		s.setSpriteSize(s.length, s.width);
+		s.isWreck = false;
+		this.setWreck();
+		if (this == LovePirates.playerShip) {
+			LovePirates.playerShip = s;
+		}
+		
+	}
+	float getPower() {
+		
+		return maxPower;
 	}
 	
 	

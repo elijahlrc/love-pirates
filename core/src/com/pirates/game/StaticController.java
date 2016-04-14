@@ -42,4 +42,10 @@ public class StaticController implements Controller {
 		return false;
 	}
 
+	@Override
+	public void setOwner(Ship s) {
+		this.owner = s;
+		
+	}
+
 }
