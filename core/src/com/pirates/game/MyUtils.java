@@ -48,8 +48,8 @@ class MyUtils {
 						r = (float) a[i][j]*0.65f;
 						g = (float) (a[i][j]*.65f);
 						t = .9f;
-
 					}
+					
 					c.set(r, g, b, t);
 					toSave.drawPixel(i,j,Color.rgba8888(c));
 				}
@@ -78,7 +78,7 @@ class MyUtils {
 		lineList.add(a);
 	}
 		
-		
+	
 	static void renderLines() {
 		LovePirates.debugShapeRenderer.begin(ShapeType.Line);
 		for (Vector2[] line: lineList) {
@@ -90,6 +90,7 @@ class MyUtils {
 		LovePirates.debugShapeRenderer.end();
 		lineList.clear();
 	}
+	
 	/**
 	 * relative text used to display things like ui that stays in the same place on the screen
 	 * relative to the players ship, and is specified with a vector relative to the player ship. 
@@ -103,7 +104,7 @@ class MyUtils {
 	static void DrawText(String text, Boolean relative, Vector2 pos, int lifetime) {
 		textList.add(new DrawableText(text, relative, pos.cpy(), lifetime));
 	}
-		
+	
 	
 	static void renderText(SpriteBatch batch) {
 		textArrayListRefreshCount += 1;

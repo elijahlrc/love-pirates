@@ -268,7 +268,7 @@ public class Ship extends DrawableObj implements Collideable, Target{
 	 * Fire method iterates through slots and fires them with the appropriate side;
 	 */
 	void fire() {
-		ArrayList<FireingDirection> fireDirs = controller.getFireDir();
+		ArrayList<FiringDirection> fireDirs = controller.getFireDir();
 		for (Slot s : slots) {
 			s.fire(fireDirs,reloadSpeed);
 		}

@@ -11,7 +11,7 @@ interface Controller {
 	/** returns a float between 0 and 1 (inclusive) for how fast the ship is going. /or some reason vector2's use floats so this is a float*/
 	float getPower();
 	/** get the directions a ship is firing at any given time*/
-	ArrayList<FireingDirection> getFireDir();//returns a firing direction for the ship to fire
+	ArrayList<FiringDirection> getFireDir();//returns a firing direction for the ship to fire
 	/**
 	 * called every frame before getpower, getturn etc.
 	 */

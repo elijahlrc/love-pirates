@@ -8,7 +8,7 @@ public class Slot {
 	Vector2 offset;
 	int size;
 	float dir;//in rad, ranging from 0 to 2pi
-	FireingDirection side;
+	FiringDirection side;
 	Equipment inslot;
 	Ship owner;
 	/**
@@ -19,7 +19,7 @@ public class Slot {
 	 * @param slotDir angle slot fires, in degrees
 	 * @param fireSlot the key which fires this slot
 	 */
-	Slot(float xOffset, float yOffset, int sizeOfSlot,float slotDir, FireingDirection fireSlot,Ship ownedBy) {
+	Slot(float xOffset, float yOffset, int sizeOfSlot,float slotDir, FiringDirection fireSlot,Ship ownedBy) {
 		offset = new Vector2(xOffset,yOffset);
 		size = sizeOfSlot;
 		dir = slotDir;
@@ -30,7 +30,7 @@ public class Slot {
 	void setContents(Equipment e) {
 		inslot = e;
 	}
-	void fire(ArrayList<FireingDirection> dirToFire,float reloadSpeed) {
+	void fire(ArrayList<FiringDirection> dirToFire,float reloadSpeed) {
 		if (inslot != null) {
 			inslot.tick(reloadSpeed);
 			if ((dirToFire != null)&&(dirToFire.contains(side))) {
