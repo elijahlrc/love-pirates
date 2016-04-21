@@ -59,4 +59,12 @@ public class Slot {
 		}
 		return 0;
 	}
+	public float getProjDrag() {
+		if (inslot  != null){
+			if (inslot.iswepon()) {
+				return inslot.getProjDrag();
+			}
+		}
+		return 0;
+	}
 }

@@ -76,7 +76,7 @@ public class Ship extends DrawableObj implements Collideable, Target{
 		length = len;
 		spriteWidth = width;
 		spriteLength = length;
-		turnRate = baseTurnRate/2 + baseTurnRate*sailors/(length*20);
+		turnRate = baseTurnRate/4 + baseTurnRate*sailors/(length*10);
 		maxPower = maxpower;
 		slots = new Slot[NUM_SLOTS];
 		boss = false;
@@ -146,10 +146,10 @@ public class Ship extends DrawableObj implements Collideable, Target{
 
 	}
 	void getReloadSpeed() {
-		reloadSpeed = ((float)findNumberOfCannons())/(float) gunners;
+		reloadSpeed = ((float)findNumberOfCannons())/((float) gunners+1f);
 	}
 	void getTurnRate() {
-		turnRate = baseTurnRate/16 + baseTurnRate*sailors/(length*10);
+		turnRate = baseTurnRate/4 + baseTurnRate*sailors/(length*10);
 	}
 	
 
@@ -451,6 +451,20 @@ public class Ship extends DrawableObj implements Collideable, Target{
 		}
 		return speedTotal/weaponCount;
 	}
+	public float getCannonProjectileDrag() {
+		float dragTotal = 0;
+		int weaponCount = 0;
+		for (Slot slot : slots) {
+			if (slot.getProjDrag()>=0) {
+				weaponCount += 1;
+				dragTotal += slot.getProjDrag();
+			}
+		}
+		if (weaponCount == 0) {
+			return 1;
+		}
+		return dragTotal/weaponCount;
+	}
 	public float getCannonballLifetime() {
 		float lifetimeTotal = 0;
 		int weaponCount = 0;
@@ -555,6 +569,7 @@ public class Ship extends DrawableObj implements Collideable, Target{
 		
 		return maxPower;
 	}
+	
 	
 	
 	

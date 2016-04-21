@@ -13,20 +13,23 @@ import com.badlogic.gdx.physics.box2d.*;
 public class Buckshot extends Projectile implements Collideable  {	
 	static final float LIFETIME = 50;
 	int number;
-	private float size;
 	private Body body;
 	private BodyDef bodyDef;
 	private FixtureDef fixtureDef;
 	CircleShape circleShape = new CircleShape();
 	private Fixture fixture;
 	private Ship owner;
+	
+	
+	static float drag = 3f;
+	static float density = .1f;
+	static float size = .2f;
 	/**
 	 * 
 	 */
 	Buckshot(Vector2 position, Vector2 velocity, Ship owner) {
 		dead = false;
 		lifetime = LIFETIME;
-		size = .2f;
 		this.owner = owner;
 		bodyDef = new BodyDef();
 		bodyDef.bullet = true;
@@ -34,7 +37,7 @@ public class Buckshot extends Projectile implements Collideable  {
 		bodyDef.type = BodyDef.BodyType.DynamicBody;
 		circleShape.setRadius(size/2);
 		fixtureDef.shape = circleShape;
-		fixtureDef.density = .06f;
+		fixtureDef.density = density;
 		fixtureDef.filter.categoryBits = LovePirates.PROJ_MASK;
 		fixtureDef.filter.maskBits = LovePirates.SHIP_MASK;
 
@@ -50,7 +53,7 @@ public class Buckshot extends Projectile implements Collideable  {
 		Vector2 realVel = velocity.cpy();
 		realVel.setLength(actualspeed);
 		realVel.setAngleRad(actualang);
-		body.setLinearDamping(4f);
+		body.setLinearDamping(drag);
 		body.setLinearVelocity(realVel);
 
 	}

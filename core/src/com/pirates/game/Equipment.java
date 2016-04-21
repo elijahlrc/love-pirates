@@ -22,4 +22,5 @@ public abstract class Equipment {
 	abstract void tick(float reloadSpeed);
 	abstract float getProjSpeed();
 	abstract float getProjLifetime();
+	abstract float getProjDrag();
 }

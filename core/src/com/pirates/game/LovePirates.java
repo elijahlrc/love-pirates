@@ -8,6 +8,7 @@ import java.util.Random;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -53,7 +54,7 @@ public class LovePirates extends ApplicationAdapter {
 	static TextureRegion lsea;
 	static Texture debug;
 	static HashSet<Vector2> debugObjects;
-	static int MAPDEGREE = 9;
+	static int MAPDEGREE = 10;
 	static int MAPSIZE = (int) Math.pow(2, MAPDEGREE);
 	static int COLLIDERPOOLSIZE = 15000;//maybe bigger?
 	static float dt;
@@ -79,13 +80,13 @@ public class LovePirates extends ApplicationAdapter {
 	static PerlinNoiseGen noiseGen;
 	static Color seaTintColor = new Color();
 	static Texture mapTexture;
-	static int mapSpriteSize = 200;
+	static int mapSpriteSize = 170;
 	public static Ui UI;
 	static LootScreen lootScreen;
 	private static Skin skin;
 	static CStage stage;
-	static final int numShips = 30;
-
+	static final int numShips = 70;
+	static Ui ui = new Ui(skin, stage);
 	
 	
 	//Ship factories
@@ -163,7 +164,6 @@ public class LovePirates extends ApplicationAdapter {
 		camera = new OrthographicCamera(width/TILESIZE*.5f,height/TILESIZE*.5f);
 		//box2d
 		Box2D.init();
-		Ui.init();
 				//map gen init
 		noiseGen =  PerlinNoiseGen.init();
 		
@@ -370,6 +370,17 @@ public class LovePirates extends ApplicationAdapter {
 			if (ship.alive == false) {
 				if (ship.isWreck()) {
 					shipRemovalSet.add(ship);
+					if (ship == LovePirates.playerShip) {
+						//restart
+						genWorld(1);
+						playerShip = basicShipGen.genShip(2,0,0);
+						playerShip.setPos(100, 400);
+						playerShip.setControler(new PlayerController());
+						while (map[(int) playerShip.getPos().x][(int) playerShip.getPos().y]>SEALEVEL) {
+							playerShip.setPos((int) playerShip.getPos().x+10, (int) playerShip.getPos().y);
+						}
+						ships.add(playerShip);
+					}
 					ship.delete();
 				} else {
 					ship.alive = true;
@@ -385,11 +396,11 @@ public class LovePirates extends ApplicationAdapter {
 		shipRemovalSet.clear();
 		MyUtils.renderText(batch);
 		
-		if (DEBUGPRINTOUT) {
-			MyUtils.DrawText("Player Alive = " + playerShip.alive, true, new Vector2(10,10), 0);
-			MyUtils.DrawText("Player wrecked = " + playerShip.isWreck(), true, new Vector2(10,11), 0);
-			MyUtils.DrawText("Player controller = " + playerShip.controller, true, new Vector2(10,12), 0);
-		}
+		//if (DEBUGPRINTOUT) {
+		//	MyUtils.DrawText("Player Alive = " + playerShip.alive, true, new Vector2(10,10), 0);
+		//	MyUtils.DrawText("Player wrecked = " + playerShip.isWreck(), true, new Vector2(10,11), 0);
+		//	MyUtils.DrawText("Player controller = " + playerShip.controller, true, new Vector2(10,12), 0);
+		//}
 
 		
 		for (Vector2 debugLoc : debugObjects) {
@@ -431,6 +442,11 @@ public class LovePirates extends ApplicationAdapter {
 		
 		world.step(1/60f, 6, 4);
 		physicsPrefCount.stop();
+		
+		
+		if (stage.keysDown.contains(Input.Keys.ESCAPE)) {
+			Gdx.app.exit();
+		}
 		
 		//this debug renderer seems to be very heavy
 		//debugRenderer.render(world, camera.combined);

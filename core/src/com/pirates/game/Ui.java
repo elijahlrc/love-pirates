@@ -5,12 +5,16 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
 public class Ui {
 	private static Color c;
-
+	static CStage stage;
 	private static Vector2 pos;
-	private Ui() {
+	private Skin skin;
+	Ui(Skin skin, CStage stage) {
+		this.skin = skin;
+		Ui.stage = stage;
 		c = new Color();
 		c.r = 0;
 		c.b = 0;
@@ -19,11 +23,7 @@ public class Ui {
 		pos = new Vector2();
 		
 	}
-	static void init() {
-		LovePirates.UI = new Ui();
-	}
-	
-	
+
 
 	//Draw UI/minimap
 	static void drawMiniMap(Batch b, float x_pos, float y_pos){

@@ -3,6 +3,7 @@
  */
 package com.pirates.game;
 import com.badlogic.gdx.math.Vector2;
+
 import java.util.Random;
 /**
  * @author Elijah
@@ -61,6 +62,11 @@ public class BuckshotCannon extends Equipment {
 	@Override
 	float getProjLifetime() {
 		return Cannonball.LIFETIME;
+	}
+
+	@Override
+	float getProjDrag() {
+		return Buckshot.drag;
 	}
 	
 

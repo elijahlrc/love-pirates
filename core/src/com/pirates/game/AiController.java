@@ -25,6 +25,7 @@ public class AiController implements Controller {
 	private float projectileSpeed;
 	private float projectileLifetime;
 	private float projectileRange;
+	private float projectileDrag;
 	private float targetDeltaAngle;
 	private Vector2 rayCastHitLoc;
 	private Vector2 reverse;
@@ -37,12 +38,10 @@ public class AiController implements Controller {
 	enum Modes {AGRESIVE, BACKINGUP}
 	Modes mode = Modes.AGRESIVE;
 	int backupCount = 0;
-	int maxBackupCount = 100;
-	private float rangeFactor = 1.5f;
-	
+	int maxBackupCount = 100;	
 	AiController(Ship owner) {
 		targetcounter = 0;
-		w = LovePirates.width/LovePirates.TILESIZE;
+		w = (LovePirates.width/LovePirates.TILESIZE)/3;
 		active = false;
 		agressive = false;
 		target = findTarget();
@@ -51,11 +50,14 @@ public class AiController implements Controller {
 		rayCastHitLoc = new Vector2(0,0);
 		projectileSpeed = getCannonProjectileSpeed();
 		projectileLifetime = getCannonProjectileLifetime();
-		projectileRange = rangeFactor*projectileSpeed*projectileLifetime/60;
+		projectileDrag = getCannonProjectileDrag();
+		projectileRange = projectileSpeed*(projectileLifetime/60)/projectileDrag;
 		raycastCallback = new CollisionAvoidanceCallback(this);
 		
 	}
 	
+	
+
 	@Override
 	/**
 	 * called every frame, updates raycasts, targets, and gets targetDeltaAngle and
@@ -73,33 +75,35 @@ public class AiController implements Controller {
 			MyUtils.DrawText("BackupCount = "+backupCount, false, owner.getPos().add(numbOffset), 0);
 		}
 
-		if ((backupCount < 0) && (mode == Modes.AGRESIVE)){
-			backupCount = maxBackupCount;
-			mode = Modes.BACKINGUP;
-		} else if ((rayCastHitLoc != null) && (mode == Modes.AGRESIVE)) {
-			backupCount -= 1;
-		} else if ((rayCastHitLoc == null) && (mode == Modes.AGRESIVE)){
-			backupCount = maxBackupCount;			
-		} else if (mode == Modes.BACKINGUP) {
-			backupCount -= 1;
-			if (backupCount < 0) {
-				backupCount = maxBackupCount;
-				mode = Modes.AGRESIVE;
-			}
-		}
 		rayCastHitLoc =null;
 		if (target == null){//this does not know if a target is dead, so will keep attacking where player died!
 			target = findTarget();
 		}
-		active = LovePirates.mapSpriteSize/Math.sqrt(2) > owner.getPos().sub(LovePirates.playerShip.getPos()).len();
-		
+		//ships ai activates when close to player and goes dormant when far away.
+		active = LovePirates.mapSpriteSize > owner.getPos().sub(LovePirates.playerShip.getPos()).len();
 		if (active) {
+			if ((backupCount < 0) && (mode == Modes.AGRESIVE)){
+				backupCount = maxBackupCount;
+				mode = Modes.BACKINGUP;
+			} else if ((rayCastHitLoc != null) && (mode == Modes.AGRESIVE)) {
+				backupCount -= 1;
+			} else if ((rayCastHitLoc == null) && (mode == Modes.AGRESIVE)){
+				backupCount = maxBackupCount;			
+			} else if (mode == Modes.BACKINGUP) {
+				backupCount -= 1;
+				if (backupCount < 0) {
+					backupCount = maxBackupCount;
+					mode = Modes.AGRESIVE;
+				}
+			}
+			
+			
 			getVecToTargetAndAngle();
 			castRays();
 			if (agressive && w < owner.getPos().sub(targetPos()).len()) {
 				agressive = false;
 				target = findTarget();
-			} else if (!agressive && w < owner.getPos().sub(LovePirates.playerShip.getPos()).len()) {
+			} else if (!agressive && w > owner.getPos().sub(LovePirates.playerShip.getPos()).len()) {
 				agressive = true;
 				target = findTarget();
 				
@@ -151,6 +155,9 @@ public class AiController implements Controller {
 	}
 	private float getCannonProjectileLifetime() {
 		return owner.getCannonballLifetime();
+	}
+	private float getCannonProjectileDrag() {
+		return owner.getCannonProjectileDrag();
 	}
 	void rayCastCatcher(Vector2 CollisionLoc) {
 		float dist = owner.getPos().sub(CollisionLoc).len();
@@ -306,9 +313,9 @@ public class AiController implements Controller {
 				}
 				if (rayCastHitLoc == null) {
 					if (vecToTarget.len() < projectileRange/1.5) {
-						return 1;
-					} else {
 						return .75f;
+					} else {
+						return 1;
 					}
 				} else {
 					return .5f;

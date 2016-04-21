@@ -45,9 +45,7 @@ public class Cannon extends Equipment {
 	void tick(float reloadSpeed) {
 		if (countdown >= 0) {
 			countdown -= (.5+rand.nextFloat())/(reloadSpeed*60f);
-		}
-		// TODO Auto-generated method stub
-		
+		}		
 	}
 
 	@Override
@@ -59,6 +57,11 @@ public class Cannon extends Equipment {
 	float getProjLifetime() {
 		
 		return Cannonball.LIFETIME;
+	}
+
+	@Override
+	float getProjDrag() {
+		return Cannonball.drag;
 	}
 	
 
