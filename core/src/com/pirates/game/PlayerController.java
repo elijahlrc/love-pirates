@@ -72,12 +72,12 @@ class PlayerController implements Controller {
 			
 			//MyUtils.DrawText("direction: " + direction, true, new Vector2(7,7), 20);
 			//MyUtils.DrawText("target: " + target, true, new Vector2(5,5), 20);
-			MyUtils.DrawText("angle: " + targetAngle, true, direction, 40);
+			//MyUtils.DrawText("angle: " + targetAngle, true, direction, 40);
 			
 			// if clicks on left/right side of ship, fire on left/right
-			if (targetAngle < 1.7 && targetAngle > 1.3) {
+			if (targetAngle < 1.8 && targetAngle > 1.2) {
 				dirs.add(FiringDirection.LEFT);
-			} else if (targetAngle < 0.7 && targetAngle > 0.3) {
+			} else if (targetAngle < 0.8 && targetAngle > 0.2) {
 				dirs.add(FiringDirection.RIGHT);
 			}
 		

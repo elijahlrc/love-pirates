@@ -1,5 +1,6 @@
 package com.pirates.game;
 
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -12,6 +13,8 @@ public class Ui {
 	static CStage stage;
 	private static Vector2 pos;
 	private Skin skin;
+	private static boolean centeredUi = true; //if true the Ui for cannons and turning is displayed overlaid on the ship, otherwise it appears in the bottom left
+	private static int tabTogleTimer = 50;
 	Ui(Skin skin, CStage stage) {
 		this.skin = skin;
 		Ui.stage = stage;
@@ -63,24 +66,27 @@ public class Ui {
 	
 	
 	
-	static void drawShipIcon(Batch b, float x_pos, float y_pos) {
+	static void drawShipIcon(Batch b, float x_pos, float y_pos, boolean background) {
 		Ship ship = LovePirates.playerShip;
 		float x = ship.getPos().x+x_pos;
 		float y = ship.getPos().y+y_pos;
 		float x_off;
 		float y_off;
 		c.a = 1f;
-		TextureRegion t = LovePirates.textureRegions[5];
-		b.draw(t,x-1,y-1,2,2);
-		int index = ship.getSpriteIndex();
-		float[] size = ship.getSize();
-		t = LovePirates.textureRegions[index];
+		TextureRegion t;
 		float shipRotationR = ship.getDir();
-		float shipRotation = (float) (shipRotationR * 360/(2*Math.PI));
-		b.draw(t,x-size[0]/2,y-size[1]/2,
-				   size[0]/2,size[1]/2,
-				   size[0],size[1],
-				   1f,1f,shipRotation,true);
+		if (background) {
+			t = LovePirates.textureRegions[5];
+			b.draw(t,x-1,y-1,2,2);
+			int index = ship.getSpriteIndex();
+			float[] size = ship.getSize();
+			t = LovePirates.textureRegions[index];
+			float shipRotation = (float) (shipRotationR * 360/(2*Math.PI));
+			b.draw(t,x-size[0]/2,y-size[1]/2,
+					   size[0]/2,size[1]/2,
+					   size[0],size[1],
+					   1f,1f,shipRotation,true);
+		}
 		c.g = 0;
 		for (Slot slot : ship.slots) {
 			t = LovePirates.textureRegions[5];
@@ -105,10 +111,23 @@ public class Ui {
 		b.setColor(c);
 	}
 	public static void draw(SpriteBatch batch) {
-		float x_pos = 2.5f-LovePirates.width/(LovePirates.TILESIZE*4);
-		float y_pos = 2-LovePirates.height/(LovePirates.TILESIZE*4);
-		
-		drawShipIcon(batch,x_pos,y_pos);
+		float x_pos; 
+		float y_pos;
+		tabTogleTimer -= 1;
+		if (tabTogleTimer<0 && stage.keysDown.contains(Input.Keys.TAB)) {
+			centeredUi = !centeredUi;
+			tabTogleTimer = 50;
+		}
+		if (centeredUi) {
+			
+			x_pos = 0;
+			y_pos = 0;
+			drawShipIcon(batch,x_pos,y_pos,false);
+		} else {
+			x_pos = 2.5f-LovePirates.width/(LovePirates.TILESIZE*4);
+			y_pos = 2-LovePirates.height/(LovePirates.TILESIZE*4);
+			drawShipIcon(batch,x_pos,y_pos,true);
+		}
 		
 		x_pos = LovePirates.mapSpriteSize/LovePirates.TILESIZE+LovePirates.width/(LovePirates.TILESIZE*4f);
 		y_pos = LovePirates.mapSpriteSize/LovePirates.TILESIZE+LovePirates.height/(LovePirates.TILESIZE*4f);

@@ -85,7 +85,7 @@ public class LovePirates extends ApplicationAdapter {
 	static LootScreen lootScreen;
 	private static Skin skin;
 	static CStage stage;
-	static Ui ui = new Ui(skin, stage);
+	static Ui ui;
 	
 	
 	static final int numShips = 30;
@@ -206,6 +206,7 @@ public class LovePirates extends ApplicationAdapter {
         //stage handles input and is used to draw UI
 		stage = new CStage();
         Gdx.input.setInputProcessor(stage);
+        ui = new Ui(skin, stage);
         FileHandle skinfile = Gdx.files.internal("uiskin.json");
 		skin = new Skin(skinfile);
         
