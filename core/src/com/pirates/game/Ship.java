@@ -383,18 +383,28 @@ public class Ship extends DrawableObj implements Collideable, Target{
 	 * @return
 	 */
 	Slot findOpenSlot() {
-		ArrayList<Slot> openslots = new ArrayList<Slot>();
+		ArrayList<Slot> leftOpenSlots = new ArrayList<Slot>();
+		ArrayList<Slot> rightOpenSlots = new ArrayList<Slot>();
 		int slotIndex;
 		for (Slot s : slots) {
 			if (s.inslot == null) {
-				openslots.add(s);
+				if (s.side == FiringDirection.LEFT){
+					leftOpenSlots.add(s);
+				} else {
+					rightOpenSlots.add(s);
+				}
 			}
 		}
-		if (openslots.size() == 0) {
+		if (leftOpenSlots.size() + rightOpenSlots.size() == 0) {
 			return null;
+		} else if (leftOpenSlots.size() > rightOpenSlots.size()) {
+			slotIndex = rand.nextInt(leftOpenSlots.size());
+			return leftOpenSlots.get(slotIndex);
+		} else {
+			slotIndex = rand.nextInt(rightOpenSlots.size());
+			return rightOpenSlots.get(slotIndex);
 		}
-		slotIndex = rand.nextInt(openslots.size());
-		return openslots.get(slotIndex);
+		
 	}
 	int findNumberOfCannons() {
 		int slotNumber = 0;
