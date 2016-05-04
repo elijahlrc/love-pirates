@@ -83,6 +83,7 @@ public class LovePirates extends ApplicationAdapter {
 	static int mapSpriteSize = 170;
 	public static Ui UI;
 	static LootScreen lootScreen;
+	static MainMenuOverlay mainMenu;
 	private static Skin skin;
 	static CStage stage;
 	static Ui ui;
@@ -211,23 +212,31 @@ public class LovePirates extends ApplicationAdapter {
 		skin = new Skin(skinfile);
         
         lootScreen = new LootScreen(skin, stage);
+        mainMenu = new MainMenuOverlay(skin, stage);
         
-        
-		genWorld(1);
-		//ShipGenerator.genShip			   (x,    y, turnRate, drag, power, length, width, cannons,buckshot, slots, hp, maxhp, boss, gunnars, maxgunners, sailors, maxsailors)
-		//playerShip = ShipGenerator.genShip(100, 400, .9f, 		1.5f, 10,     2f,    .75f,   10,    0,		 10, 	7f,  20,   false,15,      40,         30,       50);
-		//playerShip = ShipGenerator.genShip(100, 400,  1, 		1,   5,      2.5f,  .75f,   10,    0, 		 10,    10f, 20,   false,15,      40,         20,       50);
-		//playerShip = ShipGenerator.genShip(100, 400, .65f, 		.70f, 10,     1.5f,    .75f,   0,    25,		 25, 	15f,  20,   false,30,      40,         45,       50);
-		//playerShip = ShipGenerator.genShip(100, 400, .75f, 		5f, 15,     2.5f,    1.5f,   25,    0,		 25, 	15f,  20,   false,30,      40,         25,       50);
-		playerShip = basicShipGen.genShip(2,0,0);
-		playerShip.setPos(100, 400);
 
-		playerShip.setControler(new PlayerController());
-		while (map[(int) playerShip.getPos().x][(int) playerShip.getPos().y]>SEALEVEL) {
-			playerShip.setPos((int) playerShip.getPos().x+10, (int) playerShip.getPos().y);
-		}
-		ships.add(playerShip);
+        // creates and adds a main menu overlay
+        MainMenuOverlay.makeMainMenu();
 		
+        makeNewWorld();
+        
+        
+//		genWorld(1);
+//		
+//		//ShipGenerator.genShip			   (x,    y, turnRate, drag, power, length, width, cannons,buckshot, slots, hp, maxhp, boss, gunnars, maxgunners, sailors, maxsailors)
+//		//playerShip = ShipGenerator.genShip(100, 400, .9f, 		1.5f, 10,     2f,    .75f,   10,    0,		 10, 	7f,  20,   false,15,      40,         30,       50);
+//		//playerShip = ShipGenerator.genShip(100, 400,  1, 		1,   5,      2.5f,  .75f,   10,    0, 		 10,    10f, 20,   false,15,      40,         20,       50);
+//		//playerShip = ShipGenerator.genShip(100, 400, .65f, 		.70f, 10,     1.5f,    .75f,   0,    25,		 25, 	15f,  20,   false,30,      40,         45,       50);
+//		//playerShip = ShipGenerator.genShip(100, 400, .75f, 		5f, 15,     2.5f,    1.5f,   25,    0,		 25, 	15f,  20,   false,30,      40,         25,       50);
+//		playerShip = basicShipGen.genShip(2,0,0);
+//		playerShip.setPos(100, 400);
+//
+//		playerShip.setControler(new PlayerController());
+//		while (map[(int) playerShip.getPos().x][(int) playerShip.getPos().y]>SEALEVEL) {
+//			playerShip.setPos((int) playerShip.getPos().x+10, (int) playerShip.getPos().y);
+//		}
+//		ships.add(playerShip);
+	
 		batch = new SpriteBatch();
 		batch.enableBlending();
 		
@@ -376,15 +385,7 @@ public class LovePirates extends ApplicationAdapter {
 				if (ship.isWreck()) {
 					shipRemovalSet.add(ship);
 					if (ship == LovePirates.playerShip) {
-						//restart
-						genWorld(1);
-						playerShip = basicShipGen.genShip(2,0,0);
-						playerShip.setPos(100, 400);
-						playerShip.setControler(new PlayerController());
-						while (map[(int) playerShip.getPos().x][(int) playerShip.getPos().y]>SEALEVEL) {
-							playerShip.setPos((int) playerShip.getPos().x+10, (int) playerShip.getPos().y);
-						}
-						ships.add(playerShip);
+						makeNewWorld();
 					}
 					ship.delete();
 				} else {
@@ -477,6 +478,18 @@ public class LovePirates extends ApplicationAdapter {
 	
 			}
 		}
+	}
+	
+	static void makeNewWorld() {
+		//restart
+		genWorld(1);
+		playerShip = basicShipGen.genShip(2,0,0);
+		playerShip.setPos(100, 400);
+		playerShip.setControler(new PlayerController());
+		while (map[(int) playerShip.getPos().x][(int) playerShip.getPos().y]>SEALEVEL) {
+			playerShip.setPos((int) playerShip.getPos().x+10, (int) playerShip.getPos().y);
+		}
+		ships.add(playerShip);
 	}
 
 	
