@@ -116,7 +116,7 @@ public class Ui {
 		tabTogleTimer -= 1;
 		if (tabTogleTimer<0 && stage.keysDown.contains(Input.Keys.TAB)) {
 			centeredUi = !centeredUi;
-			tabTogleTimer = 50;
+			tabTogleTimer = 20;
 		}
 		if (centeredUi) {
 			
