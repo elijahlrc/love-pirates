@@ -4,7 +4,6 @@ import java.util.Random;
 
 public class TresureChestGen {
 	static Random rand = new Random();
-	private static boolean pointfound;
 	private static int size = LovePirates.map.length;
 	public TresureChestGen() {
 		// TODO Auto-generated constructor stub
@@ -18,7 +17,6 @@ public class TresureChestGen {
 		
 	}
 	static TresureChest genChest(double[][] map) {
-		pointfound = false;
 		int[] point = {0,0};
 		while (true) {
 			while (!inSand(point[0], point[1], map)) {
