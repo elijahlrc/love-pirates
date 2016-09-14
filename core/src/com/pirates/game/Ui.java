@@ -14,17 +14,12 @@ public class Ui {
 	private static Vector2 pos;
 	private Skin skin;
 	private static boolean centeredUi = true; //if true the Ui for cannons and turning is displayed overlaid on the ship, otherwise it appears in the bottom left
-	private static int tabTogleTimer = 50;
-	Ui(Skin skin, CStage stage) {
+	private static int tabToggleTimer = 50;
+	public Ui(Skin skin, CStage stage) {
 		this.skin = skin;
 		Ui.stage = stage;
-		c = new Color();
-		c.r = 0;
-		c.b = 0;
-		c.g = .25f;
-		c.a = 1f;
+		c = new Color(0, 0, .25f, 1f);
 		pos = new Vector2();
-		
 	}
 
 
@@ -52,11 +47,14 @@ public class Ui {
 	            false, true);
 		
 		Vector2 shipPos;
+		TextureRegion shipTexture = LovePirates.textureRegions[14];
+		int shipHeight = shipTexture.getRegionHeight();
+		int shipWidth = shipTexture.getRegionWidth();
 		for (Ship ship : LovePirates.ships){
 			shipPos = ship.getPos();
 			if ((shipPos.x>playerPos.x - LovePirates.mapSpriteSize/2 && shipPos.x<playerPos.x + LovePirates.mapSpriteSize/2) &&
 			    (shipPos.y>playerPos.y - LovePirates.mapSpriteSize/2 && shipPos.y<playerPos.y + LovePirates.mapSpriteSize/2)) {
-				b.draw(LovePirates.textureRegions[14],
+				b.draw(shipTexture,
 					shipPos.x/LovePirates.TILESIZE+playerPos.x -playerPos.x/LovePirates.TILESIZE + LovePirates.width/(LovePirates.TILESIZE*4f)-LovePirates.mapSpriteSize/(2*LovePirates.TILESIZE),
 					shipPos.y/LovePirates.TILESIZE+playerPos.y -playerPos.y/LovePirates.TILESIZE + LovePirates.height/(LovePirates.TILESIZE*4f)-LovePirates.mapSpriteSize/(2*LovePirates.TILESIZE),
 					.25f, .25f);
@@ -113,10 +111,10 @@ public class Ui {
 	public static void draw(SpriteBatch batch) {
 		float x_pos; 
 		float y_pos;
-		tabTogleTimer -= 1;
-		if (tabTogleTimer<0 && stage.keysDown.contains(Input.Keys.TAB)) {
+		tabToggleTimer -= 1;
+		if (tabToggleTimer <0 && stage.keysDown.contains(Input.Keys.TAB)) {
 			centeredUi = !centeredUi;
-			tabTogleTimer = 20;
+			tabToggleTimer = 20;
 		}
 		if (centeredUi) {
 			

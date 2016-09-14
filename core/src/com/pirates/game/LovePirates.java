@@ -163,10 +163,10 @@ public class LovePirates extends ApplicationAdapter {
 	
 	@Override
 	public void create() {
-		
-		Gdx.graphics.setDisplayMode(Gdx.graphics.getDesktopDisplayMode().width, Gdx.graphics.getDesktopDisplayMode().height, true);
 		width = Gdx.graphics.getDesktopDisplayMode().width;
 		height = Gdx.graphics.getDesktopDisplayMode().height;
+		Gdx.graphics.setDisplayMode(width, height, false);
+
 		font = new BitmapFont();
 		font.setScale(1/32f);
 		font.setUseIntegerPositions(false);
