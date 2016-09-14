@@ -374,6 +374,14 @@ public class Ship extends DrawableObj implements Collideable, Target{
 					LootScreen.makeLootScreen(bship, this);
 				}
 			}
+		} else if (a instanceof Ship) {
+			if ( ((Ship) a).controller instanceof PlayerController) {
+				Ship aship = (Ship) a;
+				if (aship.isWreck) {
+					aship.body.setLinearVelocity(0, 0);
+					LootScreen.makeLootScreen(aship, this);
+				}
+			}
 		}
 	}
 

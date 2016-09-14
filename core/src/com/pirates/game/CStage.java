@@ -7,16 +7,21 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 
 public class CStage extends Stage {
 	HashSet<Integer> keysDown;
+	HashSet<Integer> keysPressedThisFrame;
 	public static Vector2 mousePosition = new Vector2(0, 0); // XY position of mouse
 	public static boolean isClicking = false;				 // is mouse being clicked?
 	
 	public CStage() {
 		keysDown = new HashSet<Integer>();
+		keysPressedThisFrame = new HashSet<Integer>();
 	}
-	
+	void tick(){
+		keysPressedThisFrame.clear();;
+	}
 	@Override
 	public boolean keyDown(int keyCode) {
 		keysDown.add(keyCode);
+		keysPressedThisFrame.add(keyCode);
 		return super.keyDown(keyCode);
 	}
 	

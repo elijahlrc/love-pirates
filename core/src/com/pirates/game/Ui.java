@@ -56,7 +56,7 @@ public class Ui {
 			shipPos = ship.getPos();
 			if ((shipPos.x>playerPos.x - LovePirates.mapSpriteSize/2 && shipPos.x<playerPos.x + LovePirates.mapSpriteSize/2) &&
 			    (shipPos.y>playerPos.y - LovePirates.mapSpriteSize/2 && shipPos.y<playerPos.y + LovePirates.mapSpriteSize/2)) {
-				b.draw(LovePirates.debug,
+				b.draw(LovePirates.textureRegions[14],
 					shipPos.x/LovePirates.TILESIZE+playerPos.x -playerPos.x/LovePirates.TILESIZE + LovePirates.width/(LovePirates.TILESIZE*4f)-LovePirates.mapSpriteSize/(2*LovePirates.TILESIZE),
 					shipPos.y/LovePirates.TILESIZE+playerPos.y -playerPos.y/LovePirates.TILESIZE + LovePirates.height/(LovePirates.TILESIZE*4f)-LovePirates.mapSpriteSize/(2*LovePirates.TILESIZE),
 					.25f, .25f);

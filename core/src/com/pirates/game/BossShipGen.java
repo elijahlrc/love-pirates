@@ -21,11 +21,11 @@ public class BossShipGen extends ShipGen {
 	Ship genShip(int level,int x,int y) {
 		float turnRate = (float) (Math.abs(rand.nextGaussian()/2)+.5f);
 		
-		float meanLen = (float) Math.max(4, (2*Math.log(level)+2));
+		float meanLen = (float) Math.max(2.5, (3*Math.log(level)+1));
 		float sdLen = meanLen*.25f;
 		float length = (float) Math.max(3f, helperGauss(meanLen,sdLen));
 			
-		float meanWid = .375f*meanLen;
+		float meanWid = .4f*meanLen;
 		float sdWid = .2f*meanWid;
 		float width = (float) Math.max(.5f, helperGauss(meanWid,sdWid));
 			
@@ -43,9 +43,9 @@ public class BossShipGen extends ShipGen {
 		float hp = (float) Math.max(helperGauss(meanHp,sdHp), 2);
 			
 			//max of 5 gunners per cannon
-		float meanCannons = 5*(level+length)-10;
+		float meanCannons = 2*(length);
 		float sdCannons = .25f*meanCannons;
-		int cannons = (int) Math.max(helperGauss(meanCannons,sdCannons), 4);
+		int cannons = (int) Math.max(helperGauss(meanCannons,sdCannons), 3);
 		int gunners = (int) Math.max(Math.min(cannons*5, cannons*helperGauss(.5f,.3f)),2);
 
 			

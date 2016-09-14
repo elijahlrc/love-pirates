@@ -42,6 +42,7 @@ public class LovePirates extends ApplicationAdapter {
 	static int width;
 	static int height;
 	static int TILESIZE = 16;
+	int TILESIZEPLUSS = TILESIZE + 1;
 	static float SEALEVEL = .73f;
 	static float SANDWIDTH =.015f;
 	static float GRASSWIDTH = .05f;
@@ -95,8 +96,9 @@ public class LovePirates extends ApplicationAdapter {
 	static Ui ui;
 	static DecorateLand mapDecorator = new DecorateLand();
 	
-	static final int numShips = 100;
+	static final int numShips = 75;
 	final static float cameraScalingFactor = .5f;
+	static boolean paused = false;
 
 	//Ship factories
 	//called like basicShipGen.genShip(level);
@@ -193,12 +195,18 @@ public class LovePirates extends ApplicationAdapter {
 		Texture shrubSprite = new Texture("shrub.png");
 		Texture mtreeSprite = new Texture("moutantreesprite.png");
 		Texture seaWeedSprite = new Texture("seaweed.png");
+		Texture thickSeaWeedSprite = new Texture("thickSeaweed.png");
+		Texture thinSeaWeedSprite = new Texture("thinSeaweed.png");
+		Texture shipIconSprite = new Texture("shipIcon.png");
 		shiptex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 		seaWeedSprite.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 		treeSprite.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 		shrubSprite.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 		mtreeSprite.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+		thickSeaWeedSprite.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+		thinSeaWeedSprite.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 		debug = new Texture("debug.bmp");
+		
 		textureRegions[1] = new TextureRegion(cannoballtext, cannoballtext.getWidth(), cannoballtext.getHeight());
 		textureRegions[0] = new TextureRegion(shiptex, shiptex.getWidth(), shiptex.getHeight()); //this is wrong, these should all be in a texture region
 		textureRegions[3] = new TextureRegion(debristext, debristext.getWidth(), debristext.getHeight());//but baylife
@@ -209,17 +217,21 @@ public class LovePirates extends ApplicationAdapter {
 		textureRegions[8] = new TextureRegion(treeSprite, treeSprite.getWidth(), treeSprite.getHeight());
 		textureRegions[9] = new TextureRegion(shrubSprite, shrubSprite.getWidth(), shrubSprite.getHeight());
 		textureRegions[10] = new TextureRegion(mtreeSprite, mtreeSprite.getWidth(), mtreeSprite.getHeight());
-		textureRegions[11] = new TextureRegion(seaWeedSprite, seaWeedSprite.getWidth(), seaWeedSprite.getHeight());
+		textureRegions[12] = new TextureRegion(seaWeedSprite, seaWeedSprite.getWidth(), seaWeedSprite.getHeight());
+		textureRegions[13] = new TextureRegion(thickSeaWeedSprite, thickSeaWeedSprite.getWidth(), thickSeaWeedSprite.getHeight());
+		textureRegions[11] = new TextureRegion(thinSeaWeedSprite, thinSeaWeedSprite.getWidth(), thinSeaWeedSprite.getHeight());
+		textureRegions[14] = new TextureRegion(shipIconSprite, shipIconSprite.getWidth(), shipIconSprite.getHeight());
 		tiles = new Texture("tiles2.png");
 		tiles.setFilter(TextureFilter.Linear,TextureFilter.Linear);
-		land =  new TextureRegion(tiles,0,0,TILESIZE,TILESIZE);
-		sea =  new TextureRegion(tiles,TILESIZE,TILESIZE,TILESIZE,TILESIZE);
-		grass =  new TextureRegion(tiles,TILESIZE,0,TILESIZE,TILESIZE);
-		ygrass =  new TextureRegion(tiles,2*TILESIZE,0,TILESIZE,TILESIZE);
-		bgrass =  new TextureRegion(tiles,2*TILESIZE,TILESIZE,TILESIZE,TILESIZE);
-		dsea =  new TextureRegion(tiles,TILESIZE,2*TILESIZE,TILESIZE,TILESIZE);
-		lsea =  new TextureRegion(tiles,2*TILESIZE,2*TILESIZE,TILESIZE,TILESIZE);
-		sand =  new TextureRegion(tiles,0,TILESIZE,TILESIZE,TILESIZE);
+		
+		land =  new TextureRegion(tiles,0,0,TILESIZEPLUSS,TILESIZEPLUSS);
+		sea =  new TextureRegion(tiles,TILESIZEPLUSS,TILESIZEPLUSS,TILESIZEPLUSS,TILESIZEPLUSS);
+		grass =  new TextureRegion(tiles,TILESIZEPLUSS,0,TILESIZEPLUSS,TILESIZEPLUSS-1);
+		ygrass =  new TextureRegion(tiles,2*TILESIZEPLUSS,0,TILESIZEPLUSS,TILESIZEPLUSS);
+		bgrass =  new TextureRegion(tiles,2*TILESIZEPLUSS,TILESIZEPLUSS,TILESIZEPLUSS,TILESIZEPLUSS);
+		dsea =  new TextureRegion(tiles,TILESIZEPLUSS,2*TILESIZEPLUSS,TILESIZEPLUSS,TILESIZEPLUSS);
+		lsea =  new TextureRegion(tiles,2*TILESIZEPLUSS+1,2*TILESIZEPLUSS,TILESIZEPLUSS,TILESIZEPLUSS);
+		sand =  new TextureRegion(tiles,0,TILESIZEPLUSS-1,TILESIZEPLUSS,TILESIZEPLUSS);
 		
         //stage handles input and is used to draw UI
 		stage = new CStage();
@@ -229,10 +241,7 @@ public class LovePirates extends ApplicationAdapter {
 		skin = new Skin(skinfile);
         
         lootScreen = new LootScreen(skin, stage);
-        mainMenu = new MainMenuOverlay(skin, stage);
-
-        // creates and adds a main menu overlay
-        MainMenuOverlay.makeMainMenu();
+        mainMenu = new MainMenuOverlay(skin, stage);        
 		
         makeNewWorld();
 	
@@ -261,14 +270,15 @@ public class LovePirates extends ApplicationAdapter {
 	@Override
 	public void render() {
 		
-		renderPrefCount.tick();
-		shipPrefCount.tick();
-		physicsPrefCount.tick();
+		
 		totalPrefCount.tick();
 		
 		totalPrefCount.start();
 		
 		
+		renderPrefCount.tick();
+		shipPrefCount.tick();
+		physicsPrefCount.tick();
 		Gdx.gl.glClearColor(.1f, .1f, .5f, 1f);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		dt = Gdx.graphics.getDeltaTime();
@@ -287,20 +297,21 @@ public class LovePirates extends ApplicationAdapter {
 		/*
 		 * render land
 		 */
+		float drawSize = (float) TILESIZEPLUSS / (float) TILESIZE;
 		for (int i 		= (int)((playerPos.x)-(width/20)); 	   	i < ((int) (playerPos.x) + (width/20)); i++){
 			for (int j 	= (int)((playerPos.y)-(height/20)); 	j < ((int) (playerPos.y) + (height/20)); j++){
 				if (i<0 || i>=map.length || j<0 || j>=map[0].length){
-					batch.draw(dsea,i,j, 1, 1);
+					batch.draw(dsea,i,j, drawSize, drawSize);
 				} else if (map[i][j] > SEALEVEL+BGRASSWIDTH) {
-					batch.draw(land,i,j, 1, 1);
+					batch.draw(land,i,j, drawSize, drawSize);
 				} else if (map[i][j] > SEALEVEL+YGRASSWIDTH){
-					batch.draw(bgrass, i, j, 1, 1);
+					batch.draw(bgrass, i, j, drawSize, drawSize);
 				} else if (map[i][j] > SEALEVEL+GRASSWIDTH){
-					batch.draw(ygrass, i, j, 1, 1);
+					batch.draw(ygrass, i, j, drawSize, drawSize);
 				} else if (map[i][j] > SEALEVEL+SANDWIDTH){
-					batch.draw(grass, i, j, 1, 1);
+					batch.draw(grass, i, j, drawSize, drawSize);
 				} else if (map[i][j] > SEALEVEL){
-					batch.draw(sand, i, j, 1, 1);
+					batch.draw(sand, i, j, drawSize, drawSize);
 				} else {
 					float height = (float) map[i][j];
 					float darkness = (float) Math.max(Math.min(1.5*Math.pow(height,2), 1),.2);
@@ -309,7 +320,8 @@ public class LovePirates extends ApplicationAdapter {
 					seaTintColor.b = darkness; 
 					seaTintColor.a = 1;
 					batch.setColor(seaTintColor);
-					batch.draw(lsea, i, j, 1, 1);
+					batch.draw(lsea, i, j, drawSize, drawSize);
+					
 					batch.setColor(Color.WHITE.tmp());
 				}
 			}
@@ -333,13 +345,15 @@ public class LovePirates extends ApplicationAdapter {
 				} else if (l.id == 30) {
 					batch.draw(textureRegions[11], i, j, 1, 1);
 				} else if (l.id == 31) {
-					batch.draw(textureRegions[11], i, j, 1, 1);
+					batch.draw(textureRegions[12], i, j, 1, 1);
+				} else if (l.id == 32) {
+					batch.draw(textureRegions[13], i, j, 1, 1);
 				}
 			}
 		}
 		
-		renderPrefCount.stop();
-		shipPrefCount.start();
+		
+		
 		TextureRegion t;
 		
 		
@@ -357,6 +371,7 @@ public class LovePirates extends ApplicationAdapter {
 					   size[0],size[1],
 					   1f,1f,debrieRot,true);
 		}
+		renderPrefCount.stop();
 		
 		for (Debries debrie : debries) {
 			if (debrie.alive == false) {
@@ -366,18 +381,12 @@ public class LovePirates extends ApplicationAdapter {
 		}
 		debries.removeAll(debriesRemovalSet);
 		
-		while (ships.size()<numShips) {
-			Ship aiShip;
-			if (rand.nextFloat() < .9) {
-				aiShip= basicShipGen.genShip(lvl);
-			} else {
-				aiShip = bossShipGen.genShip(lvl);
-			}
-			ships.add(aiShip);
-		}
+		shipPrefCount.start();
+		
 		/*
 		 * draw and tick ships
 		 */
+		
 		for (Ship ship : ships){
 			ship.tick();
 			x = ship.getPos().x;
@@ -393,85 +402,97 @@ public class LovePirates extends ApplicationAdapter {
 					   size[0],size[1],
 					   1f,1f,shipRotation,true);
 		}
-		
-		for (Ship ship : ships){
-			if (ship.alive == false) {
-				if (ship.isWreck()) {
-					shipRemovalSet.add(ship);
-					if (ship == LovePirates.playerShip) {
-						makeNewWorld();
-					}
-					ship.delete();
+		if (!paused) {
+			while (ships.size()<numShips) {
+				Ship aiShip;
+				if (rand.nextFloat() < .9) {
+					aiShip= basicShipGen.genShip(lvl);
 				} else {
-					ship.alive = true;
-					ship.setHp(ship.getMaxHp()/7.5f);
-					ship.setWreck();
+					aiShip = bossShipGen.genShip(lvl);
+				}
+				ships.add(aiShip);
+			}
+			for (Ship ship : ships){
+				if (ship.alive == false) {
+					if (ship.isWreck()) {
+						shipRemovalSet.add(ship);
+						if (ship == LovePirates.playerShip) {
+							makeNewWorld();
+						}
+						ship.delete();
+					} else {
+						ship.alive = true;
+						ship.setHp(ship.getMaxHp()/7.5f);
+						ship.setWreck();
+					}
 				}
 			}
+			for (Ship s:shipRemovalSet) {
+				world.destroyBody(s.getBody());
+			}
+			ships.removeAll(shipRemovalSet);
+			shipRemovalSet.clear();
+			
+			
+			
+			
+			MyUtils.renderText(batch);
+			
+			//if (DEBUGPRINTOUT) {
+			//	MyUtils.DrawText("Player Alive = " + playerShip.alive, true, new Vector2(10,10), 0);
+			//	MyUtils.DrawText("Player wrecked = " + playerShip.isWreck(), true, new Vector2(10,11), 0);
+			//	MyUtils.DrawText("Player controller = " + playerShip.controller, true, new Vector2(10,12), 0);
+			//}
+	
+			
+			for (Vector2 debugLoc : debugObjects) {
+				batch.draw(debug,debugLoc.x, debugLoc.y,.2f,.2f);
+			}
+			debugObjects.clear();
+			for (Projectile proj : projectiles){
+				proj.tick();
+				x = proj.getPos().x;
+				y = proj.getPos().y;
+				t = textureRegions[proj.getSpriteIndex()];
+				float[] size = proj.getSize();
+				batch.draw(t,x,y,
+						   t.getRegionWidth()/2, t.getRegionHeight()/2, 
+						   size[0],size[1],
+						   1f,1f,0,true);
+			}
+	
+			Ui.draw(batch);
+			
+			
+			
+			
+			
+			for (Projectile proj : projectiles){
+				if (proj.dead == true) {
+					projRemovalSet.add(proj);
+					proj.delete();
+				}
+			}
+			
+			projectiles.removeAll(projRemovalSet);
+			projRemovalSet.clear();
+			
+			shipPrefCount.stop();
+			
+			physicsPrefCount.start();
+			world.step(1/60f, 6, 4);
+			physicsPrefCount.stop();
 		}
-		for (Ship s:shipRemovalSet) {
-			world.destroyBody(s.getBody());
-		}
-		ships.removeAll(shipRemovalSet);
-		shipRemovalSet.clear();
-		
-		
-		
-		
-		MyUtils.renderText(batch);
-		
-		//if (DEBUGPRINTOUT) {
-		//	MyUtils.DrawText("Player Alive = " + playerShip.alive, true, new Vector2(10,10), 0);
-		//	MyUtils.DrawText("Player wrecked = " + playerShip.isWreck(), true, new Vector2(10,11), 0);
-		//	MyUtils.DrawText("Player controller = " + playerShip.controller, true, new Vector2(10,12), 0);
-		//}
-
-		
-		for (Vector2 debugLoc : debugObjects) {
-			batch.draw(debug,debugLoc.x, debugLoc.y,.2f,.2f);
-		}
-		debugObjects.clear();
-		for (Projectile proj : projectiles){
-			proj.tick();
-			x = proj.getPos().x;
-			y = proj.getPos().y;
-			t = textureRegions[proj.getSpriteIndex()];
-			float[] size = proj.getSize();
-			batch.draw(t,x,y,
-					   t.getRegionWidth()/2, t.getRegionHeight()/2, 
-					   size[0],size[1],
-					   1f,1f,0,true);
-		}
-
-		Ui.draw(batch);
-		
-		
-		
 		batch.end();
 		stage.draw();
-		for (Projectile proj : projectiles){
-			if (proj.dead == true) {
-				projRemovalSet.add(proj);
-				proj.delete();
+		if (stage.keysPressedThisFrame.contains(Input.Keys.ESCAPE)) {
+			if (!paused) {
+				MainMenuOverlay.makeMainMenu();
+			} else {
+				MainMenuOverlay.kill();
 			}
 		}
-		
-		projectiles.removeAll(projRemovalSet);
-		projRemovalSet.clear();
-		
-		shipPrefCount.stop();
-		
-		physicsPrefCount.start();
-		
-		
-		world.step(1/60f, 6, 4);
-		physicsPrefCount.stop();
-		
-		
-		if (stage.keysDown.contains(Input.Keys.ESCAPE)) {
-			Gdx.app.exit();
-		}
-		
+		stage.tick();
 		//this debug renderer seems to be very heavy
 		//debugRenderer.render(world, camera.combined);
 		totalPrefCount.stop();
@@ -500,9 +521,9 @@ public class LovePirates extends ApplicationAdapter {
 	
 	static void makeNewWorld() {
 		//restart
+		System.out.println("makeNewWorld called");
 		genWorld(1);
-		playerShip = basicShipGen.genShip(2,0,0);
-		playerShip.setPos(100, 400);
+		playerShip = basicShipGen.genShip(2,300,300);
 		playerShip.setControler(new PlayerController());
 		while (map[(int) playerShip.getPos().x][(int) playerShip.getPos().y]>SEALEVEL) {
 			playerShip.setPos((int) playerShip.getPos().x+10, (int) playerShip.getPos().y);

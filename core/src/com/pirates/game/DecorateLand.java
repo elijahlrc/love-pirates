@@ -42,8 +42,8 @@ public class DecorateLand {
 		for (int i = 0; i<3000; i++) {
 			makeForest(map,decorationMap,80,1,rand.nextInt(arrayWidth),rand.nextInt(arrayHeight));
 		}
-		for (int i = 0; i<3000; i++) {
-			makeSeaweed(map,decorationMap,(int) Math.abs(helperGauss(20, 10)),1,rand.nextInt(arrayWidth),rand.nextInt(arrayHeight));
+		for (int i = 0; i<8000; i++) {
+			makeSeaweed(map,decorationMap,(int) Math.abs(helperGauss(30, 10)),1,rand.nextInt(arrayWidth),rand.nextInt(arrayHeight));
 		}
 		return decorationMap;
 	}
@@ -87,7 +87,7 @@ public class DecorateLand {
 		}
 	}
 	void makeSeaweed(double[][] map, LandDecoration[][] decorationMap, int size, float density, int xCenter, int yCenter) {
-		float positionDelta = (float) Math.sqrt(size)/2;
+		float positionDelta = (float) Math.sqrt(size)/4;
 		arrayWidth = map.length;
 		arrayHeight = map[0].length;
 		int xPos;
@@ -97,14 +97,17 @@ public class DecorateLand {
 			float yOffset = helperGauss(0,.5f);
 			xPos = Math.min(arrayWidth-1, Math.max(0,(int) helperGauss(xCenter,positionDelta)));
 			yPos = Math.min(arrayWidth-1, Math.max(0,(int) helperGauss(yCenter,positionDelta)));
-			if(!(decorationMap[xPos][yPos] == null || decorationMap[xPos][yPos].id == 30) || map[xPos][yPos] <= SEALEVEL - .2f || map[xPos][yPos] >= SEALEVEL && rand.nextFloat()<density) {//if a decoration allready placed here skip
+			if(!(decorationMap[xPos][yPos] == null || decorationMap[xPos][yPos].id == 30 || decorationMap[xPos][yPos].id == 31) || map[xPos][yPos] <= SEALEVEL - .2f || map[xPos][yPos] >= SEALEVEL && rand.nextFloat()<density) {//if a decoration allready placed here skip
 				continue;
 			}
-			if (decorationMap[xPos][yPos] != null && decorationMap[xPos][yPos].id == 30) {
-				decorationMap[xPos][yPos] = new LandDecoration(31,xOffset, yOffset);;
-			} else {
-				decorationMap[xPos][yPos] = new LandDecoration(30,xOffset, yOffset);;
+			if (decorationMap[xPos][yPos] == null) {
+				decorationMap[xPos][yPos] = new LandDecoration(30,xOffset, yOffset);
+			} else if (decorationMap[xPos][yPos].id == 31) {
+				decorationMap[xPos][yPos] = new LandDecoration(32, xOffset, yOffset);
+			} else if (decorationMap[xPos][yPos].id == 30) {
+				decorationMap[xPos][yPos] = new LandDecoration(31, xOffset, yOffset);
 			}
+
 		}
 	}
 	

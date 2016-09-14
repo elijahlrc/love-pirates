@@ -22,7 +22,7 @@ class BasicShipGen extends ShipGen{
 		int buckshotcannons = 0;
 		float turnRate = (float) (Math.abs(helperGauss(1.75f,.3f)));
 		
-		float meanLen = (float) Math.max(2, (2*Math.log(level)+2));
+		float meanLen = (float) Math.max(2, (3*Math.log(level)+1));
 		float sdLen = meanLen*.25f;
 		float length = (float) Math.max(1.5f, helperGauss(meanLen,sdLen));
 		
