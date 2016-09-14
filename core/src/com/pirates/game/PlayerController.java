@@ -1,9 +1,7 @@
 package com.pirates.game;
 
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.math.Vector;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.ui.Table.Debug;
 
 import java.util.ArrayList;
 class PlayerController implements Controller {
