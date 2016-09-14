@@ -278,7 +278,7 @@ public class LovePirates extends ApplicationAdapter {
 		
 		renderPrefCount.tick();
 		shipPrefCount.tick();
-		physicsPrefCount.tick();
+		
 		Gdx.gl.glClearColor(.1f, .1f, .5f, 1f);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		dt = Gdx.graphics.getDeltaTime();
@@ -292,6 +292,7 @@ public class LovePirates extends ApplicationAdapter {
 		float x;
 		float y;
 		Vector2 playerPos = playerShip.getPos();
+		
 		renderPrefCount.start();
 
 		/*
@@ -477,12 +478,13 @@ public class LovePirates extends ApplicationAdapter {
 			projectiles.removeAll(projRemovalSet);
 			projRemovalSet.clear();
 			
-			shipPrefCount.stop();
 			
+			physicsPrefCount.tick();
 			physicsPrefCount.start();
 			world.step(1/60f, 6, 4);
 			physicsPrefCount.stop();
 		}
+		shipPrefCount.stop();
 		batch.end();
 		stage.draw();
 		if (stage.keysPressedThisFrame.contains(Input.Keys.ESCAPE)) {
