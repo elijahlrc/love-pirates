@@ -50,7 +50,7 @@ public class LovePirates extends ApplicationAdapter {
 	static float BGRASSWIDTH = .10f;
 	static LandDecoration[][] decorationMap;
 
-	static boolean DEBUGPRINTOUT = false;
+	static boolean DEBUGPRINTOUT = true;
 	static TextureRegion land;
 	static TextureRegion sea;
 	static TextureRegion grass;
@@ -269,7 +269,11 @@ public class LovePirates extends ApplicationAdapter {
 
 	@Override
 	public void render() {
-		
+
+		if (stage.keysPressedThisFrame.contains(Input.Keys.ENTER)) {
+            DEBUGPRINTOUT = !DEBUGPRINTOUT;
+        }
+
 		
 		totalPrefCount.tick();
 		

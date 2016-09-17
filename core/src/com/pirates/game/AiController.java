@@ -125,8 +125,11 @@ public class AiController implements Controller {
 		//causes the ships to fire in front of you, but not too far in front. lower number means farther in front.
 		Vector2 predictedVecToTarget = vecToTarget.cpy();
 		predictedVecToTarget.add(targetVel.setLength(targetVel.len()*travelTime));
-		//LovePirates.debugObjects.add(owner.getPos().add(vecToTarget));
-		//LovePirates.debugObjects.add(owner.getPos().add(predictedVecToTarget));
+
+		if (LovePirates.DEBUGPRINTOUT) {
+			LovePirates.debugObjects.add(owner.getPos().add(vecToTarget));
+			LovePirates.debugObjects.add(owner.getPos().add(predictedVecToTarget));
+		}
 		
 		//now get ether left or right side to face target:
 		targetDeltaAngle = predictedVecToTarget.angleRad(ownerAngle);
