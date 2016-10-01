@@ -20,6 +20,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.PerformanceCounter;
+import com.badlogic.gdx.utils.viewport.Viewport;
 /*
  * getPower() and getTurn() get called by ships to see what they should do
  */
@@ -32,6 +33,7 @@ public class LovePirates extends ApplicationAdapter {
 	static HashSet<Ship> ships;
 	static HashSet<Debries> debries;
 	static OrthographicCamera camera;
+	static Viewport viewport;
 	static Ship playerShip;
 	static int width;
 	static int height;
@@ -166,9 +168,12 @@ public class LovePirates extends ApplicationAdapter {
 		UI_POS1 = new Vector2(width/(TILESIZE*4f)-10,0.5f);
 		UI_POS2 = new Vector2(width/(TILESIZE*4f)-10,-.5f);
 		rand = new Random();
-
-		camera = new OrthographicCamera(width/TILESIZE*cameraScalingFactor, height/TILESIZE*cameraScalingFactor);
-
+		float vWidth = width/TILESIZE*cameraScalingFactor;
+		float vHeight =height/TILESIZE*cameraScalingFactor;
+		camera = new OrthographicCamera(vWidth,vHeight);
+		//stage handles input and  is used to draw UI
+		stage = new CStage(width, height, camera);
+		Gdx.input.setInputProcessor(stage);
 		//box2d
 		Box2D.init();
 				//map gen init
@@ -229,9 +234,6 @@ public class LovePirates extends ApplicationAdapter {
 		lsea =  new TextureRegion(tiles,2*TILESIZEPLUSS+1,2*TILESIZEPLUSS,TILESIZEPLUSS,TILESIZEPLUSS);
 		sand =  new TextureRegion(tiles,0,TILESIZEPLUSS-1,TILESIZEPLUSS,TILESIZEPLUSS);
 		
-        //stage handles input and is used to draw UI
-		stage = new CStage();
-        Gdx.input.setInputProcessor(stage);
         ui = new Ui(skin, stage);
         FileHandle skinfile = Gdx.files.internal("uiskin.json");
 		skin = new Skin(skinfile);
@@ -434,11 +436,6 @@ public class LovePirates extends ApplicationAdapter {
 			ships.removeAll(shipRemovalSet);
 			shipRemovalSet.clear();
 			
-			
-			
-			
-			MyUtils.renderText(batch);
-			
 			//if (DEBUGPRINTOUT) {
 			//	MyUtils.DrawText("Player Alive = " + playerShip.alive, true, new Vector2(10,10), 0);
 			//	MyUtils.DrawText("Player wrecked = " + playerShip.isWreck(), true, new Vector2(10,11), 0);
@@ -484,8 +481,11 @@ public class LovePirates extends ApplicationAdapter {
 			world.step(1/60f, 6, 4);
 			physicsPerfCount.stop();
 		}
+		MyUtils.renderText(batch);
+		
 		shipPerfCount.stop();
 		batch.end();
+		stage.act();
 		stage.draw();
 		if (stage.keysPressedThisFrame.contains(Input.Keys.ESCAPE)) {
 			if (!paused) {
@@ -532,6 +532,14 @@ public class LovePirates extends ApplicationAdapter {
 		}
 		ships.add(playerShip);
 	}
-
+	
+	@Override
+	public void resize(int width, int height) {
+		float vWidth = width/TILESIZE*cameraScalingFactor;
+		float vHeight =height/TILESIZE*cameraScalingFactor;
+	    camera.setToOrtho(false, vWidth, vHeight);
+	    camera.update();
+	    stage.getViewport().setScreenSize(width, height); // update the size of ViewPort
+	}
 	
 }

@@ -8,9 +8,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 public class LootScreen {
 	private static Skin skin;
 	static CStage stage;
-	static final int width = 200;
-	static final int height = 20;
-	static final int offset = (int) (width/1.5);
+	static final int WIDTH = 200;
+	static final int HEIGHT = 20;
+	static final int OFFSET = (int) (WIDTH/1.5);
 	static TextButton crewb;
 	static TextButton cargob;
 	static TextButton weaponb;
@@ -37,17 +37,16 @@ public class LootScreen {
 		tries = 1;
 		float xCenterPos = (targetShip.getPos().x-LovePirates.playerShip.getPos().x)*
 				LovePirates.TILESIZE+LovePirates.width/2;
-		float yCenterPos = (targetShip.getPos().y-LovePirates.playerShip.getPos().y)*
-				LovePirates.TILESIZE+LovePirates.height/2;
-		crewb = new TextButton("Conscript enemy crew", skin, "default");
-		cargob = new TextButton("Loot cargo", skin, "default");
-		weaponb = new TextButton("Try to steal enemy cannons", skin, "default");
-		tresureb = new TextButton("Just take the treasure", skin, "default");
-		captureb = new TextButton("Capture the ship!!!!", skin, "default");
+		float yCenterPos = (targetShip.getPos().y-LovePirates.playerShip.getPos().y)*LovePirates.TILESIZE + LovePirates.height/2;
+		crewb = new TextButton("Conscript enemy crew", skin);
+		cargob = new TextButton("Loot cargo", skin);
+		weaponb = new TextButton("Try to steal enemy cannons", skin);
+		tresureb = new TextButton("Just take the treasure", skin);
+		captureb = new TextButton("Capture the ship!!!!", skin);
 
-	    crewb.setWidth(width);
-	    crewb.setHeight(height);
-	    crewb.setPosition(xCenterPos+offset,yCenterPos+offset);
+	    crewb.setWidth(WIDTH);
+	    crewb.setHeight(HEIGHT);
+	    crewb.setPosition(xCenterPos+OFFSET,yCenterPos+OFFSET);
 	    crewb.addListener(new ClickListener(){
 	        @Override 
 	        public void clicked(InputEvent event, float x, float y){
@@ -57,9 +56,9 @@ public class LootScreen {
 	        }
 	    });
 	    	    
-	    cargob.setWidth(width);
-	    cargob.setHeight(height);
-	    cargob.setPosition(xCenterPos-offset,yCenterPos+offset);
+	    cargob.setWidth(WIDTH);
+	    cargob.setHeight(HEIGHT);
+	    cargob.setPosition(xCenterPos-OFFSET,yCenterPos+OFFSET);
 	    
 	    cargob.addListener(new ClickListener(){
 	        @Override 
@@ -69,9 +68,9 @@ public class LootScreen {
 	        }
 	    });
 	    
-	    weaponb.setWidth(width);
-	    weaponb.setHeight(height);
-	    weaponb.setPosition(xCenterPos+offset,yCenterPos-offset);
+	    weaponb.setWidth(WIDTH);
+	    weaponb.setHeight(HEIGHT);
+	    weaponb.setPosition(xCenterPos+OFFSET,yCenterPos-OFFSET);
 	    
 	    weaponb.addListener(new ClickListener(){
 	        @Override 
@@ -81,9 +80,9 @@ public class LootScreen {
 	        }
 	    });
 	    
-	    tresureb.setWidth(width);
-	    tresureb.setHeight(height);
-	    tresureb.setPosition(xCenterPos-offset,yCenterPos-offset);
+	    tresureb.setWidth(WIDTH);
+	    tresureb.setHeight(HEIGHT);
+	    tresureb.setPosition(xCenterPos-OFFSET,yCenterPos-OFFSET);
 	    
 	    tresureb.addListener(new ClickListener(){
 	        @Override 
@@ -93,9 +92,9 @@ public class LootScreen {
 	        }
 	    });
 	    
-	    captureb.setWidth(width);
-	    captureb.setHeight(height);
-	    captureb.setPosition(xCenterPos,yCenterPos+offset*1.5f);
+	    captureb.setWidth(WIDTH);
+	    captureb.setHeight(HEIGHT);
+	    captureb.setPosition(xCenterPos,yCenterPos+OFFSET*1.5f);
 	    
 	    captureb.addListener(new ClickListener(){
 	        @Override 

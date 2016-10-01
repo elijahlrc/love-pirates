@@ -2,8 +2,12 @@ package com.pirates.game;
 
 import java.util.HashSet;
 
+import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.utils.Scaling;
+import com.badlogic.gdx.utils.viewport.ScalingViewport;
 
 public class CStage extends Stage {
 	HashSet<Integer> keysDown;
@@ -11,7 +15,10 @@ public class CStage extends Stage {
 	public static Vector2 mousePosition = new Vector2(0, 0); // XY position of mouse
 	public static boolean isClicking = false;				 // is mouse being clicked?
 	
-	public CStage() {
+	public CStage(float width, float height, Camera camera) {
+		//setViewport(LovePirates.viewport);
+		super(new ScalingViewport(Scaling.stretch, width, height, new OrthographicCamera()));
+		
 		keysDown = new HashSet<Integer>();
 		keysPressedThisFrame = new HashSet<Integer>();
 	}
