@@ -3,7 +3,7 @@ package com.pirates.game;
 public class BossShipGen extends ShipGen {
 
 	public BossShipGen() {
-		// TODO Auto-generated constructor stub
+		super("boss_ship_data.txt");
 	}
 	Ship genShip(int level) {
 		int mapSize = LovePirates.MAPSIZE;

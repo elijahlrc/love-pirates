@@ -44,7 +44,7 @@ public class LovePirates extends ApplicationAdapter {
 	static float BGRASSWIDTH = .10f;
 	static LandDecoration[][] decorationMap;
 
-	static boolean DEBUGPRINTOUT = true;
+	static boolean DEBUGPRINTOUT = false;
 	static TextureRegion land;
 	static TextureRegion sea;
 	static TextureRegion grass;
@@ -63,11 +63,11 @@ public class LovePirates extends ApplicationAdapter {
 	static ColliderPool colliderPool;
 	static Box2DDebugRenderer debugRenderer;
 	static Random rand;
-	//these are used to keep track of preformance.
-	static PerformanceCounter totalPrefCount;
-	static PerformanceCounter renderPrefCount;
-	static PerformanceCounter shipPrefCount;
-	static PerformanceCounter physicsPrefCount;
+	//these are used to keep track of Performance.
+	static PerformanceCounter totalPerfCount;
+	static PerformanceCounter renderPerfCount;
+	static PerformanceCounter shipPerfCount;
+	static PerformanceCounter physicsPerfCount;
 	//some collision filters:
 	final static short LAND_MASK = 0x0001; 
 	final static short SHIP_MASK = 0x0002;
@@ -96,8 +96,8 @@ public class LovePirates extends ApplicationAdapter {
 
 	//Ship factories
 	//called like basicShipGen.genShip(level);
-	static ShipGen basicShipGen = new BasicShipGen();
-	static ShipGen bossShipGen = new BossShipGen();
+	static ShipGen basicShipGen;
+	static ShipGen bossShipGen;
 	static Vector2 UI_POS1;
 	static Vector2 UI_POS2;
 
@@ -110,10 +110,10 @@ public class LovePirates extends ApplicationAdapter {
 	static void genWorld(int level) {
 
 		lvl = level;
-		shipPrefCount = new PerformanceCounter("ship");
-		renderPrefCount = new PerformanceCounter("render");
-		physicsPrefCount = new PerformanceCounter("physics");
-		totalPrefCount = new PerformanceCounter("total");
+		shipPerfCount = new PerformanceCounter("ship");
+		renderPerfCount = new PerformanceCounter("render");
+		physicsPerfCount = new PerformanceCounter("physics");
+		totalPerfCount = new PerformanceCounter("total");
 		debugObjects = new HashSet<Vector2>();
 		debugShapeRenderer = new ShapeRenderer();
 		
@@ -173,6 +173,9 @@ public class LovePirates extends ApplicationAdapter {
 		Box2D.init();
 				//map gen init
 		noiseGen =  PerlinNoiseGen.init();
+
+		basicShipGen = new BasicShipGen();
+		bossShipGen = new BossShipGen();
 		
 		//list of blitable images
 		textureRegions = new TextureRegion[99];
@@ -268,13 +271,13 @@ public class LovePirates extends ApplicationAdapter {
         }
 
 		
-		totalPrefCount.tick();
+		totalPerfCount.tick();
 		
-		totalPrefCount.start();
+		totalPerfCount.start();
 		
 		
-		renderPrefCount.tick();
-		shipPrefCount.tick();
+		renderPerfCount.tick();
+		shipPerfCount.tick();
 		
 		Gdx.gl.glClearColor(.1f, .1f, .5f, 1f);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -290,7 +293,7 @@ public class LovePirates extends ApplicationAdapter {
 		float y;
 		Vector2 playerPos = playerShip.getPos();
 		
-		renderPrefCount.start();
+		renderPerfCount.start();
 
 		/*
 		 * render land
@@ -369,7 +372,7 @@ public class LovePirates extends ApplicationAdapter {
 					   size[0],size[1],
 					   1f,1f,debrieRot,true);
 		}
-		renderPrefCount.stop();
+		renderPerfCount.stop();
 		
 		for (Debries debrie : debries) {
 			if (debrie.alive == false) {
@@ -379,7 +382,7 @@ public class LovePirates extends ApplicationAdapter {
 		}
 		debries.removeAll(debriesRemovalSet);
 		
-		shipPrefCount.start();
+		shipPerfCount.start();
 		
 		/*
 		 * draw and tick ships
@@ -476,12 +479,12 @@ public class LovePirates extends ApplicationAdapter {
 			projRemovalSet.clear();
 			
 			
-			physicsPrefCount.tick();
-			physicsPrefCount.start();
+			physicsPerfCount.tick();
+			physicsPerfCount.start();
 			world.step(1/60f, 6, 4);
-			physicsPrefCount.stop();
+			physicsPerfCount.stop();
 		}
-		shipPrefCount.stop();
+		shipPerfCount.stop();
 		batch.end();
 		stage.draw();
 		if (stage.keysPressedThisFrame.contains(Input.Keys.ESCAPE)) {
@@ -494,25 +497,25 @@ public class LovePirates extends ApplicationAdapter {
 		stage.tick();
 		//this debug renderer seems to be very heavy
 		//debugRenderer.render(world, camera.combined);
-		totalPrefCount.stop();
+		totalPerfCount.stop();
 		MyUtils.renderLines();
 		if (DEBUGPRINTOUT) {
-			if (shipPrefCount.load.latest > .06) {
-				System.out.println(shipPrefCount);
+			if (shipPerfCount.load.latest > .06) {
+				System.out.println(shipPerfCount);
 	
 			}
-			if (renderPrefCount.load.latest > .1) {
-				System.out.println(renderPrefCount);
+			if (renderPerfCount.load.latest > .1) {
+				System.out.println(renderPerfCount);
 	
 			}
-			if (physicsPrefCount.load.latest > .05) {
-				System.out.println(physicsPrefCount);
+			if (physicsPerfCount.load.latest > .05) {
+				System.out.println(physicsPerfCount);
 	
 			}
-			if (totalPrefCount.time.latest > .00833) {
-				float fps = 1/totalPrefCount.time.latest;
+			if (totalPerfCount.time.latest > .00833) {
+				float fps = 1/totalPerfCount.time.latest;
 				System.out.println("FPS = " + fps);
-				System.out.println(totalPrefCount);
+				System.out.println(totalPerfCount);
 	
 			}
 		}

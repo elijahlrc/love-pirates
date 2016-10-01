@@ -1,0 +1,7 @@
+turnRateMean 1.75
+turnRateSd .3
+
+lenMin 2
+lenMult 3
+lenAdd 1
+lenSdFrac .25
