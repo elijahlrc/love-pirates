@@ -78,6 +78,7 @@ public class MainMenuOverlay {
 	public static void kill() {
 		stage.clear();
 		LovePirates.paused = false;
+		LovePirates.world.clearForces();
 		
 	}
 	
