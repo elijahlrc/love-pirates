@@ -1,0 +1,12 @@
+# turn rate parameters:
+turnRateMean 1.75
+turnRateSd .3
+
+# length parameters
+# meanLength = lenMult * log(level) + lenAdd
+# length std dev = meanLength * .lenSdFrac 
+lenMin 2
+lenMult 3 
+lenAdd 1  
+lenSdFrac .25 
+

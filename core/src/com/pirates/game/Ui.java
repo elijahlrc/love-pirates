@@ -79,7 +79,7 @@ public class Ui {
 			int index = ship.getSpriteIndex();
 			float[] size = ship.getSize();
 			t = LovePirates.textureRegions[index];
-			float shipRotation = (float) (shipRotationR * 360/(2*Math.PI));
+			float shipRotation = (float) (shipRotationR * 180/(Math.PI));
 			b.draw(t,x-size[0]/2,y-size[1]/2,
 					   size[0]/2,size[1]/2,
 					   size[0],size[1],

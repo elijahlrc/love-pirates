@@ -44,7 +44,7 @@ public class LovePirates extends ApplicationAdapter {
 	static float BGRASSWIDTH = .10f;
 	static LandDecoration[][] decorationMap;
 
-	static boolean DEBUGPRINTOUT = true;
+	static boolean DEBUGPRINTOUT = false;
 	static TextureRegion land;
 	static TextureRegion sea;
 	static TextureRegion grass;
@@ -96,8 +96,8 @@ public class LovePirates extends ApplicationAdapter {
 
 	//Ship factories
 	//called like basicShipGen.genShip(level);
-	static ShipGen basicShipGen = new BasicShipGen();
-	static ShipGen bossShipGen = new BossShipGen();
+	static ShipGen basicShipGen;
+	static ShipGen bossShipGen;
 	static Vector2 UI_POS1;
 	static Vector2 UI_POS2;
 
@@ -174,6 +174,9 @@ public class LovePirates extends ApplicationAdapter {
 		Box2D.init();
 				//map gen init
 		noiseGen =  PerlinNoiseGen.init();
+
+		basicShipGen = new BasicShipGen();
+		bossShipGen = new BossShipGen();
 		
 		//list of blitable images
 		textureRegions = new TextureRegion[99];
