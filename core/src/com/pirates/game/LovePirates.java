@@ -138,7 +138,6 @@ public class LovePirates extends ApplicationAdapter {
 		map = noiseGen.getFullPerlinArray(MAPDEGREE);
 		mapTexture = MyUtils.visuliseArray(map, false);
 		//save map
-		MyUtils.visuliseArray(map,false);
 		for (int i = 0; i<70; i++) {
 			debries.add(TresureChestGen.genChest(map));
 		}
@@ -523,7 +522,7 @@ public class LovePirates extends ApplicationAdapter {
 		//restart
 		System.out.println("makeNewWorld called");
 		genWorld(1);
-		playerShip = basicShipGen.genShip(2,300,300);
+		playerShip = basicShipGen.genShip(4,300,300);
 		playerShip.setControler(new PlayerController());
 		while (map[(int) playerShip.getPos().x][(int) playerShip.getPos().y]>SEALEVEL) {
 			playerShip.setPos((int) playerShip.getPos().x+10, (int) playerShip.getPos().y);
