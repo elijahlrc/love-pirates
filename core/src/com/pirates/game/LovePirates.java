@@ -525,7 +525,8 @@ public class LovePirates extends ApplicationAdapter {
 		//restart
 		System.out.println("makeNewWorld called");
 		genWorld(1);
-		playerShip = basicShipGen.genShip(4,300,300);
+
+		playerShip = basicShipGen.genShip(5,300,300);
 		playerShip.setControler(new PlayerController());
 		while (map[(int) playerShip.getPos().x][(int) playerShip.getPos().y]>SEALEVEL) {
 			playerShip.setPos((int) playerShip.getPos().x+10, (int) playerShip.getPos().y);
