@@ -568,9 +568,7 @@ public class Ship extends DrawableObj implements Collideable, Target{
 		s.addCrew(sailors,"sailors");
 		s.setControler(this.controller);
 		
-		s.alive = true;
-		this.setWreck();
-		
+		s.alive = true;		
 		s.hp = (float) Math.ceil(s.maxhp/10);
 		s.repairSupplies += repairSupplies;
 		s.gold = gold;
@@ -578,9 +576,7 @@ public class Ship extends DrawableObj implements Collideable, Target{
 		s.setSpriteSize(s.length, s.width);
 		s.isWreck = false;
 		this.setWreck();
-		if (this == LovePirates.playerShip) {
-			LovePirates.playerShip = s;
-		}
+		LovePirates.playerShip = s;
 		
 	}
 	float getPower() {
