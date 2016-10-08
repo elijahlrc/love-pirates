@@ -353,7 +353,7 @@ public class Ship extends DrawableObj implements Collideable, Target{
 		} else if (b instanceof Buckshot){
 				Ship owner = ((Buckshot) b).getOwner();
 				if (owner != this) {
-					Float dmg = impulse.getNormalImpulses()[0]*DAMAGEFACTOR/4;
+					Float dmg = impulse.getNormalImpulses()[0]*DAMAGEFACTOR;
 					//MyUtils.DrawText(((Float) (Math.round(dmg*10)/10f)).toString(), false, ((Buckshot) b).getPos(), (int) ((Buckshot) b).lifetime);
 					hp -= dmg;
 					removeCrew((int) Math.max(rand.nextGaussian()*dmg,0),"sailors");

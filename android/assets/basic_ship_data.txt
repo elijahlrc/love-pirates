@@ -1,12 +1,12 @@
 # turn rate parameters:
-turnRateMean 1.75
+turnRateMean 2
 turnRateSd .3
-turnRateMin .75
+turnRateMin 1
 
 lenMeanMin 2
-lenMult 3 
+lenMult 1
 lenAdd 1  
-lenSdFrac .25
+lenSdFrac .2
 lenMin 1.5
 
 sailorMult 2.5
@@ -20,16 +20,16 @@ widthMin .5
 
 drag 1.5
 
-powerMult 0.7
+powerMult 3
 powerSdRatio .3
-powerMin 3
+powerMin 7
 
 hpMult 2
 hpAdd 5
 hpSdRatio .2
 hpMin 2
 
-cannonProb 0.75
+cannonProb 0
 cannonMult 1.5
 cannonAdd -4
 cannonSdRatio .25

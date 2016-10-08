@@ -19,6 +19,18 @@ abstract class ShipGen {
 	static float clampGauss(float mean, float sd, float min) {
 		return (float) Math.max(min, helperGauss(mean, sd));
 	}
+	static int[] partition(int sum, int num, int min) {
+		int[] result = new int[num];
+		for (int i = 0; i < num; ++i) {
+			result[i] = min;
+		}
+		int remaining = sum - (num * min);
+		for (int j = 0; j < remaining; ++j) {
+			int index = rand.nextInt(num);
+			result[index] += 1;
+		}
+		return result;
+	}
 
 	public float v(String variableName) {
 		return variableMap.get(variableName.toLowerCase());

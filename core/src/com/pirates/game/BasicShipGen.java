@@ -1,5 +1,7 @@
 package com.pirates.game;
 
+import java.util.Arrays;
+
 class BasicShipGen extends ShipGen{
 	public BasicShipGen(String dataFile) {
 		super(dataFile);
@@ -25,15 +27,23 @@ class BasicShipGen extends ShipGen{
 
 	@Override
 	Ship genShip(int level,int x,int y) {
+		int[] points = ShipGen.partition(100, 5, 5);
+		int sizePoints = points[0];
+		int turnPoints = points[1];
+		int sailorsPoints = points[2];
+		int powerPoints = points[3];
+		int hpPoints = points[4];
+
 		int cannons = 0;
 		int buckshotcannons = 0;
-		float turnRate = clampGauss(v("turnRateMean"), v("turnRateSd"), v("turnRateMin"));
 		
-		float meanLen = (float) Math.max(v("lenMeanMin"), (v("lenMult")*Math.log(level)+v("lenAdd")));
+		float meanLen = (float) Math.max(v("lenMeanMin"), (v("lenMult")*Math.log(sizePoints)+v("lenAdd")));
 		float sdLen = meanLen*v("lenSdFrac");
 		float length = clampGauss(meanLen, sdLen, v("lenMin"));
 
-		int sailors = (int) Math.abs((length * v("sailorMult") * helperGauss(v("sailorMean"), v("sailorSd"))));
+		float turnRate = (float)Math.log(turnPoints) * clampGauss(v("turnRateMean"), v("turnRateSd"), v("turnRateMin"));
+
+		int sailors = (int) Math.abs((Math.log(sailorsPoints) * v("sailorMult") * helperGauss(v("sailorMean"), v("sailorSd"))));
 		int maxSailors = sailors * (int) v("sailorMaxMult");
 
 		float meanWid = v("widthLengthRatio") * meanLen;
@@ -42,11 +52,11 @@ class BasicShipGen extends ShipGen{
 
 
 		float drag = v("drag"); //constant for now, see if this is useful to change later
-		float meanPower = (float) (Math.log(length) * v("powerMult"));
+		float meanPower = (float) (Math.log(powerPoints) * v("powerMult"));
 		float sdPower = v("powerSdRatio") * meanPower;
 		float power = clampGauss(meanPower, sdPower, v("powerMin"));
 
-		float meanHp = width * length * level * v("hpMult") + v("hpAdd");
+		float meanHp = (float)Math.log(hpPoints) * v("hpMult") + v("hpAdd");
 		float sdHp = v("hpSdRatio") * meanHp;
 		float hp = clampGauss(meanHp,sdHp, v("hpMin"));
 
