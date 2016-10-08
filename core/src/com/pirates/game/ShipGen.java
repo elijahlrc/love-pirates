@@ -16,6 +16,9 @@ abstract class ShipGen {
 	static float helperGauss(float mean,float sd) {
 		return (float) (rand.nextGaussian()*sd-sd+mean);
 	}
+	static float clampGauss(float mean, float sd, float min) {
+		return (float) Math.max(min, helperGauss(mean, sd));
+	}
 
 	public float v(String variableName) {
 		return variableMap.get(variableName.toLowerCase());

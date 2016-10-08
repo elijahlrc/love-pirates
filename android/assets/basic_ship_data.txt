@@ -1,12 +1,49 @@
 # turn rate parameters:
 turnRateMean 1.75
 turnRateSd .3
+turnRateMin .75
 
-# length parameters
-# meanLength = lenMult * log(level) + lenAdd
-# length std dev = meanLength * .lenSdFrac 
-lenMin 2
+lenMeanMin 2
 lenMult 3 
 lenAdd 1  
-lenSdFrac .25 
+lenSdFrac .25
+lenMin 1.5
 
+sailorMult 2.5
+sailorMean 1
+sailorSd 0.3
+sailorMaxMult 2
+
+widthLengthRatio .4
+widthSdRatio 0.1
+widthMin .5
+
+drag 1.5
+
+powerMult 0.7
+powerSdRatio .3
+powerMin 3
+
+hpMult 2
+hpAdd 5
+hpSdRatio .2
+hpMin 2
+
+cannonProb 0.75
+cannonMult 1.5
+cannonAdd -4
+cannonSdRatio .25
+cannonMin 2
+
+buckshotProb 0.25
+buckshotMult 2
+buckshotAdd -4
+buckshotSdRatio .25
+buckshotMin 2
+
+gunnerMultMean 2.5
+gunnerMultSd 1.5
+gunnerMaxRatio .5
+gunnersPerCannon 5
+
+repairSuppliesRatio 0.1

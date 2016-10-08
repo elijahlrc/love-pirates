@@ -1,8 +1,11 @@
 package com.pirates.game;
 
 class BasicShipGen extends ShipGen{
+	public BasicShipGen(String dataFile) {
+		super(dataFile);
+	}
     public BasicShipGen() {
-        super("basic_ship_data.txt");
+        this("basic_ship_data.txt");
     }
 	
 	Ship genShip(int level) {
@@ -24,46 +27,48 @@ class BasicShipGen extends ShipGen{
 	Ship genShip(int level,int x,int y) {
 		int cannons = 0;
 		int buckshotcannons = 0;
-		float turnRate = (float) (Math.abs(helperGauss(v("turnRateMean"), v("turnRateSd"))));
+		float turnRate = clampGauss(v("turnRateMean"), v("turnRateSd"), v("turnRateMin"));
 		
-		float meanLen = (float) Math.max(v("lenMin"), (v("lenMult")*Math.log(level)+v("lenAdd")));
+		float meanLen = (float) Math.max(v("lenMeanMin"), (v("lenMult")*Math.log(level)+v("lenAdd")));
 		float sdLen = meanLen*v("lenSdFrac");
-		float length = (float) Math.max(1.5f, helperGauss(meanLen,sdLen));
+		float length = clampGauss(meanLen, sdLen, v("lenMin"));
 
-        // TODO: change all the magic numbers to v("someName")
+		int sailors = (int) Math.abs((length * v("sailorMult") * helperGauss(v("sailorMean"), v("sailorSd"))));
+		int maxSailors = sailors * (int) v("sailorMaxMult");
 
-		int sailors = (int) Math.abs((length*2.5*helperGauss(1,.3f)));
-		int maxSailors = sailors*2;
-
-		float meanWid = .4f*meanLen;
-		float sdWid = .1f*meanWid;
-		float width = (float) Math.max(.5f, helperGauss(meanWid,sdWid));
+		float meanWid = v("widthLengthRatio") * meanLen;
+		float sdWid = v("widthSdRatio") * meanWid;
+		float width = clampGauss(meanWid, sdWid, v("widthMin"));
 
 
-		float drag = 1.5f;//constant for now, see if this is useful to change later
-		float meanPower = (float) (Math.log(length)*7);
-		float sdPower = .3f*meanPower;
-		float power = (float) Math.max(3f, helperGauss(meanPower,sdPower));
+		float drag = v("drag"); //constant for now, see if this is useful to change later
+		float meanPower = (float) (Math.log(length) * v("powerMult"));
+		float sdPower = v("powerSdRatio") * meanPower;
+		float power = clampGauss(meanPower, sdPower, v("powerMin"));
 
-		float meanHp = width*length*level*2+5;
-		float sdHp = .2f*meanHp;
-		float hp = (float) Math.max(helperGauss(meanHp,sdHp), 2);
-		if (rand.nextFloat()>.25) {
-			float meanCannons = 1.5f*(level+length)-4;
-			float sdCannons = .25f*meanCannons;
-			cannons = (int) Math.max(helperGauss(meanCannons,sdCannons), 2);
+		float meanHp = width * length * level * v("hpMult") + v("hpAdd");
+		float sdHp = v("hpSdRatio") * meanHp;
+		float hp = clampGauss(meanHp,sdHp, v("hpMin"));
+
+		if (rand.nextFloat() > (1 - v("cannonProb"))) {
+			float meanCannons = v("cannonMult") * (level+length) + v("cannonAdd");
+			float sdCannons = v("cannonSdRatio") * meanCannons;
+			cannons = (int) clampGauss(meanCannons, sdCannons, v("cannonMin"));
 		} else {
-			float meanBuckcannons = 2*(level+length)-4;
-			float sdBuckcannons = .25f*meanBuckcannons;
-			buckshotcannons = (int) Math.max(helperGauss(meanBuckcannons,sdBuckcannons), 2);
+			float meanBuckcannons = v("buckshotMult") * (level+length) + v("buckshotAdd");
+			float sdBuckcannons = v("buckshotSdRatio") * meanBuckcannons;
+			buckshotcannons = (int) clampGauss(meanBuckcannons, sdBuckcannons, v("buckshotMin"));
 		}
-		int gunners = (int) Math.max((cannons+buckshotcannons)*helperGauss(2.5f, 1.5f),Math.ceil(buckshotcannons+cannons/2f));
+		int totalCannons = cannons+buckshotcannons;
+		int gunners = (int) Math.max(totalCannons * helperGauss(v("gunnerMultMean"), v("gunnerMultSd")),
+				Math.ceil(totalCannons * v("gunnerMaxRatio")));
 
 		Ship aiShip;
 		aiShip= ShipGenerator.genShip(x,y,turnRate,
-				drag,power,length,width,cannons,buckshotcannons,cannons+buckshotcannons,hp,hp,false, gunners, (cannons+buckshotcannons)*5, sailors, maxSailors);
+				drag,power,length,width,cannons,buckshotcannons,totalCannons,hp,hp,false,
+				gunners, totalCannons * (int) v("gunnersPerCannon"), sailors, maxSailors);
 		aiShip.setControler(new AiController(aiShip));
-		aiShip.getLoot("repair supplies", (int) Math.ceil(hp/10));
+		aiShip.getLoot("repair supplies", (int) Math.ceil(hp * v("repairSuppliesRatio")));
 		return aiShip;
 	}
 }
