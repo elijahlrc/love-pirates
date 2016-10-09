@@ -1,9 +1,12 @@
 package com.pirates.game;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 /* 
@@ -52,10 +55,11 @@ public class MainMenuOverlay {
 		exitButton.setWidth(BUTTON_WIDTH);
 		exitButton.setHeight(BUTTON_HEIGHT);
 		exitButton.setPosition(xCenterPos + XOFFSET, yCenterPos - 3 * OFFSET);
-		exitButton.addListener(new ClickListener() {
+		exitButton.addListener(new ChangeListener() {
 			@Override
-			public void clicked(InputEvent event, float x, float y) {
+			public void changed(ChangeEvent event, Actor actor) {
 				Gdx.app.exit();
+				
 			}
 		});
 		
@@ -67,7 +71,7 @@ public class MainMenuOverlay {
 		optionsBtn.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
-				
+				MyUtils.DrawText(event.getStageX() + " " + event.getStageY(), true, new Vector2(5, 5), 60);
 			}
 		});
 		
