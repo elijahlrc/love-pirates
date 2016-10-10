@@ -31,6 +31,7 @@ public class CSV {
             System.out.println(var + " " + value);
             map.put(var, value);
         }
+        scanner.close();
         return map;
     }
 }
