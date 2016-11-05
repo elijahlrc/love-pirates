@@ -48,6 +48,7 @@ public class Ship extends DrawableObj implements Collideable, Target{
 	private float reloadSpeed;
 	private boolean isWreck;
 	boolean boss;
+	private int level;
 	/**This class is the super for all ships
 	 * All ships have position vector "loc", velocity vector "vel", drag coefficient "dragcoef", and a "maxpower"
 	 * Perhaps the following things should be in some kind of ship data structure/class, 
@@ -76,7 +77,7 @@ public class Ship extends DrawableObj implements Collideable, Target{
 		length = len;
 		spriteWidth = width;
 		spriteLength = length;
-		turnRate = baseTurnRate/4 + baseTurnRate*sailors/(length*10);
+		turnRate = baseTurnRate/4 + baseTurnRate*sailors/(length*width*10);
 		maxPower = maxpower;
 		slots = new Slot[NUM_SLOTS];
 		boss = false;
@@ -518,8 +519,8 @@ public class Ship extends DrawableObj implements Collideable, Target{
 		//DeadShipGen.genShip(this);
 		//old loot style
 		
-		int lootAmount = (int) (2*(length*width));
-		int debriesAmount = lootAmount*3;
+		int lootAmount = (int) (2*(level));
+		int debriesAmount = (int) (2*(length*width));
 		for (int i = 0 ; i <= debriesAmount; i++) {
 			LovePirates.debries.add(new Debries((float) (body.getPosition().x+((Math.random()-.5)*Math.sqrt(i))),(float) (body.getPosition().y+((Math.random()-.5)*Math.sqrt(i))), false));
 		}

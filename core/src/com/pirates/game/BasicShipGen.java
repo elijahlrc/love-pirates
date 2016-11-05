@@ -27,7 +27,7 @@ class BasicShipGen extends ShipGen{
 
 	@Override
 	Ship genShip(int level,int x,int y) {
-		int[] points = ShipGen.partition(100, 5, 5);
+		int[] points = ShipGen.partition(100 + (level * 10), 5, 5);
 		int sizePoints = points[0];
 		int turnPoints = points[1];
 		int sailorsPoints = points[2];

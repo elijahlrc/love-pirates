@@ -15,12 +15,8 @@ public class CSV {
     public static Map<String, Float> readFile(String fileName) {
         FileHandle file = Gdx.files.internal(fileName);
         Scanner scanner;
-        try {
-            scanner = new Scanner(file.file());
-        } catch (java.io.FileNotFoundException e) {
-            System.out.println("Could not load CSV file " + fileName);
-            return null;
-        }
+
+        scanner = new Scanner(file.reader());
 
         HashMap<String, Float> map = new HashMap<String, Float>();
         while (scanner.hasNext()) {
