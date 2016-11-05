@@ -101,7 +101,9 @@ class PlayerController implements Controller {
 	@Override
 	public void tick() {
 		// TODO Auto-generated method stub
-		
+		if (LovePirates.stage.keysPressedThisFrame.contains(Input.Keys.I)) {
+			LovePirates.inventoryUi.OpenInventory();
+		}
 	}
 	@Override
 	public void setProjectileSpeed(float projectileSpeed) {
