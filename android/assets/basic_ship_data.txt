@@ -2,12 +2,14 @@
 turnRateMean 2
 turnRateSd .3
 turnRateMin 1
+turnRateMax 3
 
 lenMeanMin 2
 lenMult 1
 lenAdd 1  
-lenSdFrac .1
+lenSdFrac .2
 lenMin 1.5
+lenMax 4
 
 sailorMult 2.5
 sailorMean 1
@@ -15,8 +17,9 @@ sailorSd 0.3
 sailorMaxMult 2
 
 widthLengthRatio .4
-widthSdRatio 0.05
+widthSdRatio 0.03
 widthMin .5
+widthMax 3
 
 drag 1.5
 
@@ -29,7 +32,7 @@ hpAdd 5
 hpSdRatio .2
 hpMin 2
 
-cannonProb 0
+cannonProb 0.75
 cannonMult 1.5
 cannonAdd -4
 cannonSdRatio .25

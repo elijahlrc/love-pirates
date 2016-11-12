@@ -39,16 +39,16 @@ class BasicShipGen extends ShipGen{
 		
 		float meanLen = (float) Math.max(v("lenMeanMin"), (v("lenMult")*Math.log(sizePoints)+v("lenAdd")));
 		float sdLen = meanLen*v("lenSdFrac");
-		float length = clampGauss(meanLen, sdLen, v("lenMin"));
+		float length = clampGauss(meanLen, sdLen, v("lenMin"), v("lenMax"));
 
-		float turnRate = (float)Math.log(turnPoints) * clampGauss(v("turnRateMean"), v("turnRateSd"), v("turnRateMin"));
+		float turnRate = (float)Math.log(turnPoints) * clampGauss(v("turnRateMean"), v("turnRateSd"), v("turnRateMin"), v("turnRateMax"));
 
 		int sailors = (int) Math.abs((Math.log(sailorsPoints) * v("sailorMult") * helperGauss(v("sailorMean"), v("sailorSd"))));
 		int maxSailors = sailors * (int) v("sailorMaxMult");
 
 		float meanWid = v("widthLengthRatio") * meanLen;
 		float sdWid = v("widthSdRatio") * meanWid;
-		float width = clampGauss(meanWid, sdWid, v("widthMin"));
+		float width = clampGauss(meanWid, sdWid, v("widthMin"), v("widthMax"));
 
 
 		float drag = v("drag"); //constant for now, see if this is useful to change later

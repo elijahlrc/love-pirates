@@ -2,6 +2,8 @@
  * Simple weapon class, extends equipment, implements fire method
  */
 package com.pirates.game;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.math.Vector2;
 import java.util.Random;
 /**
@@ -16,6 +18,7 @@ public class Cannon extends Equipment {
 	private float fireSpeed;
 	private float reloadTime;
 	private static Random rand = new Random();
+	private static Sound sound;
 	public Cannon() {
 		countdown = 0;
 		fireSpeed = 20f;
@@ -29,6 +32,7 @@ public class Cannon extends Equipment {
 	@Override
 	void fire(float dir, Vector2 offset, Ship owner) {
 		if (countdown <= 0) {
+			LovePirates.soundEffects.play("cannon");
 			Vector2 offsetVec = offset.cpy().rotateRad(owner.getDir());
 			Vector2 firepos = owner.getPos().add(offsetVec);
 			Vector2 vel = new Vector2(1,1);

@@ -24,7 +24,7 @@ public class CSV {
             scanner.skip(comment);
             String var = scanner.next(word).toLowerCase();
             float value = scanner.nextFloat();
-            System.out.println(var + " " + value);
+            //System.out.println(var + " " + value);
             map.put(var, value);
         }
         scanner.close();

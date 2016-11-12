@@ -263,7 +263,6 @@ public class Ship extends DrawableObj implements Collideable, Target{
 		forceD.setLength((float) (drag*Math.pow(getVel().len(),1.5)));
 		
 		body.applyForceToCenter(forceD, true);
-		
 	}
 	/**
 	 * Fire method iterates through slots and fires them with the appropriate side;

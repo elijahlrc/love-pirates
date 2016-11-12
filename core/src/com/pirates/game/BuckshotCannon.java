@@ -30,6 +30,7 @@ public class BuckshotCannon extends Equipment {
 	@Override
 	void fire(float dir, Vector2 offset, Ship owner) {
 		if (countdown <= 0) {
+			LovePirates.soundEffects.play("buckshot");
 			Vector2 offsetVec = offset.cpy().rotateRad(owner.getDir());
 			Vector2 firepos = owner.getPos().add(offsetVec);
 			Vector2 vel = new Vector2(1,1);

@@ -1,4 +1,5 @@
 package com.pirates.game;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 
@@ -91,6 +92,7 @@ public class LovePirates extends ApplicationAdapter {
 	static CStage stage;
 	static Ui ui;
 	static DecorateLand mapDecorator = new DecorateLand();
+	static SoundEffects soundEffects;
 	
 	static final int numShips = 75;
 	final static float cameraScalingFactor = .5f;
@@ -102,7 +104,8 @@ public class LovePirates extends ApplicationAdapter {
 	static ShipGen bossShipGen;
 	static Vector2 UI_POS1;
 	static Vector2 UI_POS2;
-	//static InventoryUi inventoryUi;
+	static InventoryUi inventoryUi;
+	public static Music water;
 
 	//static BodyDef bodyDef = new BodyDef();
 	//static FixtureDef fixtureDef = new FixtureDef();
@@ -234,6 +237,18 @@ public class LovePirates extends ApplicationAdapter {
 		dsea =  new TextureRegion(tiles,TILESIZEPLUSS,2*TILESIZEPLUSS,TILESIZEPLUSS,TILESIZEPLUSS);
 		lsea =  new TextureRegion(tiles,2*TILESIZEPLUSS+1,2*TILESIZEPLUSS,TILESIZEPLUSS,TILESIZEPLUSS);
 		sand =  new TextureRegion(tiles,0,TILESIZEPLUSS-1,TILESIZEPLUSS,TILESIZEPLUSS);
+
+		// music and sound fx
+		soundEffects = new SoundEffects(0.6f);
+		Music music = Gdx.audio.newMusic(Gdx.files.internal("waves.ogg"));
+		music.setVolume(0.15f);
+		music.setLooping(true);
+		music.play();
+		water = Gdx.audio.newMusic(Gdx.files.internal("rushing.ogg"));
+		water.setVolume(0.1f);
+		water.setLooping(true);
+		water.play();
+		// TODO: maybe refactor Music stuff into a separate class?
 		
         ui = new Ui(skin, stage);
         FileHandle skinfile = Gdx.files.internal("uiskin.json");
@@ -241,7 +256,7 @@ public class LovePirates extends ApplicationAdapter {
         
         lootScreen = new LootScreen(skin, stage);
         mainMenu = new MainMenuOverlay(skin, stage);        
-        //inventoryUi = new InventoryUi(skin, stage);
+        inventoryUi = new InventoryUi(skin, stage);
         makeNewWorld();
 	
 		batch = new SpriteBatch();
@@ -273,6 +288,10 @@ public class LovePirates extends ApplicationAdapter {
             DEBUGPRINTOUT = !DEBUGPRINTOUT;
         }
 
+        Body playerBody = playerShip.getBody();
+        float volume = 0.04f * Math.abs(playerBody.getAngularVelocity()) + 0.04f * playerBody.getLinearVelocity().len();
+		water.setVolume(Math.min(1.0f, volume));
+		System.out.println(volume);
 		
 		totalPerfCount.tick();
 		
@@ -539,6 +558,8 @@ public class LovePirates extends ApplicationAdapter {
 	public void resize(int width, int height) {
 		float vWidth = width/TILESIZE*cameraScalingFactor;
 		float vHeight =height/TILESIZE*cameraScalingFactor;
+		UI_POS1 = new Vector2(width/(TILESIZE*4f)-10,0.5f);
+		UI_POS2 = new Vector2(width/(TILESIZE*4f)-10,-.5f);
 	    camera.setToOrtho(false, vWidth, vHeight);
 	    camera.update();
 	    stage.getViewport().setScreenSize(width, height); // update the size of ViewPort
