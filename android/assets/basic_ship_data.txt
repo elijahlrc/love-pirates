@@ -6,7 +6,7 @@ turnRateMin 1
 lenMeanMin 2
 lenMult 1
 lenAdd 1  
-lenSdFrac .2
+lenSdFrac .1
 lenMin 1.5
 
 sailorMult 2.5
@@ -15,7 +15,7 @@ sailorSd 0.3
 sailorMaxMult 2
 
 widthLengthRatio .4
-widthSdRatio 0.1
+widthSdRatio 0.05
 widthMin .5
 
 drag 1.5

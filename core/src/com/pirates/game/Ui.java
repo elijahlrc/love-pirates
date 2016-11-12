@@ -24,13 +24,17 @@ public class Ui {
 
 
 	//Draw UI/minimap
-	static void drawMiniMap(Batch b, float x_pos, float y_pos){
+	static void drawMiniMap(Batch b){
 		Vector2 playerPos = LovePirates.playerShip.getPos();
 		float mapSizeInTiles = LovePirates.mapSpriteSize/LovePirates.TILESIZE;
 		int xpos = (int) (LovePirates.width/(LovePirates.TILESIZE*4) - mapSizeInTiles);
-		int ypos = (int) (LovePirates.height/(LovePirates.TILESIZE*4) - mapSizeInTiles +1.2f);
+		int ypos = (int) (LovePirates.height/(LovePirates.TILESIZE*4) - mapSizeInTiles);
+
 		int x_off = (int) (playerPos.x-LovePirates.mapSpriteSize/2);
 		int y_off = (int) (playerPos.y-LovePirates.mapSpriteSize/2);
+		//int x_off = (int) (LovePirates.mapSpriteSize/LovePirates.TILESIZE+LovePirates.width/(LovePirates.TILESIZE*4f));
+		//int y_off = (int)(LovePirates.mapSpriteSize/LovePirates.TILESIZE+LovePirates.height/(LovePirates.TILESIZE*4f));
+
 		b.draw(LovePirates.mapTexture,
 				playerPos.x+xpos,playerPos.y+ypos,
 	            0,0,
@@ -72,6 +76,7 @@ public class Ui {
 		float y_off;
 		c.a = 1f;
 		TextureRegion t;
+
 		float shipRotationR = ship.getDir();
 		if (background) {
 			t = LovePirates.textureRegions[5];
@@ -126,11 +131,7 @@ public class Ui {
 			y_pos = 2-LovePirates.height/(LovePirates.TILESIZE*4);
 			drawShipIcon(batch,x_pos,y_pos,true);
 		}
-		
-		x_pos = LovePirates.mapSpriteSize/LovePirates.TILESIZE+LovePirates.width/(LovePirates.TILESIZE*4f);
-		y_pos = LovePirates.mapSpriteSize/LovePirates.TILESIZE+LovePirates.height/(LovePirates.TILESIZE*4f);
-		
-		drawMiniMap(batch, x_pos, y_pos);
+		drawMiniMap(batch);
 		
 		String ui;
 		ui = String.format("You have %d repair supplies %n" +
