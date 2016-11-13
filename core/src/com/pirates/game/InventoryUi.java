@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -22,8 +23,11 @@ import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop.Payload;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop.Source;
 import com.badlogic.gdx.utils.Scaling;
 
+
 public class InventoryUi {
+
 	private static Color c;
+	
 	static CStage stage;
 	private static Vector2 pos;
 	private Table table;
@@ -52,24 +56,7 @@ public class InventoryUi {
 		scroll.setFadeScrollBars(false);
 		
 
-		/*so this structure is a bit confusing, but here it goes:
-		 * Intended Functionality:
-		 *	 We have a screen called 'table' for the whole inventory UI
-		 *	 within table there are two sections, one displays the ship and its
-		 *	 wepon and other slots, and the other shows an inventory grid.
-		 *	 items can be moved between slots in the grid or on the ship.
-		 * Implementation:
-		 *	 A Table called "table" makes up the inventory screen
-		 *		within this table there are 2 cells, 
-		 *			one for the ship
-		 *				the ship cell currently contains a table called "shipSlotTable" which contains an image of the ship
-		 *			one for the inventory
-		 *	 			The inventory list is a table named "InventoryList" with a ScrollPane 
-		 *				It has an arbitrary number of child elements of type Table representing inventory slots
-		 *					each inventory slot has either 1 or 0 Image elements each of which represents an actual item
-		 *					these inventory slots act as draganddrop sources and targets
-		 *
-		 */
+		
 		for (int i = 0; i < 200; i++) {
 			if (i != 0 && i%5 == 0) {
 				inventoryList.row();
@@ -83,18 +70,8 @@ public class InventoryUi {
 					Payload p = new Payload();
 					System.out.println("Grabbed (and creating payload for): " + ((Table) this.getActor()).getChildren().items[0]);
 					p.setObject(((Table) this.getActor()).getChildren().items[0]);
+					//this.getActor()
 					return p;
-				}
-				@Override
-				public void dragStop(InputEvent event,
-	                     float x,
-	                     float y,
-	                     int pointer,
-	                     DragAndDrop.Payload payload,
-	                     DragAndDrop.Target target) {
-					if (target != null) {
-						//((Table) this.getActor());
-					}
 				}
 				
 			});
@@ -105,12 +82,14 @@ public class InventoryUi {
 					Table slot = ((Table) this.getActor());
 					if (slot.getCells().size != 0) {
 						Cell<Actor> targetloc = (Cell<Actor>) slot.getCells().get(0);
-						if (targetloc.getActor() == null) {
+						System.out.println(targetloc);
+						System.out.println(targetloc.getActor());
+						//if (targetloc.getActor() == null) {
 							System.out.println("Sucessfully droped obj");
 							targetloc.setActor((Actor) payload.getObject());
-						} else {
-							System.out.println("Failed to drop obj, target allready  had a " + targetloc.getActor() + " in it");
-						}
+						//} else {
+						//	System.out.println("Failed to drop obj, target allready  had a " + targetloc.getActor() + " in it");
+						//}
 					} else {
 						slot.add((Actor) payload.getObject());
 					}
