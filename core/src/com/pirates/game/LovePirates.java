@@ -102,7 +102,7 @@ public class LovePirates extends ApplicationAdapter {
 	static ShipGen bossShipGen;
 	static Vector2 UI_POS1;
 	static Vector2 UI_POS2;
-	//static InventoryUi inventoryUi;
+	static InventoryUi inventoryUi;
 
 	//static BodyDef bodyDef = new BodyDef();
 	//static FixtureDef fixtureDef = new FixtureDef();
@@ -241,7 +241,7 @@ public class LovePirates extends ApplicationAdapter {
         
         lootScreen = new LootScreen(skin, stage);
         mainMenu = new MainMenuOverlay(skin, stage);        
-        //inventoryUi = new InventoryUi(skin, stage);
+        inventoryUi = new InventoryUi(skin, stage);
         makeNewWorld();
 	
 		batch = new SpriteBatch();
