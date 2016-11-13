@@ -19,6 +19,9 @@ abstract class ShipGen {
 	static float clampGauss(float mean, float sd, float min) {
 		return (float) Math.max(min, helperGauss(mean, sd));
 	}
+	static float clampGauss(float mean, float sd, float min, float max) {
+		return (float) Math.min(Math.max(min, helperGauss(mean, sd)), max);
+	}
 	static int[] partition(int sum, int num, int min) {
 		int[] result = new int[num];
 		for (int i = 0; i < num; ++i) {
